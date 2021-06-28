@@ -36,7 +36,13 @@ extern	char		far signon;
 
 #ifndef SPEAR
 
+// *** SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
+// Include GFXV_APO.H instead of GFXV_WL6.H
+#ifdef GOODTIMES
 #include "GFXV_WL6.H"
+#else
+#include "GFXV_APO.H"
+#endif
 #include "AUDIOWL6.H"
 #include "MAPSWL6.H"
 
@@ -99,8 +105,14 @@ void	Quit (char *error);		// defined in user program
 // replacing refresh manager with custom routines
 //
 
+// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+#define	PORTTILESWIDE		22
+#define	PORTTILESHIGH		14
+#else
 #define	PORTTILESWIDE		20      // all drawing takes place inside a
 #define	PORTTILESHIGH		13		// non displayed port of this size
+#endif
 
 #define UPDATEWIDE			PORTTILESWIDE
 #define UPDATEHIGH			PORTTILESHIGH

@@ -212,7 +212,13 @@ asm	mov	[WORD PTR XMSDriver+2],es		// function pointer to XMS driver
 
 	XMS_CALL(XMS_QUERYFREE);			// Find out how much XMS is available
 	XMSAvail = _AX;
+	// *** PRE-V1.4 APOGEE + SOD (DEMO) V1.0 RESTORATION ***
+	// What preceded bugfix?
+#ifdef GAMEVER_RESTORATION_ANY_ALL_PRE14
+	if (_BL)
+#else
 	if (!_AX)				// AJR: bugfix 10/8/92
+#endif
 		goto error;
 
 	XMSAvail &= ~(PMPageSizeKB - 1);	// Round off to nearest page size
@@ -223,7 +229,13 @@ asm	mov	[WORD PTR XMSDriver+2],es		// function pointer to XMS driver
 	XMS_CALL(XMS_ALLOC);				// And do the allocation
 	XMSHandle = _DX;
 
+	// *** PRE-V1.4 APOGEE + SOD (DEMO) V1.0 RESTORATION ***
+	// What preceded bugfix?
+#ifdef GAMEVER_RESTORATION_ANY_ALL_PRE14
+	if (_BL)
+#else
 	if (!_AX)				// AJR: bugfix 10/8/92
+#endif
 	{
 		XMSAvail = 0;
 		goto error;
@@ -895,7 +907,12 @@ asm	out	dx,al
 	{
 		boolean mainonly = (pagenum >= PMSoundStart);
 if (!PMPages[pagenum].offset)	// JDC: sparse page
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	return 0;
+#else
 	Quit ("Tried to load a sparse page!");
+#endif
 		if (!(result = PML_GetPageFromXMS(pagenum,mainonly)))
 		{
 			if (PMPages[pagenum].lastHit == PMFrameCount)

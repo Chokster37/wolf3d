@@ -422,11 +422,14 @@ void PageLayout (boolean shownumber)
 // clear the screen
 //
 	VWB_Bar (0,0,320,200,BACKCOLOR);
+	// *** SOD V1.4 ACTIVISION RESTORATION ***
+	// Although none of WL_TEXT.C should even be used...
+#ifndef SPEAR
 	VWB_DrawPic (0,0,H_TOPWINDOWPIC);
 	VWB_DrawPic (0,8,H_LEFTWINDOWPIC);
 	VWB_DrawPic (312,8,H_RIGHTWINDOWPIC);
 	VWB_DrawPic (8,176,H_BOTTOMINFOPIC);
-
+#endif
 
 	for (i=0;i<TEXTROWS;i++)
 	{
@@ -478,24 +481,45 @@ void PageLayout (boolean shownumber)
 
 	if (shownumber)
 	{
+		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
+		// Micro difference - where/when to set px and py...
 		#ifdef SPANISH
 		strcpy (str,"Hoja ");
 		itoa (pagenum,str2,10);
 		strcat (str,str2);
 		strcat (str," de ");
+		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
+		// Pick location based on version
+		#ifdef GAMEVER_RESTORATION_ANY_POST_GT114
 		py = 183;
 		px = 208;
+		#endif
 		#else
 		strcpy (str,"pg ");
 		itoa (pagenum,str2,10);
 		strcat (str,str2);
 		strcat (str," of ");
+		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
+		// Pick location based on version
+		#ifdef GAMEVER_RESTORATION_ANY_POST_GT114
 		py = 183;
 		px = 213;
+		#endif
 		#endif
 		itoa (numpages,str2,10);
 		strcat (str,str2);
 		fontcolor = 0x4f; 			   //12^BACKCOLOR;
+		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
+		// Pick location based on version
+		#ifndef GAMEVER_RESTORATION_ANY_POST_GT114
+		#ifdef SPANISH
+		py = 183;
+		px = 208;
+		#else
+		py = 183;
+		px = 213;
+		#endif
+		#endif
 
 		VWB_DrawPropString (str);
 	}
@@ -558,10 +582,14 @@ void CacheLayoutGraphics (void)
 				numpages++;
 			if (ch == 'E')		// end of file, so load graphics and return
 			{
+				// *** SOD 1.4 ACTIVISION RESTORATION ***
+				// Although none of WL_TEXT.C should even be used...
+#ifndef SPEAR
 				CA_MarkGrChunk(H_TOPWINDOWPIC);
 				CA_MarkGrChunk(H_LEFTWINDOWPIC);
 				CA_MarkGrChunk(H_RIGHTWINDOWPIC);
 				CA_MarkGrChunk(H_BOTTOMINFOPIC);
+#endif
 				CA_CacheMarks ();
 				text = textstart;
 				return;
@@ -711,8 +739,11 @@ void ShowArticle (char far *article)
 			break;
 		}
 
-		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("goobers"))
+		// *** APOGEE VERSIONS RESTORATION ***
+		// This is also skipped in the Shareware 1.4 Apogee EXE
+		#if (!defined SPEAR) && (defined GOODTIMES)
+		//#ifndef SPEAR
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
 			PicturePause();
 		#endif
 
@@ -727,10 +758,16 @@ void ShowArticle (char far *article)
 
 #ifndef JAPAN
 #ifdef ARTSEXTERN
+// *** PRE-V1.4 APOGEE RESTORATION *** - Change the the order of appearances endextern and helpextern in the v1.2 EXE's layout (and SPEAR wasn't ready for that)
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+int		helpextern = T_HELPART;
+int 	endextern = T_ENDART1;
+#else
 int 	endextern = T_ENDART1;
 #ifndef SPEAR
 int		helpextern = T_HELPART;
 #endif
+#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 #endif
 char helpfilename[13] = "HELPART.",
 	 endfilename[13] = "ENDART1.";
@@ -785,7 +822,12 @@ void HelpScreens (void)
 
 
 
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	MenuFadeOut();
+#else
 	VW_FadeOut();
+#endif
 
 	FreeMusic ();
 	CA_DownLevel ();
@@ -806,6 +848,10 @@ void EndText (void)
 
 	ClearMemory ();
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	ResetSplitScreen ();
+#endif
 	CA_UpLevel ();
 	MM_SortMem ();
 #ifdef JAPAN
@@ -826,7 +872,12 @@ void EndText (void)
 
 
 #ifdef ARTSEXTERN
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	artnum = endextern;
+#else
 	artnum = endextern+gamestate.episode;
+#endif
 	CA_CacheGrChunk (artnum);
 	text = (char _seg *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
@@ -846,7 +897,12 @@ void EndText (void)
 #endif
 
 
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	MenuFadeOut();
+#else
 	VW_FadeOut();
+#endif
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
 	if (MousePresent)

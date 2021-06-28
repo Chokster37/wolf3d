@@ -117,7 +117,10 @@ void	VL_SetVGAPlaneMode (void)
 asm	mov	ax,0x13
 asm	int	0x10
 	VL_DePlaneVGA ();
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 	VGAMAPMASK(15);
+#endif
 	VL_SetLineWidth (40);
 }
 
@@ -825,15 +828,25 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 
 void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y)
 {
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	byte    far *screen,far *maskptr,far *dest,mask;
+#else
 	byte    far *screen,far *dest,mask;
 	byte	far *maskptr;
+#endif
 	int		plane;
 
 	width>>=2;
 	dest = MK_FP(SCREENSEG,bufferofs+ylookup[y]+(x>>2) );
 //	mask = 1 << (x&3);
 
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	maskptr = source;
+#else
 //	maskptr = source;
+#endif
 
 	for (plane = 0; plane<4; plane++)
 	{

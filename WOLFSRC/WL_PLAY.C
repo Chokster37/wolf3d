@@ -22,6 +22,10 @@
 =============================================================================
 */
 
+// *** PRE-V1.4 APOGEE RESTORATION *** - There were apparently some unused variable here
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+boolean		unusedplayvar;
+#endif
 boolean		madenoise;					// true when shooting or screaming
 
 exit_t		playstate;
@@ -152,6 +156,8 @@ int songs[]=
  ULTIMATE_MUS,	// Boss level
  PACMAN_MUS,	// Secret level
 
+ // *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
  //
  // Episode Four
  //
@@ -196,6 +202,7 @@ int songs[]=
 
  ULTIMATE_MUS,	// Boss level
  FUNKYOU_MUS		// Secret level
+#endif // GAMEVER_RESTORATION_WL1_APO10
 #else
 
  //////////////////////////////////////////////////////////////
@@ -457,6 +464,8 @@ void PollControls (void)
 	int		max,min,i;
 	byte	buttonbits;
 
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 //
 // get timing info for last frame
 //
@@ -481,6 +490,7 @@ void PollControls (void)
 	}
 	else
 		CalcTics ();
+#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 
 	controlx = 0;
 	controly = 0;
@@ -501,6 +511,14 @@ void PollControls (void)
 
 		controlx = *demoptr++;
 		controly = *demoptr++;
+		// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+		tics = *demoptr++;
+
+		while (tics > TimeCount - lasttimecount);
+
+		lasttimecount = TimeCount;
+#endif
 
 		if (demoptr == lastdemoptr)
 			playstate = ex_completed;		// demo is done
@@ -511,6 +529,10 @@ void PollControls (void)
 		return;
 	}
 
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	CalcTics();
+#endif
 
 //
 // get button states
@@ -569,6 +591,10 @@ void PollControls (void)
 		*demoptr++ = buttonbits;
 		*demoptr++ = controlx;
 		*demoptr++ = controly;
+		// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+		*demoptr++ = tics;
+#endif
 
 		if (demoptr >= lastdemoptr)
 			Quit ("Demo buffer overflowed!");
@@ -646,7 +672,10 @@ void CheckKeys (void)
 
 		IN_Ack();
 		godmode ^= 1;
+		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 		DrawAllPlayBorderSides ();
+#endif
 		IN_ClearKeysDown();
 		return;
 	}
@@ -689,17 +718,38 @@ void CheckKeys (void)
 		IN_ClearKeysDown();
 		IN_Ack();
 
+		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+		for (i=0;i<3;i++)
+		{
+			bufferofs = screenloc[i];
+			DrawPlayBorderSides ();
+		}
+#else
 		DrawAllPlayBorder ();
+#endif
 	}
 
 	//
 	// OPEN UP DEBUG KEYS
 	//
 #ifndef SPEAR
+		// *** PRE-V1.4 (INCLUDING V1.0) APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	if (Keyboard[sc_Tab] &&
+		Keyboard[sc_Control] &&
+		Keyboard[sc_Enter] &&
+#else
 	if (Keyboard[sc_BackSpace] &&
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+		Keyboard[sc_Alt] &&
+		Keyboard[sc_LShift] &&
+#else
 		Keyboard[sc_LShift] &&
 		Keyboard[sc_Alt] &&
-		MS_CheckParm("goobers"))
+#endif
+#endif // GAMEVER_RESTORATION_WL1_APO10
+		MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
 #else
 	if (Keyboard[sc_BackSpace] &&
 		Keyboard[sc_LShift] &&
@@ -718,7 +768,16 @@ void CheckKeys (void)
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	for (i=0;i<3;i++)
+	{
+		bufferofs = screenloc[i];
+		DrawPlayBorderSides ();
+	}
+#else
 	 DrawAllPlayBorderSides ();
+#endif
 	 DebugOk=1;
 	}
 
@@ -744,7 +803,16 @@ void CheckKeys (void)
 	 IN_ClearKeysDown();
 	 IN_Ack();
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	for (i=0;i<3;i++)
+	{
+		bufferofs = screenloc[i];
+		DrawPlayBorderSides ();
+	}
+#else
 	 DrawAllPlayBorder ();
+#endif
 	}
 
 //
@@ -781,7 +849,16 @@ void CheckKeys (void)
 		VW_ScreenToScreen (displayofs,bufferofs,80,160);
 		US_ControlPanel(scan);
 
+		 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+		 for (i=0;i<3;i++)
+		 {
+			 bufferofs = screenloc[i];
+			 DrawPlayBorderSides ();
+		 }
+#else
 		 DrawAllPlayBorderSides ();
+#endif
 
 		if (scan == sc_F9)
 		  StartMusic ();
@@ -797,6 +874,10 @@ void CheckKeys (void)
 		StopMusic ();
 		ClearMemory ();
 		VW_FadeOut ();
+		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+		ResetSplitScreen ();
+#endif
 
 		US_ControlPanel(scan);
 
@@ -870,7 +951,10 @@ next element.
 =========================
 */
 
+// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 int	objcount;
+#endif
 
 void InitActorList (void)
 {
@@ -890,7 +974,10 @@ void InitActorList (void)
 	objfreelist = &objlist[0];
 	lastobj = NULL;
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 	objcount = 0;
+#endif
 
 //
 // give the player the first free spots
@@ -932,7 +1019,10 @@ void GetNewActor (void)
 	new->active = false;
 	lastobj = new;
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 	objcount++;
+#endif
 }
 
 //===========================================================================
@@ -955,7 +1045,10 @@ void RemoveObj (objtype *gone)
 	if (gone == player)
 		Quit ("RemoveObj: Tried to remove the player!");
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 	gone->state = NULL;
+#endif
 
 //
 // fix the next object's back link
@@ -976,7 +1069,10 @@ void RemoveObj (objtype *gone)
 	gone->prev = objfreelist;
 	objfreelist = gone;
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 	objcount--;
+#endif
 }
 
 /*
@@ -1264,7 +1360,12 @@ void DoActor (objtype *ob)
 	if (!ob->active && !areabyplayer[ob->areanumber])
 		return;
 
+// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	if (ob != player)
+#else
 	if (!(ob->flags&(FL_NONMARK|FL_NEVERMARK)) )
+#endif
 		actorat[ob->tilex][ob->tiley] = NULL;
 
 //
@@ -1284,6 +1385,15 @@ void DoActor (objtype *ob)
 			}
 		}
 
+		// *** PRE-V1.4 APOGEE RESTORATION *** - Including special case for v1.0
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+		if (ob != player)
+			actorat[ob->tilex][ob->tiley] = ob;
+#elif defined GAMEVER_RESTORATION_ANY_APO_PRE14
+		if (!(ob->flags&FL_NEVERMARK))
+			if ( !((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley]))
+				actorat[ob->tilex][ob->tiley] = ob;
+#else
 		if (ob->flags&FL_NEVERMARK)
 			return;
 
@@ -1291,6 +1401,7 @@ void DoActor (objtype *ob)
 			return;
 
 		actorat[ob->tilex][ob->tiley] = ob;
+#endif
 		return;
 	}
 
@@ -1343,6 +1454,17 @@ think:
 		}
 	}
 
+	// *** PRE-V1.4 APOGEE RESTORATION *** - Including special case for v1.0
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+	if (ob != player)
+		actorat[ob->tilex][ob->tiley] = ob;
+	return;
+#elif defined GAMEVER_RESTORATION_ANY_APO_PRE14
+	if (!(ob->flags&FL_NEVERMARK))
+		if ( !((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley]))
+			actorat[ob->tilex][ob->tiley] = ob;
+	return;
+#else
 	if (ob->flags&FL_NEVERMARK)
 		return;
 
@@ -1350,6 +1472,7 @@ think:
 		return;
 
 	actorat[ob->tilex][ob->tiley] = ob;
+#endif
 }
 
 //==========================================================================
@@ -1362,31 +1485,50 @@ think:
 =
 ===================
 */
+
+// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 long funnyticount;
+#endif
 
 
 void PlayLoop (void)
 {
 	int		give;
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	int	helmetangle;
+#endif
 
 	playstate = TimeCount = lasttimecount = 0;
 	frameon = 0;
 	running = false;
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	pwallstate = anglefrac = 0;
+	facecount = 0;
+#else
 	anglefrac = 0;
 	facecount = 0;
 	funnyticount = 0;
+#endif
 	memset (buttonstate,0,sizeof(buttonstate));
 	ClearPaletteShifts ();
 
 	if (MousePresent)
 		Mouse(MDelta);	// Clear accumulated mouse movement
 
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+	tics = 1;
+#endif
 	if (demoplayback)
 		IN_StartAck ();
 
 	do
 	{
+		// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 		if (virtualreality)
 		{
 			helmetangle = peek (0x40,0xf0);
@@ -1394,6 +1536,7 @@ void PlayLoop (void)
 			if (player->angle >= ANGLES)
 				player->angle -= ANGLES;
 		}
+#endif
 
 
 		PollControls();
@@ -1436,6 +1579,15 @@ void PlayLoop (void)
 
 		CheckKeys();
 
+		// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+		if (demoplayback)
+		{
+			if (demoptr == lastdemoptr)
+				playstate = ex_demodone;
+		}
+#endif
+
 //
 // debug aids
 //
@@ -1457,12 +1609,15 @@ void PlayLoop (void)
 		}
 
 
+		// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 		if (virtualreality)
 		{
 			player->angle -= helmetangle;
 			if (player->angle < 0)
 				player->angle += ANGLES;
 		}
+#endif
 
 	}while (!playstate && !startgame);
 

@@ -66,9 +66,21 @@
 
 #define	STR_LEFT	"Left"
 #define	STR_RIGHT	"Right"
+// *** APOGEE+FORMGEN VERSIONS RESTORATION ***
+// There was a typo fix
+#ifdef GOODTIMES
 #define	STR_FRWD	"Frwd"
+#else
+#define	STR_FRWD	"Fwrd"
+#endif
+
 #define	STR_BKWD	"Bkwrd"
+// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#define	STR_THINK	"Computing"
+#else
 #define	STR_THINK	"Thinking"
+#endif
 
 #define STR_SIZE1	"Use arrows to size"
 #define STR_SIZE2	"ENTER to accept"
@@ -107,4 +119,3 @@
 #define STR_SAVECHT4	"play anyway...."
 
 #define	STR_SEEAGAIN	"Let's see that again!"
-

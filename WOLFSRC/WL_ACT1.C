@@ -98,7 +98,12 @@ struct
 #endif
 {SPR_STAT_45,block},			// stove           " (SOD:gibs)
 {SPR_STAT_46,block},			// spears          " (SOD:gibs)
+// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef GAMEVER_RESTORATION_WL1_APO10
+{SPR_STAT_47,block},				// vines			"
+#else
 {SPR_STAT_47},					// vines			"
+#endif
 //
 // NEW PAGE
 //
@@ -165,13 +170,19 @@ void SpawnStatic (int tilex, int tiley, int type)
 	case	bo_key3:
 	case	bo_key4:
 	case	bo_clip:
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	case	bo_25clip:
+#endif
 	case	bo_machinegun:
 	case	bo_chaingun:
 	case	bo_food:
 	case	bo_alpo:
 	case	bo_gibs:
+	// *** PRE-V1.4 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	case	bo_spear:
+#endif
 		laststatobj->flags = FL_BONUS;
 		laststatobj->itemnumber = statinfo[type].type;
 		break;
@@ -687,8 +698,11 @@ void MoveDoors (void)
 {
 	int		door;
 
+	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifndef GAMEVER_RESTORATION_WL1_APO10
 	if (gamestate.victoryflag)		// don't move door during victory sequence
 		return;
+#endif
 
 	for (door = 0 ; door < doornum ; door++)
 		switch (doorobjlist[door].action)
