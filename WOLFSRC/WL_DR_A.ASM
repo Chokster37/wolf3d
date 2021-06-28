@@ -2,6 +2,8 @@
 	MODEL	MEDIUM,C
 	P286
 
+MORE_DOORS	=	1
+
 SCREENSEG	=	0a000h
 
 FINEANGLES	=	3600
@@ -539,8 +541,13 @@ horizdoor:
 	mov	[xtile],bx					; save off live register variables
 	mov	[WORD yintercept+2],dx
 
+IF MORE_DOORS
+	cmp    al,255
+	je   horizpushwall
+ELSE
 	test al,040h      				; both high bits set == pushable wall
 	jnz	horizpushwall
+ENDIF
 
 	mov	bx,ax
 	and	bx,7fh						; strip high bit
@@ -641,8 +648,13 @@ vertdoor:
 	mov	[xtile],bx					; save off live register variables
 	mov	[WORD yintercept+2],dx
 
+IF MORE_DOORS
+	cmp   al,255
+	je   vertpushwall
+ELSE
 	test al,040h      				; both high bits set == pushable wall
 	jnz	vertpushwall
+ENDIF
 
 	mov	bx,ax
 	and	bx,7fh						; strip high bit

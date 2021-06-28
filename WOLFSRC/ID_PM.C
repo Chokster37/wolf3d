@@ -16,7 +16,11 @@
 //	EMS specific variables
 	boolean			EMSPresent;
 	word			EMSAvail,EMSPagesAvail,EMSHandle,
+#ifdef KEEP_UNUSED
 					EMSPageFrame,EMSPhysicalPage;
+#else
+					EMSPageFrame;
+#endif
 	EMSListStruct	EMSList[EMSFrameCount];
 
 //	XMS specific variables
@@ -1136,7 +1140,9 @@ PM_Reset(void)
 	XMSPagesAvail = XMSAvail / PMPageSizeKB;
 
 	EMSPagesAvail = EMSAvail * (EMSPageSizeKB / PMPageSizeKB);
+#ifdef KEEP_UNUSED
 	EMSPhysicalPage = 0;
+#endif
 
 	MainPagesUsed = EMSPagesUsed = XMSPagesUsed = 0;
 

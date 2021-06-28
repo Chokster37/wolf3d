@@ -223,7 +223,11 @@ menuitems
 //
 typedef struct {
 		int kill,secret,treasure;
+	#ifdef KEEP_STRUCT
 		long time;
+	#else
+		int time;	// only goes up to 99:00 (5940)
+	#endif
 		} LRstruct;
 
 extern LRstruct LevelRatios[];

@@ -4,6 +4,8 @@
 #pragma hdrstop
 #include <BIOS.H>
 
+#ifdef KEEP_DEBUG
+
 /*
 =============================================================================
 
@@ -34,12 +36,13 @@ int DebugKeys (void);
 =============================================================================
 */
 
-
+#ifdef KEEP_UNUSED
 int	maporgx;
 int	maporgy;
 enum {mapview,tilemapview,actoratview,visview}	viewtype;
 
 void ViewMap (void);
+#endif
 
 //===========================================================================
 
@@ -236,7 +239,7 @@ static	char	buf[10];
 	int				i,j,k,x;
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 	// Define sound variable in pre-v1.4 Apogee releases
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
 	int sound;
 #endif
 	longword		l;
@@ -250,7 +253,7 @@ static	char	buf[10];
 		US_ClearWindow();
 		// *** PRE-V1.4 APOGEE RESTORATION ***
 		// Do set sound in pre-v1.4 Apogee releases
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
 		sound = -1;
 #else
 //		sound = -1;
@@ -351,7 +354,7 @@ static	char	buf[10];
 				{
 					// *** PRE-V1.4 APOGEE RESTORATION ***
 					// Do set sound in pre-v1.4 Apogee releases
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
 					sound = j;
 #else
 //					sound = j;
@@ -649,7 +652,7 @@ int DebugKeys (void)
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
 // Do compile this in pre-v1.4, even if it's never called
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
 //#if 0
 /*
 ===================
@@ -785,3 +788,4 @@ void ViewMap (void)
 }
 #endif
 
+#endif // KEEP_DEBUG

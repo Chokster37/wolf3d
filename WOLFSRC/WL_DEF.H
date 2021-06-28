@@ -46,9 +46,17 @@
 =============================================================================
 */
 
+#ifndef MORE_STUFF
 #define MAXACTORS		150				// max number of nazis, etc / map
 #define MAXSTATS		400				// max number of lamps, bonus, etc
+#endif
+
+#ifndef MORE_DOORS
 #define MAXDOORS		64				// max number of sliding doors
+#else
+#define MOVINGTILE	255
+#endif
+
 #define MAXWALLTILES	64				// max number of wall tiles
 
 //
@@ -94,7 +102,15 @@
 #define MINACTORDIST	0x10000l		// minimum dist from player center
 										// to any actor center
 
+#ifdef KEEP_UNUSED
 #define NUMLATCHPICS	100
+#else
+	#ifdef SPEAR
+	#define NUMLATCHPICS	51
+	#else
+	#define NUMLATCHPICS	46
+	#endif
+#endif
 
 
 #define PI	3.141592657
@@ -611,7 +627,7 @@ typedef enum {
 
 
 // *** APOGEE VERSIONS RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
+#if (!defined KEEP_WOLFWL6) || (defined GAMEVER_RESTORATION_WL1_APO10)
 #define NUMENEMIES		13
 #elif defined GAMEVER_RESTORATION_ANY_APO_PRE14
 #define NUMENEMIES		16
@@ -683,7 +699,11 @@ typedef struct statstruct
 typedef struct doorstruct
 {
 	byte	tilex,tiley;
+#ifdef KEEP_STRUCT
 	boolean	vertical;
+#else
+	byte	vertical;
+#endif
 	byte	lock;
 	enum	{dr_open,dr_closed,dr_opening,dr_closing}	action;
 	int		ticcount;
@@ -698,29 +718,51 @@ typedef struct doorstruct
 
 typedef struct objstruct
 {
+#ifdef KEEP_STRUCT
 	activetype	active;
 	int			ticcount;
 	classtype	obclass;
 	statetype	*state;
 
 	byte		flags;				//	FL_SHOOTABLE, etc
+#else
+	char		active,obclass;
+	byte		dir,tilex,tiley,flags;
+	char		temp1,temp2;
+	int		speed,ticcount;
+	statetype	*state;
+#endif
 
 	long		distance;			// if negative, wait for that door to open
+#ifdef KEEP_STRUCT
 	dirtype		dir;
+#endif
 
 	fixed 		x,y;
+#ifdef KEEP_STRUCT
 	unsigned	tilex,tiley;
+#endif
 	byte		areanumber;
 
 	int	 		viewx;
 	unsigned	viewheight;
-	fixed		transx,transy;		// in global coord
+	fixed		transx;
+#ifdef KEEP_UNUSED
+	fixed		transy;		// in global coord
+#endif
 
 	int 		angle;
 	int			hitpoints;
+#ifdef KEEP_STRUCT
 	long		speed;
 
-	int			temp1,temp2,temp3;
+	int			temp1,temp2;
+#endif
+
+#ifdef KEEP_UNUSED
+	int temp3;
+#endif
+
 	struct		objstruct	*next,*prev;
 } objtype;
 
@@ -958,7 +1000,10 @@ extern	statobj_t	statobjlist[MAXSTATS],*laststatobj;
 extern	doorobj_t	doorobjlist[MAXDOORS],*lastdoorobj;
 
 extern	unsigned	farmapylookup[MAPSIZE];
+
+#ifdef KEEP_UNUSED
 extern	byte		*nearmapylookup[MAPSIZE];
+#endif
 
 extern	byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 extern	byte		spotvis[MAPSIZE][MAPSIZE];
@@ -1162,7 +1207,11 @@ boolean	CheckSight (objtype *ob);
 typedef struct
 {
 	unsigned	codeofs[65];
+#ifdef KEEP_STRUCT
 	unsigned	width[65];
+#else
+	byte		width[65];
+#endif
 	byte		code[];
 }	t_compscale;
 
@@ -1257,7 +1306,11 @@ extern	boolean		areabyplayer[NUMAREAS];
 extern unsigned	pwallstate;
 extern unsigned	pwallpos;			// amount a pushable wall has been moved (0-63)
 extern unsigned	pwallx,pwally;
+#ifdef MORE_DOORS
+extern byte	pwalltile, pwalldir;
+#else
 extern int			pwalldir;
+#endif
 
 
 // *** PRE-V1.4 APOGEE RESTORATION ***

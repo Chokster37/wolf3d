@@ -9,6 +9,8 @@
 
 	INCLUDE 'ID_SD.EQU'
 
+PTABLE	=	0
+
 DEBUG	=	0
 
 	EXTRN	SDL_DigitizedDone:FAR
@@ -30,7 +32,9 @@ DATASEG
 	EXTRN	pcSound:DWORD
 	EXTRN	pcLengthLeft:WORD
 	EXTRN	pcLastSample:BYTE
+IF PTABLE
 	EXTRN	pcSoundLookup:WORD
+ENDIF
 
 	EXTRN	alSound:DWORD
 	EXTRN	alBlock:WORD
@@ -60,6 +64,7 @@ DATASEG
 count_time	dw	?
 count_fx	dw	?
 
+IF PTABLE
 pcdtab	db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
 		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
 		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
@@ -76,6 +81,7 @@ pcdtab	db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
 		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
 		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
 		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
+ENDIF
 
 
 ;============================================================================
@@ -139,9 +145,12 @@ extreme		dw	?
 	or	bl,bl
 	jz	@@pcoff						; If 0, turn sounds off
 	xor	bh,bh
+IF PTABLE
 	shl	bx,1
 	mov	bx,[pcSoundLookup+bx]		; Use byte as index into frequency table
-
+ELSE
+	imul	bx,60		; Ripper
+ENDIF
 	mov	al,0b6h						; Write to channel 2 (speaker) timer
 	out	pcTAccess,al
 	mov	al,bl
@@ -299,6 +308,7 @@ extreme		dw	?
 	mov	bl,[es:di]					; Get the byte
 	inc	[WORD PTR pcSound]			; Increment pointer
 
+IF PTABLE
 	and	bl,11100000b				; Nuke some of the precision (DEBUG - do this in the table)
 
 	xor	bh,bh
@@ -307,6 +317,14 @@ extreme		dw	?
 	in	al,pcSpeaker
 	and	al,11111100b
 	or	al,ah
+ELSE
+	shr	bl,6		; Ripper
+	and	bl,2
+
+	in	al,pcSpeaker
+	and	al,11111100b
+	or	al,bl
+ENDIF
 	out	pcSpeaker,al
 
 	dec	[pcLengthLeft]

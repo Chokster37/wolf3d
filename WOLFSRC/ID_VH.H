@@ -128,7 +128,16 @@ boolean 	FizzleFade (unsigned source, unsigned dest,
 	unsigned width,unsigned height, unsigned frames,boolean abortable);
 
 
+#ifdef KEEP_UNUSED
 #define NUMLATCHPICS	100
+#else
+	#ifdef SPEAR
+	#define NUMLATCHPICS	51
+	#else
+	#define NUMLATCHPICS	46
+	#endif
+#endif
+
 extern	unsigned	latchpics[NUMLATCHPICS];
 extern	unsigned freelatch;
 

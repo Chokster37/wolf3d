@@ -96,9 +96,11 @@ boolean		bombonerror;
 
 //unsigned	totalEMSpages,freeEMSpages,EMSpageframe,EMSpagesmapped,EMShandle;
 
+#ifdef KEEP_UNUSED
 void		(* XMSaddr) (void);		// far pointer to XMS driver
 
 unsigned	numUMBs,UMBbase[MAXUMBS];
+#endif
 
 //==========================================================================
 
@@ -125,6 +127,8 @@ void 		MML_ClearBlock (void);
 =
 =======================
 */
+
+#ifdef KEEP_UNUSED
 
 boolean MML_CheckForXMS (void)
 {
@@ -219,6 +223,8 @@ asm	mov	dx,[base]
 asm	call	[DWORD PTR XMSaddr]
 	}
 }
+
+#endif
 
 //==========================================================================
 
@@ -774,6 +780,8 @@ void MM_SortMem (void)
 =====================
 */
 
+#ifdef KEEP_UNUSED
+
 void MM_ShowMemory (void)
 {
 	mmblocktype far *scan;
@@ -814,6 +822,8 @@ void MM_ShowMemory (void)
 	bufferofs = temp;
 }
 
+#endif
+
 // *** SHAREWARE V1.0 APOGEE RESTORATION *** (but looks unused in ALL versions)
 #ifndef GAMEVER_RESTORATION_WL1_APO10
 //==========================================================================
@@ -825,6 +835,8 @@ void MM_ShowMemory (void)
 =
 =====================
 */
+
+#ifdef KEEP_UNUSED
 
 void MM_DumpData (void)
 {
@@ -879,10 +891,15 @@ void MM_DumpData (void)
 	fclose (dumpfile);
 	Quit ("MMDUMP.TXT created.");
 }
+
+#endif
+
 #endif // GAMEVER_RESTORATION_WL1_APO10
 
 //==========================================================================
 
+
+#ifdef KEEP_DEBUG
 
 /*
 ======================
@@ -942,6 +959,8 @@ long MM_TotalFree (void)
 
 	return free*16l;
 }
+
+#endif
 
 //==========================================================================
 

@@ -373,7 +373,7 @@ void PG13 (void)
 {
 	VW_FadeOut();
 	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && !defined(BUGFIX_02)
 	VWB_Bar(0,0,319,200,0x82);			// background
 #else
 	VWB_Bar(0,0,320,200,0x82);			// background
@@ -523,6 +523,7 @@ void LevelCompleted (void)
 	unsigned	temp;
 	char tempstr[10];
 	long bonus,timeleft=0;
+#ifdef KEEP_STRING
 	times parTimes[]=
 	{
 	 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
@@ -767,6 +768,112 @@ void LevelCompleted (void)
 #endif
 #endif // GAMEVER_RESTORATION_WL1_APO10
 	};
+#else
+	float parTimes[]=
+	{
+    #ifndef SPEAR
+	 //
+	 // Episode One Par Times
+	 //
+	 1.5,	// "01:30"
+	 2,	// "02:00"
+	 2,	// "02:00"
+	 3.5,	// "03:30"
+	 3,	// "03:00"
+	 3,	// "03:00"
+	 2.5,	// "02:30"
+	 2.5,	// "02:30"
+
+	 //
+	 // Episode Two Par Times
+	 //
+	 1.5,	// "01:30"
+	 3.5,	// "03:30"
+	 3,	// "03:00"
+	 2,	// "02:00"
+	 4,	// "04:00"
+	 6,	// "06:00"
+	 1,	// "01:00"
+	 3,	// "03:00"
+
+	 //
+	 // Episode Three Par Times
+	 //
+	 1.5,	// "01:30"
+	 1.5,	// "01:30"
+	 2.5,	// "02:30"
+	 2.5,	// "02:30"
+	 3.5,	// "03:30"
+	 2.5,	// "02:30"
+	 2,	// "02:00"
+	 6	// "06:00"
+
+       #ifdef KEEP_WOLFWL6
+	 ,
+	 //
+	 // Episode Four Par Times
+	 //
+	 2,	// "02:00"
+	 2,	// "02:00"
+	 1.5,	// "01:30"
+	 1,	// "01:00"
+	 4.5,	// "04:30"
+	 3.5,	// "03:30"
+	 2,	// "02:00"
+	 4.5,	// "04:30"
+
+	 //
+	 // Episode Five Par Times
+	 //
+	 2.5,	// "02:30"
+	 1.5,	// "01:30"
+	 2.5,	// "02:30"
+	 2.5,	// "02:30"
+	 4,	// "04:00"
+	 3,	// "03:00"
+	 4.5,	// "04:30"
+	 3.5,	// "03:30"
+
+	 //
+	 // Episode Six Par Times
+	 //
+	 6.5,	// "06:30"
+	 4,	// "04:00"
+	 4.5,	// "04:30"
+	 6,	// "06:00"
+	 5,	// "05:00"
+	 5.5,	// "05:30"
+	 5.5,	// "05:30"
+	 8.5	// "08:30"
+       #endif
+    #else
+	 //
+	 // SPEAR OF DESTINY TIMES
+	 //
+	 1.5,	// "01:30"
+	 3.5	// "03:30"
+       #ifdef KEEP_SODFULL
+	 ,
+	 2.75,	// "02:45"
+	 3.5,	// "03:30"
+	 0,	// "??:??"	// Boss 1
+	 4.5,	// "04:30"
+	 3.25,	// "03:15"
+	 2.75,	// "02:45"
+	 4.75,	// "04:45"
+	 0,	// "??:??"	// Boss 2
+	 6.5,	// "06:30"
+	 4.5,	// "04:30"
+	 2.75,	// "02:45"
+	 4.5,	// "04:30"
+	 6,	// "06:00"
+	 0,	// "??:??"	// Boss 3
+	 6,	// "06:00"
+	 0	// "??:??"	// Boss 4
+       #endif
+    #endif
+	};
+#endif
 
 
 
@@ -808,6 +915,7 @@ void LevelCompleted (void)
 	 Write(16,10,STR_TIME);
 	 Write(16,12,STR_PAR);
 
+#ifdef KEEP_STRING
 	 // *** SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
 	 // Possibly relocated this, depending on version
 	#ifndef GOODTIMES
@@ -817,6 +925,23 @@ void LevelCompleted (void)
 	 Write(26,12,parTimes[gamestate.episode*10+mapon].timestr);
 	 #endif
 	#endif
+#else
+	 temp = parTimes[gamestate.episode*8+mapon]*60;
+	 min  = temp/60;
+	 sec  = temp%60;
+
+	 // PRINT PAR TIME
+	 i=26*8;
+	 VWB_DrawPic(i,12*8,L_NUM0PIC+(min/10));
+	 i+=2*8;
+	 VWB_DrawPic(i,12*8,L_NUM0PIC+(min%10));
+	 i+=2*8;
+	 Write(i/8,12,":");
+	 i+=1*8;
+	 VWB_DrawPic(i,12*8,L_NUM0PIC+(sec/10));
+	 i+=2*8;
+	 VWB_DrawPic(i,12*8,L_NUM0PIC+(sec%10));
+#endif
 
 	 #ifdef SPANISH
 	 Write(11,14,    STR_RAT2KILL);
@@ -849,6 +974,7 @@ void LevelCompleted (void)
 	 if (sec > 99*60)		// 99 minutes max
 	   sec = 99*60;
 
+#ifdef KEEP_STRINGS
 	 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
 	 if (gamestate.TimeCount<parTimes[gamestate.episode*10+mapon].time)
@@ -856,6 +982,10 @@ void LevelCompleted (void)
 #else
 	 if (gamestate.TimeCount<parTimes[gamestate.episode*10+mapon].time*4200)
 		timeleft=(parTimes[gamestate.episode*10+mapon].time*4200)/70-sec;
+#endif
+#else
+	 if (gamestate.TimeCount < temp*70)
+		timeleft = temp-sec;
 #endif
 
 	 min=sec/60;
@@ -1584,6 +1714,7 @@ void	CheckHighScore (long score,word other)
 #ifndef UPLOAD
 #ifndef SPEAR
 #ifndef JAPAN
+#if !defined(GOODTIMES) && defined(KEEP_NOTICE)
 ////////////////////////////////////////////////////////
 //
 // NON-SHAREWARE NOTICE
@@ -1627,6 +1758,7 @@ void NonShareware(void)
 	VW_FadeIn();
 	IN_Ack();
 }
+#endif
 #endif
 #endif
 #endif

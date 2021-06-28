@@ -53,7 +53,9 @@ int 	screenpage;
 #endif
 
 long 	lasttimecount;
+#ifdef KEEP_UNUSED
 long 	frameon;
+#endif
 
 unsigned	wallheight[MAXVIEWWIDTH];
 
@@ -100,12 +102,18 @@ int		lasttilehit;
 //
 // ray tracing variables
 //
-int			focaltx,focalty,viewtx,viewty;
+int			focaltx,focalty;
 
+#ifdef KEEP_UNUSED
+int			viewtx,viewty;
 int			midangle,angle;
 unsigned	xpartial,ypartial;
 unsigned	xpartialup,xpartialdown,ypartialup,ypartialdown;
 unsigned	xinttile,yinttile;
+#else
+int			midangle;
+unsigned	xpartialup,xpartialdown,ypartialup,ypartialdown;
+#endif
 
 unsigned	tilehit;
 unsigned	pixx;
@@ -255,7 +263,9 @@ void TransformActor (objtype *ob)
 // calculate perspective ratio
 //
 	ob->transx = nx;
+#ifdef KEEP_UNUSED
 	ob->transy = ny;
+#endif
 
 	if (nx<mindist)			// too close, don't overflow the divide
 	{
@@ -333,8 +343,14 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 	if (nx<mindist)			// too close, don't overflow the divide
 	{
 		*dispheight = 0;
+#ifdef BUGFIX_55
+	}
+	else
+	{
+#else
 		return false;
 	}
+#endif
 
 	*dispx = centerx + ny*scale/nx;	// DEBUG: use assembly divide
 
@@ -349,6 +365,9 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 
 	*dispheight = temp;
 
+#ifdef BUGFIX_55
+	}
+#endif
 //
 // see if it should be grabbed
 //
@@ -503,7 +522,12 @@ void HitVertWall (void)
 	}
 	wallheight[pixx] = CalcHeight();
 
+#ifdef BUGFIX_53
+	if (lastside==1 && lastintercept == xtile && lasttilehit == tilehit
+	&& !(lasttilehit & 0x40))
+#else
 	if (lastside==1 && lastintercept == xtile && lasttilehit == tilehit)
+#endif
 	{
 		// in the same wall type as last time, so check for optimized draw
 		if (texture == (unsigned)postsource)
@@ -575,7 +599,12 @@ void HitHorizWall (void)
 		texture = 0xfc0-texture;
 	wallheight[pixx] = CalcHeight();
 
+#ifdef BUGFIX_53
+	if (lastside==0 && lastintercept == ytile && lasttilehit == tilehit
+	&& !(lasttilehit & 0x40))
+#else
 	if (lastside==0 && lastintercept == ytile && lasttilehit == tilehit)
+#endif
 	{
 		// in the same wall type as last time, so check for optimized draw
 		if (texture == (unsigned)postsource)
@@ -817,7 +846,11 @@ void HitHorizPWall (void)
 		postx = pixx;
 		postwidth = 1;
 
+	    #ifdef MORE_DOORS
+		wallpic = horizwall[pwalltile];
+	    #else
 		wallpic = horizwall[tilehit&63];
+	    #endif
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
 		(unsigned)postsource = texture;
@@ -881,7 +914,11 @@ void HitVertPWall (void)
 		postx = pixx;
 		postwidth = 1;
 
+	#ifdef MORE_DOORS
+		wallpic = vertwall[pwalltile];
+	#else
 		wallpic = vertwall[tilehit&63];
+	#endif
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
 		(unsigned)postsource = texture;
@@ -977,19 +1014,22 @@ unsigned vgaCeiling[]=
 #else
  0x9898,
 #endif
-// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION *** 
+// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO11
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xd7d7,0x1d1d,0x1d1d,0x1d1d,0x1d1d,
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,
-#elif (!defined GAMEVER_RESTORATION_WL1_APO10)
+#elif (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
  0x1d1d,0x9d9d,0x2d2d,0xdddd,0xdddd,0x9d9d,0x2d2d,0x4d4d,0x1d1d,0xdddd,
  0x7d7d,0x1d1d,0x2d2d,0x2d2d,0xdddd,0xd7d7,0x1d1d,0x1d1d,0x1d1d,0x2d2d,
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xdddd,0xdddd,0x7d7d,0xdddd,0xdddd,0xdddd
 #endif
 #else
- 0x6f6f,0x4f4f,0x1d1d,0xdede,0xdfdf,0x2e2e,0x7f7f,0x9e9e,0xaeae,0x7f7f,
+ 0x6f6f,0x4f4f
+#ifdef KEEP_SODFULL
+ ,0x1d1d,0xdede,0xdfdf,0x2e2e,0x7f7f,0x9e9e,0xaeae,0x7f7f,
  0x1d1d,0xdede,0xdfdf,0xdede,0xdfdf,0xdede,0xe1e1,0xdcdc,0x2e2e,0x1d1d,0xdcdc
+#endif
 #endif
 };
 
@@ -1025,6 +1065,10 @@ asm	shr	bh,1					// half height
 asm	mov	es,[screenseg]
 asm	mov	di,[bufferofs]
 asm	mov	ax,[ceiling]
+
+#ifdef BUGFIX_57
+asm	xor	ch,ch
+#endif
 
 toploop:
 asm	mov	cl,bl
@@ -1099,7 +1143,11 @@ int	CalcRotate (objtype *ob)
 =====================
 */
 
+#ifndef MORE_STUFF
+
 #define MAXVISABLE	50
+
+#endif
 
 typedef struct
 {
@@ -1117,7 +1165,11 @@ void DrawScaleds (void)
 {
 	int 		i,j,least,numvisable,height;
 	memptr		shape;
+#ifdef BUGFIX_55
+	byte		*visspot;
+#else
 	byte		*tilespot,*visspot;
+#endif
 	int			shapenum;
 	unsigned	spotloc;
 
@@ -1174,6 +1226,11 @@ void DrawScaleds (void)
 
 		spotloc = (obj->tilex<<6)+obj->tiley;	// optimize: keep in struct?
 		visspot = &spotvis[0][0]+spotloc;
+#ifdef BUGFIX_55
+		if (*visspot     || *(visspot-1)  || *(visspot+1)
+		|| *(visspot-65) || *(visspot-64) || *(visspot-63)
+		|| *(visspot+65) || *(visspot+64) || *(visspot+63) )
+#else
 		tilespot = &tilemap[0][0]+spotloc;
 
 		//
@@ -1188,6 +1245,7 @@ void DrawScaleds (void)
 		|| ( *(visspot+65) && !*(tilespot+65) )
 		|| ( *(visspot+64) && !*(tilespot+64) )
 		|| ( *(visspot+63) && !*(tilespot+63) ) )
+#endif
 		{
 			obj->active = true;
 			TransformActor (obj);
@@ -1395,13 +1453,20 @@ void WallRefresh (void)
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
 
+#ifdef KEEP_UNUSED
 	viewtx = player->x >> TILESHIFT;
 	viewty = player->y >> TILESHIFT;
+#endif
 
 	xpartialdown = viewx&(TILEGLOBAL-1);
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = viewy&(TILEGLOBAL-1);
 	ypartialup = TILEGLOBAL-ypartialdown;
+
+#ifdef BUGFIX_57
+	if(xpartialdown==0) xpartialup=0xffff;
+	if(ypartialdown==0) ypartialup=0xffff;
+#endif
 
 	lastside = -1;			// the first pixel is on a new wall
 	AsmRefresh ();
@@ -1463,6 +1528,9 @@ asm	xor	ax,ax
 asm	mov	cx,2048							// 64*64 / 2
 asm	rep stosw
 
+//#ifdef BUGFIX_55
+//	spotvis[player->tilex][player->tiley] = 1;
+//#endif
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
 	if (++screenpage == 3)
@@ -1535,7 +1603,9 @@ asm	rep stosw
 		bufferofs = PAGE1START;
 #endif
 
+#ifdef KEEP_UNUSED
 	frameon++;
+#endif
 	PM_NextFrame();
 }
 

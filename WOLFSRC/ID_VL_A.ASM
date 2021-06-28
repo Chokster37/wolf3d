@@ -9,6 +9,7 @@
 	INCLUDE	'ID_VL.EQU'
 
 SCREENSEG	=	0a000h
+KEEPUNUSED	=	0
 
 	DATASEG
 
@@ -172,6 +173,8 @@ ENDIF ;GAMEVER_RESTORATION_ANY_APO_PRE14
 ;
 ;==============
 
+IF KEEPUNUSED
+
 PROC	VL_SetCRTC  crtc:WORD
 PUBLIC	VL_SetCRTC
 
@@ -216,6 +219,7 @@ PUBLIC	VL_SetCRTC
 
 ENDP
 
+ENDIF
 
 
 ;===========================================================================

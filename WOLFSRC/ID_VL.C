@@ -13,7 +13,12 @@
 //
 
 unsigned	bufferofs;
+
+#ifdef KEEP_UNUSED
 unsigned	displayofs,pelpan;
+#else
+unsigned	displayofs;
+#endif
 
 unsigned	screenseg=SCREENSEG;		// set to 0xa000 for asm convenience
 
@@ -277,6 +282,7 @@ void VL_SetLineWidth (unsigned width)
 ====================
 */
 
+#ifdef KEEP_UNUSED
 void VL_SetSplitScreen (int linenum)
 {
 	VL_WaitVBL (1);
@@ -288,6 +294,7 @@ void VL_SetSplitScreen (int linenum)
 	outportb (CRTC_INDEX,CRTC_MAXSCANLINE);
 	outportb (CRTC_INDEX+1,inportb(CRTC_INDEX+1) & (255-64));
 }
+#endif
 
 
 /*
@@ -332,6 +339,7 @@ void VL_FillPalette (int red, int green, int blue)
 =================
 */
 
+#ifdef KEEP_UNUSED
 void VL_SetColor	(int color, int red, int green, int blue)
 {
 	outportb (PEL_WRITE_ADR,color);
@@ -339,6 +347,7 @@ void VL_SetColor	(int color, int red, int green, int blue)
 	outportb (PEL_DATA,green);
 	outportb (PEL_DATA,blue);
 }
+#endif
 
 //===========================================================================
 
@@ -350,6 +359,7 @@ void VL_SetColor	(int color, int red, int green, int blue)
 =================
 */
 
+#ifdef KEEP_UNUSED
 void VL_GetColor	(int color, int *red, int *green, int *blue)
 {
 	outportb (PEL_READ_ADR,color);
@@ -357,6 +367,7 @@ void VL_GetColor	(int color, int *red, int *green, int *blue)
 	*green = inportb (PEL_DATA);
 	*blue = inportb (PEL_DATA);
 }
+#endif
 
 //===========================================================================
 
@@ -826,6 +837,7 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 =================
 */
 
+#ifdef KEEP_UNUSED
 void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y)
 {
 	// *** PRE-V1.4 APOGEE RESTORATION ***
@@ -860,6 +872,7 @@ void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y)
 			_fmemcpy (screen,source,width);
 	}
 }
+#endif
 
 //==========================================================================
 
@@ -969,6 +982,8 @@ asm	mov	ds,ax
 =
 ===================
 */
+
+#ifdef KEEP_UNUSED
 
 void VL_DrawTile8String (char *str, char far *tile8ptr, int printx, int printy)
 {
@@ -1087,6 +1102,7 @@ void VL_SizeTile8String (char *str, int *width, int *height)
 	*width = 8*strlen(str);
 }
 
+#endif
 
 
 

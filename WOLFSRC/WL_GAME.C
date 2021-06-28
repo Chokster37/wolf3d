@@ -86,6 +86,7 @@ void GameLoop (void);
 
 	fixed	globalsoundx,globalsoundy;
 	int		leftchannel,rightchannel;
+#ifdef KEEP_DUBMIX
 #define ATABLEMAX 15
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
@@ -160,6 +161,22 @@ byte lefttable[ATABLEMAX][ATABLEMAX * 2] = {
 };
 #endif
 
+#else
+
+#define ATABLEMAX 9
+byte righttable[ATABLEMAX][ATABLEMAX * 2] = {
+{ 8, 7, 7, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 1, 3, 5, 8, 8},
+{ 8, 7, 7, 7, 7, 7, 6, 4, 0, 0, 0, 0, 0, 2, 4, 6, 8, 8},
+{ 8, 7, 7, 7, 7, 6, 6, 4, 1, 0, 0, 0, 1, 2, 4, 6, 8, 8},
+{ 8, 7, 7, 7, 7, 6, 5, 4, 2, 1, 0, 1, 2, 3, 5, 7, 8, 8},
+{ 8, 8, 7, 7, 7, 6, 5, 4, 3, 2, 2, 3, 3, 5, 6, 8, 8, 8},
+{ 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 4, 4, 5, 6, 7, 8, 8, 8},
+{ 8, 8, 8, 7, 7, 7, 6, 6, 5, 5, 5, 6, 6, 7, 8, 8, 8, 8},
+{ 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 7, 7, 8, 8, 8, 8, 8, 8},
+{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
+};
+#endif
+
 void
 SetSoundLoc(fixed gx,fixed gy)
 {
@@ -194,7 +211,13 @@ SetSoundLoc(fixed gx,fixed gy)
 		x = -x;
 	if (x >= ATABLEMAX)
 		x = ATABLEMAX - 1;
+
+    #ifdef KEEP_DUBMIX
 	leftchannel  =  lefttable[x][y + ATABLEMAX];
+    #else
+	leftchannel  =  righttable[x][8 - y];	// same results
+    #endif
+
 	rightchannel = righttable[x][y + ATABLEMAX];
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
@@ -419,6 +442,8 @@ void ScanInfoPlane (void)
 			case 124:
 				SpawnDeadGuard (x,y);
 				break;
+
+#if (!defined SPEARDEMO) || (defined KEEP_SODFULL)
 //
 // officer
 //
@@ -464,6 +489,7 @@ void ScanInfoPlane (void)
 			case 123:
 				SpawnPatrol(en_officer,x,y,tile-120);
 				break;
+#endif
 
 
 //
@@ -512,6 +538,7 @@ void ScanInfoPlane (void)
 				SpawnPatrol(en_ss,x,y,tile-130);
 				break;
 
+#if (!defined SPEARDEMO) || (defined KEEP_SODFULL)
 //
 // dogs
 //
@@ -566,7 +593,7 @@ void ScanInfoPlane (void)
 				SpawnBoss (x,y);
 				break;
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 			case 197:
 				SpawnGretel (x,y);
 				break;
@@ -651,7 +678,7 @@ void ScanInfoPlane (void)
 			case 222:
 			case 223:
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_03)
 				SpawnStand(en_mutant,x,y,tile-220);
 #else
 				SpawnPatrol(en_mutant,x,y,tile-220);
@@ -674,6 +701,7 @@ void ScanInfoPlane (void)
 			case 227:
 				SpawnGhosts (en_inky,x,y);
 				break;
+#endif
 #endif
 			}
 
@@ -698,6 +726,9 @@ void SetupGameLevel (void)
 
 	if (!loadedgame)
 	{
+    #ifdef BUGFIX_09
+	 pwallstate=
+    #endif
 	 gamestate.TimeCount=
 	 gamestate.secrettotal=
 	 gamestate.killtotal=
@@ -735,7 +766,11 @@ void SetupGameLevel (void)
 		for (x=0;x<mapwidth;x++)
 		{
 			tile = *map++;
+#ifdef BUGFIX_61
+			if (tile<AMBUSHTILE)
+#else
 			if (tile<AREATILE)
+#endif
 			{
 			// solid wall
 				tilemap[x][y] = tile;
@@ -801,9 +836,11 @@ void SetupGameLevel (void)
 			tile = *map++;
 			if (tile == AMBUSHTILE)
 			{
+#ifndef BUGFIX_61
 				tilemap[x][y] = 0;
 				if ( (unsigned)actorat[x][y] == AMBUSHTILE)
 					actorat[x][y] = NULL;
+#endif
 
 				if (*map >= AREATILE)
 					tile = *map;
@@ -815,6 +852,34 @@ void SetupGameLevel (void)
 					tile = *(map-2);
 
 				*(map-1) = tile;
+#ifdef BUGFIX_61
+				if (actorat[x][y] > objlist)
+					actorat[x][y]->areanumber = tile-AREATILE;
+			}
+		}
+
+	// second backwards ambush tile pass (for some user maps)
+	for (y=mapheight-2;y>0;y--)
+		for (x=mapwidth-2;x>0;x--)
+		{
+			tile = MAPSPOT(x,y,0);
+
+			if (tile == AMBUSHTILE)
+			{
+				if (MAPSPOT(x+1,y,0) >= AREATILE)
+					tile = MAPSPOT(x+1,y,0);
+				else if (MAPSPOT(x,y-1,0) >= AREATILE)
+					tile = MAPSPOT(x,y-1,0);
+				else if (MAPSPOT(x,y+1,0) >= AREATILE)
+					tile = MAPSPOT(x,y+1,0); 
+				else if (MAPSPOT(x-1,y,0) >= AREATILE) 
+					tile = MAPSPOT(x-1,y,0); 
+
+				MAPSPOT(x,y,0) = tile; 
+
+				if (actorat[x][y] > objlist)
+					actorat[x][y]->areanumber = tile-AREATILE;
+#endif
 			}
 		}
 
@@ -856,6 +921,8 @@ void ResetSplitScreen (void)
 ===================
 */
 
+#if (!defined KEEP_UNUSED) && (!defined BUGFIX_07)
+
 void DrawPlayBorderSides (void)
 {
 	int	xl,yl;
@@ -870,6 +937,7 @@ void DrawPlayBorderSides (void)
 	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
 }
 
+#endif
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION *** - NOT used in v1.0
 #ifndef GAMEVER_RESTORATION_WL1_APO10
@@ -880,6 +948,8 @@ void DrawPlayBorderSides (void)
 =
 ===================
 */
+
+#if (!defined KEEP_UNUSED) && (!defined BUGFIX_07)
 
 void DrawAllPlayBorderSides (void)
 {
@@ -893,6 +963,8 @@ void DrawAllPlayBorderSides (void)
 	}
 	bufferofs = temp;
 }
+
+#endif
 
 /*
 ===================
@@ -959,6 +1031,11 @@ void DrawPlayScreen (void)
 	unsigned	temp;
 #endif
 
+#if (defined BUGFIX_56) && (defined GAMEVER_RESTORATION_ANY_APO_PRE14)
+	if (gamestate.score == -1)
+		gamestate.score = gamestate.oldscore;
+	else
+#endif
 	VW_FadeOut ();
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
@@ -1017,6 +1094,7 @@ void DrawPlayScreen (void)
 
 //==========================================================================
 
+#ifdef KEEP_DEBUG
 /*
 ==================
 =
@@ -1168,6 +1246,7 @@ void RecordDemo (void)
 
 	FinishDemoRecord ();
 }
+#endif // KEEP_DEBUG
 
 //==========================================================================
 
@@ -1363,10 +1442,15 @@ void Died (void)
 	VW_SetCRTC(displayofs);
 #endif
 	SD_WaitSoundDone ();
+#ifdef BUGFIX_04
+	ClearMemory ();
+#endif
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
+#ifdef KEEP_DEBUG
 #ifndef GAMEVER_RESTORATION_WL1_APO10
 	if (tedlevel == false)	// SO'S YA DON'T GET KILLED WHILE LAUNCHING!
+#endif
 #endif
 	  gamestate.lives--;
 
@@ -1379,6 +1463,15 @@ void Died (void)
 		gamestate.keys = 0;
 		gamestate.attackframe = gamestate.attackcount =
 		gamestate.weaponframe = 0;
+
+	#if (defined BUGFIX_56) && (defined GAMEVER_RESTORATION_ANY_APO_PRE14)
+		if (gamestate.score >= 1000000 && gamestate.oldscore < 1000000)
+		{
+			gamestate.score = -1;	// mark for no fadeout
+			DrawPlayScreen();
+			return;
+		}
+	#endif
 
 		DrawKeys ();
 		DrawWeapon ();
@@ -1497,8 +1590,10 @@ startplayloop:
 		StopMusic ();
 		ingame = false;
 
+#ifdef KEEP_DEBUG
 		if (demorecord && playstate != ex_warped)
 			FinishDemoRecord ();
+#endif
 
 		if (startgame || loadedgame)
 			goto restartgame;

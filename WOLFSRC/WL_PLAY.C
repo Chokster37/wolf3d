@@ -23,23 +23,29 @@
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION *** - There were apparently some unused variable here
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (defined KEEP_UNUSED)
 boolean		unusedplayvar;
 #endif
 boolean		madenoise;					// true when shooting or screaming
 
 exit_t		playstate;
 
+#ifdef KEEP_DEBUG
 int			DebugOk;
+#endif
 
 objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
 			*objfreelist,*killerobj;
 
 unsigned	farmapylookup[MAPSIZE];
+#ifdef KEEP_UNUSED
 byte		*nearmapylookup[MAPSIZE];
+#endif
 
+#ifdef KEEP_DEBUG
 boolean		singlestep,godmode,noclip;
 int			extravbls;
+#endif
 
 byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 byte		spotvis[MAPSIZE][MAPSIZE];
@@ -49,9 +55,13 @@ objtype		*actorat[MAPSIZE][MAPSIZE];
 // replacing refresh manager
 //
 unsigned	mapwidth,mapheight,tics;
+#ifdef KEEP_UNUSED
 boolean		compatability;
+#endif
 byte		*updateptr;
+#ifdef KEEP_UNUSED
 unsigned	mapwidthtable[64];
+#endif
 unsigned	uwidthtable[UPDATEHIGH];
 unsigned	blockstarts[UPDATEWIDE*UPDATEHIGH];
 byte		update[UPDATESIZE];
@@ -103,7 +113,9 @@ void	PlayLoop (void);
 */
 
 
+#ifdef KEEP_UNUSED
 objtype dummyobj;
+#endif
 
 //
 // LIST OF SONGS FOR EACH VERSION
@@ -157,7 +169,7 @@ int songs[]=
  PACMAN_MUS,	// Secret level
 
  // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
  //
  // Episode Four
  //
@@ -211,10 +223,12 @@ int songs[]=
  //
  //////////////////////////////////////////////////////////////
  XTIPTOE_MUS,
- XFUNKIE_MUS,
+ XFUNKIE_MUS
+#ifdef KEEP_SODFULL
+ ,
  XDEATH_MUS,
  XGETYOU_MUS,		// DON'T KNOW
- ULTIMATE_MUS,	// Trans Grîsse
+ ULTIMATE_MUS,	// Trans Gr‚Äùsse
 
  DUNGEON_MUS,
  GOINGAFT_MUS,
@@ -237,6 +251,7 @@ int songs[]=
 
  XEVIL_MUS		// Angel of Death BOSS
 
+#endif
 #endif
 };
 
@@ -477,6 +492,7 @@ void PollControls (void)
 		lasttimecount += DEMOTICS;
 		tics = DEMOTICS;
 	}
+#ifdef KEEP_DEBUG
 	else if (demorecord)			// demo recording and playback needs
 	{								// to be constant
 //
@@ -488,6 +504,7 @@ void PollControls (void)
 		lasttimecount += DEMOTICS;
 		tics = DEMOTICS;
 	}
+#endif
 	else
 		CalcTics ();
 #endif // GAMEVER_RESTORATION_ANY_APO_PRE14
@@ -571,6 +588,7 @@ void PollControls (void)
 	else if (controly < min)
 		controly = min;
 
+#ifdef KEEP_DEBUG
 	if (demorecord)
 	{
 	//
@@ -602,6 +620,7 @@ void PollControls (void)
 		controlx *= (int)tics;
 		controly *= (int)tics;
 	}
+#endif
 }
 
 
@@ -620,11 +639,13 @@ void PollControls (void)
 #define MAXX	320
 #define MAXY	160
 
+#ifdef KEEP_DEBUG
 void	CenterWindow(word w,word h)
 {
 	FixOfs ();
 	US_DrawWindow(((MAXX / 8) - w) / 2,((MAXY / 8) - h) / 2,w,h);
 }
+#endif
 
 //===========================================================================
 
@@ -650,6 +671,7 @@ void CheckKeys (void)
 	scan = LastScan;
 
 
+#ifdef KEEP_DEBUG
 	#ifdef SPEAR
 	//
 	// SECRET CHEAT CODE: TAB-G-F10
@@ -674,7 +696,11 @@ void CheckKeys (void)
 		godmode ^= 1;
 		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_WL1_APO10
+#ifdef BUGFIX_07
+		DrawAllPlayBorder ();
+#else
 		DrawAllPlayBorderSides ();
+#endif
 #endif
 		IN_ClearKeysDown();
 		return;
@@ -776,7 +802,11 @@ void CheckKeys (void)
 		DrawPlayBorderSides ();
 	}
 #else
+	#ifdef BUGFIX_07
+	 DrawAllPlayBorder ();
+	#else
 	 DrawAllPlayBorderSides ();
+	#endif
 #endif
 	 DebugOk=1;
 	}
@@ -814,6 +844,7 @@ void CheckKeys (void)
 	 DrawAllPlayBorder ();
 #endif
 	}
+#endif // KEEP_DEBUG
 
 //
 // pause key weirdness can't be checked as a scan code
@@ -857,7 +888,9 @@ void CheckKeys (void)
 			 DrawPlayBorderSides ();
 		 }
 #else
+	#ifndef BUGFIX_07
 		 DrawAllPlayBorderSides ();
+	#endif
 #endif
 
 		if (scan == sc_F9)
@@ -898,6 +931,7 @@ void CheckKeys (void)
 		return;
 	}
 
+#ifdef KEEP_DEBUG
 //
 // TAB-? debug keys
 //
@@ -912,6 +946,7 @@ void CheckKeys (void)
 		lasttimecount = TimeCount;
 		return;
 	}
+#endif
 
 }
 
@@ -952,7 +987,7 @@ next element.
 */
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (defined KEEP_UNUSED)
 int	objcount;
 #endif
 
@@ -975,7 +1010,7 @@ void InitActorList (void)
 	lastobj = NULL;
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (defined KEEP_UNUSED)
 	objcount = 0;
 #endif
 
@@ -1020,7 +1055,7 @@ void GetNewActor (void)
 	lastobj = new;
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (defined KEEP_UNUSED)
 	objcount++;
 #endif
 }
@@ -1070,7 +1105,7 @@ void RemoveObj (objtype *gone)
 	objfreelist = gone;
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (defined KEEP_UNUSED)
 	objcount--;
 #endif
 }
@@ -1296,19 +1331,25 @@ void UpdatePaletteShifts (void)
 
 	if (red)
 	{
+	    #ifndef BUGFIX_06
 		VW_WaitVBL(1);
+	    #endif
 		VL_SetPalette (redshifts[red-1]);
 		palshifted = true;
 	}
 	else if (white)
 	{
+	    #ifndef BUGFIX_06
 		VW_WaitVBL(1);
+	    #endif
 		VL_SetPalette (whiteshifts[white-1]);
 		palshifted = true;
 	}
 	else if (palshifted)
 	{
+	    #ifndef BUGFIX_06
 		VW_WaitVBL(1);
+	    #endif
 		VL_SetPalette (&gamepal);		// back to normal
 		palshifted = false;
 	}
@@ -1330,7 +1371,9 @@ void FinishPaletteShifts (void)
 	if (palshifted)
 	{
 		palshifted = 0;
+	    #ifndef BUGFIX_06
 		VW_WaitVBL(1);
+	    #endif
 		VL_SetPalette (&gamepal);
 	}
 }
@@ -1501,11 +1544,16 @@ void PlayLoop (void)
 #endif
 
 	playstate = TimeCount = lasttimecount = 0;
+#ifdef KEEP_UNUSED
 	frameon = 0;
 	running = false;
+#endif
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
-	pwallstate = anglefrac = 0;
+    #ifndef BUGFIX_09
+	pwallstate =
+    #endif
+	anglefrac = 0;
 	facecount = 0;
 #else
 	anglefrac = 0;
@@ -1588,6 +1636,7 @@ void PlayLoop (void)
 		}
 #endif
 
+#ifdef KEEP_DEBUG
 //
 // debug aids
 //
@@ -1598,6 +1647,7 @@ void PlayLoop (void)
 		}
 		if (extravbls)
 			VW_WaitVBL(extravbls);
+#endif
 
 		if (demoplayback)
 		{

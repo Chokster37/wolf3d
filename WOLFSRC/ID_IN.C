@@ -65,7 +65,9 @@ boolean			JoyPadPresent;
 		JoystickDef	JoyDefs[MaxJoys];
 		ControlType	Controls[MaxPlayers];
 
+	#ifdef KEEP_UNUSED
 		longword	MouseDownCount;
+	#endif
 
 		Demo		DemoMode = demo_Off;
 		byte _seg	*DemoBuffer;
@@ -78,6 +80,7 @@ boolean			JoyPadPresent;
 
 =============================================================================
 */
+
 static	byte        far ASCIINames[] =		// Unshifted ASCII for scan codes
 					{
 //	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -404,6 +407,8 @@ register	word	result;
 //		specified joystick
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 word
 IN_GetJoyButtonsDB(word joy)
 {
@@ -420,6 +425,7 @@ IN_GetJoyButtonsDB(word joy)
 	} while (result1 != result2);
 	return(result1);
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -627,6 +633,8 @@ IN_Startup(void)
 //	IN_Default() - Sets up default conditions for the Input Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 void
 IN_Default(boolean gotit,ControlType in)
 {
@@ -640,6 +648,7 @@ IN_Default(boolean gotit,ControlType in)
 		in = ctrl_Keyboard1;
 	IN_SetControlType(0,in);
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -668,11 +677,14 @@ IN_Shutdown(void)
 //			everytime a real make/break code gets hit
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 void
 IN_SetKeyHook(void (*hook)())
 {
 	INL_KeyHook = hook;
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -827,6 +839,9 @@ register	KeyboardDef	*def;
 //		player
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
+
 void
 IN_SetControlType(int player,ControlType type)
 {
@@ -850,6 +865,8 @@ IN_WaitForKey(void)
 	LastScan = 0;
 	return(result);
 }
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //

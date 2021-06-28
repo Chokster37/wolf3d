@@ -769,8 +769,10 @@ int		helpextern = T_HELPART;
 #endif
 #endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 #endif
+#ifdef KEEP_UNUSED
 char helpfilename[13] = "HELPART.",
 	 endfilename[13] = "ENDART1.";
+#endif
 #endif
 
 /*

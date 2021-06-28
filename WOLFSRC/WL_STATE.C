@@ -168,6 +168,32 @@ void NewState (objtype *ob, statetype *state)
 	}                                               \
 }
 
+#if (defined MORE_DOORS) || (defined BUGFIX_63)
+
+#define CHECKSIDE(x,y)								\
+{                                                   \
+	temp=(unsigned)actorat[x][y];                   \
+	if (temp)                                       \
+	{                                               \
+		if (temp<128)                               \
+			return false;                           \
+		if (temp<256)                                \
+		{                                            \
+ 			doornum = temp&127;                      \
+			if (ob->obclass != ghostobj)             \
+			{                                        \
+				OpenDoor (doornum);                  \
+				ob->distance = -doornum-1;           \
+				return true;                        \
+			}                                        \
+		}                                             \
+		else if (((objtype *)temp)->flags&FL_SHOOTABLE)\
+			return false;                           \
+	}                                               \
+}
+
+#else
+
 #define CHECKSIDE(x,y)								\
 {                                                   \
 	temp=(unsigned)actorat[x][y];                   \
@@ -181,6 +207,8 @@ void NewState (objtype *ob, statetype *state)
 			return false;                           \
 	}                                               \
 }
+
+#endif
 
 
 boolean TryWalk (objtype *ob)
@@ -749,7 +777,11 @@ void MoveObj (objtype *ob, long move)
 		// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		if (obj->obclass == ghostobj)
+	#ifdef BUGFIX_54
+			TakeDamage (tics*2,ob);
+	#else
 			TakeDamage (tics*2);
+	#endif
 #else
 		if (ob->obclass == ghostobj || ob->obclass == spectreobj)
 			TakeDamage (tics*2,ob);
@@ -817,6 +849,7 @@ moveok:
 ===============
 */
 
+#ifdef KEEP_UNUSED
 void DropItem (stat_t itemtype, int tilex, int tiley)
 {
 	int	x,y,xl,xh,yl,yh;
@@ -843,6 +876,7 @@ void DropItem (stat_t itemtype, int tilex, int tiley)
 				return;
 			}
 }
+#endif
 
 
 
@@ -858,8 +892,13 @@ void KillActor (objtype *ob)
 {
 	int	tilex,tiley;
 
+#ifdef BUGFIX_60
+	tilex = ob->x >> TILESHIFT;		// drop item on center
+	tiley = ob->y >> TILESHIFT;
+#else
 	tilex = ob->tilex = ob->x >> TILESHIFT;		// drop item on center
 	tiley = ob->tiley = ob->y >> TILESHIFT;
+#endif
 
 	switch (ob->obclass)
 	{
@@ -903,7 +942,7 @@ void KillActor (objtype *ob)
 		break;
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION  ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 	case gretelobj:
 		GivePoints (5000);
 		NewState (ob,&s_greteldie1);
@@ -1147,6 +1186,11 @@ boolean CheckLine (objtype *ob)
 	int	xfrac,yfrac,deltafrac;
 #endif
 	unsigned	value,intercept;
+
+#ifdef BUGFIX_65
+	if (ob->transx <= 0x18000l && (ob->flags & FL_VISABLE))
+			return true;
+#endif
 
 	x1 = ob->x >> UNSIGNEDSHIFT;		// 1/256 tile precision
 	y1 = ob->y >> UNSIGNEDSHIFT;
@@ -1433,6 +1477,28 @@ boolean CheckSight (objtype *ob)
 		if (deltax > 0)
 			return false;
 		break;
+
+#ifdef BUGFIX_64
+	case northwest:
+		if (deltay > -deltax)
+			return false;
+		break;
+
+	case northeast:
+		if (deltay > deltax)
+			return false;
+		break;
+
+	case southwest:
+		if (deltax > deltay)
+			return false;
+		break;
+
+	case southeast:
+		if (-deltax > deltay)
+			return false;
+		break;
+#endif
 	}
 
 //
@@ -1511,7 +1577,7 @@ void FirstSighting (objtype *ob)
 		break;
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 	case gretelobj:
 		SD_PlaySound(KEINSND);
 		NewState (ob,&s_gretelchase1);

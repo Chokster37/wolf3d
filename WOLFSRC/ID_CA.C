@@ -63,9 +63,11 @@ void		_seg	*grsegs[NUMCHUNKS];
 byte		far	grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
+#ifdef KEEP_UNUSED
 int			profilehandle,debughandle;
 
 char		audioname[13]="AUDIO.";
+#endif
 
 /*
 =============================================================================
@@ -90,7 +92,9 @@ char extension[5],	// Need a string, not constant to change cache files
      gfilename[10]=GREXT"GRAPH.",
      gdictname[10]=GREXT"DICT.",
      mheadname[10]="MAPHEAD.",
+#ifdef KEEP_UNUSED
      mfilename[10]="MAPTEMP.",
+#endif
      aheadname[10]="AUDIOHED.",
      afilename[10]="AUDIOT.";
 
@@ -105,12 +109,15 @@ huffnode	*grhuffman;
 huffnode	grhuffman[255];
 #endif
 
+#ifdef KEEP_UNUSED
+
 #ifdef AUDIOHEADERLINKED
 huffnode	*audiohuffman;
 #else
 huffnode	audiohuffman[255];
 #endif
 
+#endif
 
 int			grhandle;		// handle to EGAGRAPH
 int			maphandle;		// handle to MAPTEMP / GAMEMAPS
@@ -168,6 +175,8 @@ long GRFILEPOS(int c)
 ============================
 */
 
+#ifdef KEEP_UNUSED
+
 void CA_OpenDebug (void)
 {
 	unlink ("DEBUG.TXT");
@@ -179,7 +188,7 @@ void CA_CloseDebug (void)
 	close (debughandle);
 }
 
-
+#endif
 
 /*
 ============================
@@ -283,6 +292,7 @@ done:
 ==========================
 */
 
+#ifdef KEEP_UNUSED
 boolean CA_ReadFile (char *filename, memptr *ptr)
 {
 	int handle;
@@ -300,7 +310,7 @@ boolean CA_ReadFile (char *filename, memptr *ptr)
 	close (handle);
 	return true;
 }
-
+#endif
 
 /*
 ==========================
@@ -344,6 +354,7 @@ boolean CA_WriteFile (char *filename, void far *ptr, long length)
 ==========================
 */
 
+#ifdef KEEP_UNUSED
 boolean CA_LoadFile (char *filename, memptr *ptr)
 {
 	int handle;
@@ -362,6 +373,7 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 	close (handle);
 	return true;
 }
+#endif
 
 /*
 ============================================================================
@@ -674,6 +686,8 @@ void CAL_CarmackExpand (unsigned far *source, unsigned far *dest, unsigned lengt
 ======================
 */
 
+#ifdef KEEP_UNUSED
+
 long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
   unsigned rlewtag)
 {
@@ -721,6 +735,7 @@ long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
   return complength;
 }
 
+#endif
 
 /*
 ======================
@@ -1262,7 +1277,7 @@ void CAL_ExpandGrChunk (int chunk, byte far *source)
 {
 	long	expanded;
 
-
+#ifdef KEEP_DEBUG
 	if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
 	{
 	//
@@ -1286,6 +1301,9 @@ void CAL_ExpandGrChunk (int chunk, byte far *source)
 			expanded = MASKBLOCK*16;
 	}
 	else
+#else
+	if (chunk < STARTTILE8 || chunk >= STARTEXTERNS)
+#endif
 	{
 	//
 	// everything else has an explicit size longword
@@ -1556,6 +1574,8 @@ void CA_DownLevel (void)
 ======================
 */
 
+#ifdef KEEP_UNUSED
+
 void CA_ClearMarks (void)
 {
 	int i;
@@ -1641,6 +1661,7 @@ void CA_SetAllPurge (void)
 	CA_SetGrPurge ();
 }
 
+#endif
 
 //===========================================================================
 

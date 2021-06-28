@@ -327,6 +327,9 @@ void ConnectAreas (void)
 void InitAreas (void)
 {
 	memset (areabyplayer,0,sizeof(areabyplayer));
+    #ifdef BUGFIX_52
+	if (player->areanumber < NUMAREAS)
+    #endif
 	areabyplayer[player->areanumber] = true;
 }
 
@@ -363,8 +366,16 @@ void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 	int	areanumber;
 	unsigned	far *map;
 
+    #ifdef MORE_DOORS
+	if (doornum==MAXDOORS)
+	{
+			sprintf (str,"%u+ doors on level!", MAXDOORS);
+			Quit (str);
+	}
+    #else
 	if (doornum==64)
 		Quit ("64+ doors on level!");
+    #endif
 
 	doorposition[doornum] = 0;		// doors start out fully closed
 	lastdoorobj->tilex = tilex;
@@ -564,7 +575,12 @@ void DoorOpen (int door)
 
 void DoorOpening (int door)
 {
-	int		area1,area2;
+	#ifdef BUGFIX_52
+		unsigned		area1,area2;
+	#else
+		int		area1,area2;
+	#endif
+
 	unsigned	far	*map;
 	long	position;
 
@@ -589,9 +605,22 @@ void DoorOpening (int door)
 		}
 		area1 -= AREATILE;
 		area2 -= AREATILE;
+
+	#ifdef BUGFIX_52
+		if (area1 < NUMAREAS && area2 < NUMAREAS)
+		{
+			areaconnect[area1][area2]++;
+			areaconnect[area2][area1]++;
+
+			if (player->areanumber < NUMAREAS)
+				ConnectAreas ();
+		}
+	#else
 		areaconnect[area1][area2]++;
 		areaconnect[area2][area1]++;
 		ConnectAreas ();
+	#endif
+
 		if (areabyplayer[area1])
 		{
 			PlaySoundLocTile(OPENDOORSND,doorobjlist[door].tilex,doorobjlist[door].tiley);	// JAB
@@ -627,7 +656,12 @@ void DoorOpening (int door)
 
 void DoorClosing (int door)
 {
-	int		area1,area2,move;
+	#ifdef BUGFIX_52
+		unsigned	area1,area2;
+	#else
+		int		area1,area2,move;
+	#endif
+
 	unsigned	far	*map;
 	long	position;
 	int		tilex,tiley;
@@ -672,10 +706,22 @@ void DoorClosing (int door)
 		}
 		area1 -= AREATILE;
 		area2 -= AREATILE;
+
+	#ifdef BUGFIX_52
+		if (area1 < NUMAREAS && area2 < NUMAREAS)
+		{
+			areaconnect[area1][area2]--;
+			areaconnect[area2][area1]--;
+
+			if (player->areanumber < NUMAREAS)
+				ConnectAreas ();
+		}
+	#else
 		areaconnect[area1][area2]--;
 		areaconnect[area2][area1]--;
-
 		ConnectAreas ();
+	#endif
+
 	}
 
 	doorposition[door] = position;
@@ -733,7 +779,12 @@ void MoveDoors (void)
 unsigned	pwallstate;
 unsigned	pwallpos;			// amount a pushable wall has been moved (0-63)
 unsigned	pwallx,pwally;
+
+#ifdef MORE_DOORS
+byte		pwalltile, pwalldir;
+#else
 int			pwalldir;
+#endif
 
 /*
 ===============
@@ -750,8 +801,12 @@ void PushWall (int checkx, int checky, int dir)
 	if (pwallstate)
 	  return;
 
-
+    #ifdef MORE_DOORS
+	pwalltile = oldtile = tilemap[checkx][checky];
+    #else
 	oldtile = tilemap[checkx][checky];
+    #endif
+
 	if (!oldtile)
 		return;
 
@@ -804,7 +859,13 @@ void PushWall (int checkx, int checky, int dir)
 	pwalldir = dir;
 	pwallstate = 1;
 	pwallpos = 0;
+
+    #ifdef MORE_DOORS
+	tilemap[pwallx][pwally] = MOVINGTILE;
+    #else
 	tilemap[pwallx][pwally] |= 0xc0;
+    #endif
+
 	*(mapsegs[1]+farmapylookup[pwally]+pwallx) = 0;	// remove P tile info
 
 	SD_PlaySound (PUSHWALLSND);
@@ -834,7 +895,12 @@ void MovePWalls (void)
 	if (pwallstate/128 != oldblock)
 	{
 	// block crossed into a new block
+
+	    #ifdef MORE_DOORS
+		oldtile = pwalltile;
+	    #else
 		oldtile = tilemap[pwallx][pwally] & 63;
+	    #endif
 
 		//
 		// the tile can now be walked into
@@ -846,7 +912,11 @@ void MovePWalls (void)
 		//
 		// see if it should be pushed farther
 		//
+#ifdef BUGFIX_01
+		if (pwallstate>255)
+#else
 		if (pwallstate>256)
+#endif
 		{
 		//
 		// the block has been pushed two tiles
@@ -903,7 +973,12 @@ void MovePWalls (void)
 				break;
 			}
 
+		    #ifdef MORE_DOORS
+			tilemap[pwallx][pwally] = MOVINGTILE;
+		    #else
 			tilemap[pwallx][pwally] = oldtile | 0xc0;
+		    #endif
+
 		}
 	}
 

@@ -80,6 +80,9 @@ void T_Projectile (objtype *ob)
 	if (!ProjectileTryMove (ob))
 #endif
 	{
+#ifndef KEEP_WOLFWL6
+		ob->state = NULL;		// mark for removal
+#else
 		// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
 		RemoveObj(ob);
@@ -102,7 +105,7 @@ void T_Projectile (objtype *ob)
 		else
 			ob->state = NULL;		// mark for removal
 #endif // RESTORATION
-
+#endif // KEEP_WOLFWL6
 		return;
 	}
 
@@ -114,7 +117,7 @@ void T_Projectile (objtype *ob)
 			damage = (US_RndT() >>3) + 20;
 			break;
 		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 		case rocketobj:
 		// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14

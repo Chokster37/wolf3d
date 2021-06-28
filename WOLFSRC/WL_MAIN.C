@@ -41,6 +41,7 @@
 */
 
 char            str[80],str2[20];
+#ifdef KEEP_DEBUG
 // *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 unsigned				tedlevelnum;
@@ -48,7 +49,10 @@ unsigned				tedlevelnum;
 int				tedlevelnum;
 #endif
 boolean         tedlevel;
+#endif
+#ifdef KEEP_UNUSED
 boolean         nospr;
+#endif
 boolean         IsA386;
 int                     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
 	5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
@@ -62,9 +66,15 @@ int             viewwidth;
 int             viewheight;
 int             centerx;
 int             shootdelta;                     // pixels away from centerx a target can be
+#ifdef KEEP_UNUSED
 fixed           scale,maxslope;
+#else
+fixed           scale;
+#endif
 long            heightnumerator;
+#ifdef KEEP_UNUSED
 int                     minheightdiv;
+#endif
 
 
 void            Quit (char *error);
@@ -374,6 +384,9 @@ boolean SaveTheGame(int file,int x,int y)
 			sizeof(pwallstate) +
 			sizeof(pwallx) +
 			sizeof(pwally) +
+		    #ifdef MORE_DOORS
+			sizeof(pwalltile) +
+		    #endif
 			sizeof(pwalldir) +
 			sizeof(pwallpos);
 
@@ -469,6 +482,12 @@ boolean SaveTheGame(int file,int x,int y)
 	CA_FarWrite (file,(void far *)&pwally,sizeof(pwally));
 #ifndef GAMEVER_RESTORATION_WL1_APO10
 	checksum = DoChecksum((byte far *)&pwally,sizeof(pwally),checksum);
+#endif
+#ifdef MORE_DOORS
+	CA_FarWrite (file,(void far *)&pwalltile,sizeof(pwalltile));
+    #ifndef GAMEVER_RESTORATION_WL1_APO10
+	checksum = DoChecksum((byte far *)&pwalltile,sizeof(pwalltile),checksum);
+    #endif
 #endif
 	CA_FarWrite (file,(void far *)&pwalldir,sizeof(pwalldir));
 #ifndef GAMEVER_RESTORATION_WL1_APO10
@@ -612,6 +631,14 @@ boolean LoadTheGame(int file,int x,int y)
 #ifndef GAMEVER_RESTORATION_WL1_APO10
 	checksum = DoChecksum((byte far *)&pwally,sizeof(pwally),checksum);
 #endif
+
+#ifdef MORE_DOORS
+	CA_FarRead (file,(void far *)&pwalltile,sizeof(pwalltile));
+    #ifndef GAMEVER_RESTORATION_WL1_APO10
+	checksum = DoChecksum((byte far *)&pwalltile,sizeof(pwalltile),checksum);
+    #endif
+#endif
+
 	CA_FarRead (file,(void far *)&pwalldir,sizeof(pwalldir));
 #ifndef GAMEVER_RESTORATION_WL1_APO10
 	checksum = DoChecksum((byte far *)&pwalldir,sizeof(pwalldir),checksum);
@@ -623,6 +650,36 @@ boolean LoadTheGame(int file,int x,int y)
 
 #ifndef GAMEVER_RESTORATION_WL1_APO10
 	CA_FarRead (file,(void far *)&oldchecksum,sizeof(oldchecksum));
+
+#ifdef BUGFIX_52
+	if (gamestate.secretcount)      // assign valid floorcodes under moved pushwalls
+	{
+		unsigned far *map, far *obj;
+		unsigned tile, sprite;
+		map = mapsegs[0]; obj = mapsegs[1];
+		for (y=0;y<mapheight;y++)
+			for (x=0;x<mapwidth;x++)
+			{
+				tile = *map++; sprite = *obj++;
+				if (sprite == PUSHABLETILE && !tilemap[x][y]
+				    && (tile < AREATILE || tile >= (AREATILE+NUMAREAS)))
+				{
+					if (*map >= AREATILE)
+						tile = *map;
+					if (*(map-1-mapwidth) >= AREATILE)
+						tile = *(map-1-mapwidth);
+					if (*(map-1+mapwidth) >= AREATILE)
+						tile = *(map-1+mapwidth);
+					if ( *(map-2) >= AREATILE)
+						tile = *(map-2);
+
+					*(map-1) = tile; *(obj-1) = 0;
+				}
+			}
+	}
+
+	Thrust(0,0);    // set player->areanumber to the floortile you're standing on
+#endif
 
 	if (oldchecksum != checksum)
 	{
@@ -769,7 +826,9 @@ void CalcProjection (long focal)
 // the heightbuffer.  The pixel height is height>>2
 //
 	heightnumerator = (TILEGLOBAL*scale)>>6;
+#ifdef KEEP_UNUSED
 	minheightdiv = heightnumerator/0x7fff +1;
+#endif
 
 //
 // calculate the angle offset from view angle of each pixel's ray
@@ -789,8 +848,10 @@ void CalcProjection (long focal)
 // if a point's abs(y/x) is greater than maxslope, the point is outside
 // the view area
 //
+#ifdef KEEP_UNUSED
 	maxslope = finetangent[pixelangle[0]];
 	maxslope >>= 8;
+#endif
 }
 
 
@@ -899,7 +960,9 @@ void FinishSignon (void)
 
 	#endif
 
+#ifdef KEEP_DEBUG
 	if (!NoWait)
+#endif
 		IN_Ack ();
 
 	#ifndef JAPAN
@@ -925,8 +988,10 @@ void FinishSignon (void)
 
 	SETFONTCOLOR(0,15);
 #else
+#ifdef KEEP_DEBUG
 	if (!NoWait)
 		VW_WaitVBL(3*70);
+#endif
 #endif
 }
 
@@ -1303,7 +1368,11 @@ void InitGame (void)
 	if (mminfo.mainmem < 240000L)
 #elif (!defined SPEAR)
 //#ifndef SPEAR
+#ifdef BUGFIX_04
+	if (mminfo.mainmem < 235000L && _argc == 1)
+#else
 	if (mminfo.mainmem < 235000L)
+#endif
 #else
 	if (mminfo.mainmem < 257000L && !MS_CheckParm("debugmode"))
 #endif
@@ -1331,7 +1400,9 @@ void InitGame (void)
 
 	for (i=0;i<MAPSIZE;i++)
 	{
+#ifdef KEEP_UNUSED
 		nearmapylookup[i] = &tilemap[0][0]+MAPSIZE*i;
+#endif
 		farmapylookup[i] = i*64;
 	}
 
@@ -1420,7 +1491,9 @@ close(profilehandle);
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	if (virtualreality)
 	{
+#ifdef KEEP_DEBUG
 		NoWait = true;
+#endif
 		geninterrupt(0x60);
 	}
 #endif
@@ -1519,6 +1592,20 @@ void Quit (char *error)
 	unsigned        finscreen;
 	memptr	screen;
 
+#ifdef BUGFIX_58
+	if (!pictable)
+	{
+		ShutdownId ();
+
+		if (error && *error)
+		{
+			gotoxy (0,0);
+			puts(error);
+		}
+		exit(1);
+	}
+#endif
+
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	if (virtualreality)
@@ -1531,7 +1618,7 @@ void Quit (char *error)
 #endif
 	if (!*error)
 	{
-	 #ifndef JAPAN
+	 #if !(defined JAPAN) && (defined KEEP_NOTICE)
 	 CA_CacheGrChunk (ORDERSCREEN);
 	 screen = grsegs[ORDERSCREEN];
 	 #endif
@@ -1571,7 +1658,7 @@ void Quit (char *error)
 		// of Wolf3D and SOD (no copy protection), but compiled in the
 		// (shareware/registered) Apogee and SOD (demo) releases,
 		// as well as the other "GOODTIMES" releases
-		#if (!defined JAPAN) && (!defined GAMEVER_RESTORATION_ANY_ACT14)
+		#if (!defined JAPAN) && (!defined GAMEVER_RESTORATION_ANY_ACT14) && (defined KEEP_NOTICE)
 		//#ifndef JAPAN
 		movedata ((unsigned)screen,7,0xb800,0,4000);
 		gotoxy(1,24);
@@ -1607,6 +1694,7 @@ void    DemoLoop (void)
 	long nsize;
 	memptr	nullblock;
 
+#ifdef KEEP_DEBUG
 //
 // check for launch from ted
 //
@@ -1634,6 +1722,7 @@ void    DemoLoop (void)
 		GameLoop();
 		Quit (NULL);
 	}
+#endif
 
 
 //
@@ -1651,8 +1740,12 @@ void    DemoLoop (void)
 		#ifndef GOODTIMES
 		#ifndef SPEAR
 		#ifndef JAPAN
+	#ifdef KEEP_NOTICE
+	#ifdef KEEP_DEBUG
 		if (!NoWait)
+	#endif
 			NonShareware();
+	#endif
 		#endif
 		#else
 
@@ -1676,7 +1769,9 @@ void    DemoLoop (void)
 #endif
 
 #ifndef JAPAN
+#ifdef KEEP_DEBUG
 	if (!NoWait)
+#endif
 		PG13 ();
 #endif
 
@@ -1684,7 +1779,11 @@ void    DemoLoop (void)
 
 	while (1)
 	{
+#ifdef KEEP_DEBUG
 		while (!NoWait)
+#else
+		while (1)
+#endif
 		{
 //
 // title page
@@ -1808,6 +1907,7 @@ void    DemoLoop (void)
 
 		VW_FadeOut ();
 
+#ifdef KEEP_DEBUG
 		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifndef SPEAR
 		if (Keyboard[sc_Tab] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
@@ -1816,6 +1916,7 @@ void    DemoLoop (void)
 #endif
 			RecordDemo ();
 		else
+#endif
 			US_ControlPanel (0);
 
 		if (startgame || loadedgame)
@@ -1842,7 +1943,9 @@ void    DemoLoop (void)
 ==========================
 */
 
+#ifdef KEEP_UNUSED
 char    *nosprtxt[] = {"nospr",nil};
+#endif
 
 void main (void)
 {

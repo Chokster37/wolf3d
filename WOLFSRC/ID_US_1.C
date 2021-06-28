@@ -35,25 +35,37 @@
 
 //	Global variables
 		char		*abortprogram;
+#ifdef KEEP_DEBUG
 		boolean		NoWait;
+#endif
 		word		PrintX,PrintY;
 		word		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
 #define	ConfigVersion	1
 
+#ifdef KEEP_UNUSED
 static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"},
 					*ParmStrings2[] = {"COMP","NOCOMP"};
+#else
+#ifdef KEEP_DEBUG
+static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"};
+#endif
+#endif
 static	boolean		US_Started;
 
+	#ifdef KEEP_UNUSED
 		boolean		Button0,Button1,
 					CursorBad;
 		int			CursorX,CursorY;
+	#endif
 
 		void		(*USL_MeasureString)(char far *,word *,word *) = VW_MeasurePropString,
 					(*USL_DrawString)(char far *) = VWB_DrawPropString;
 
+	#ifdef KEEP_UNUSED
 		SaveGame	Games[MaxSaveGames];
+	#endif
 		HighScore	Scores[MaxScores] =
 					{
 						// *** PRE-V1.4 APOGEE RESTORATION ***
@@ -74,6 +86,7 @@ static	boolean		US_Started;
 
 //	Public routines
 
+#ifdef KEEP_DEBUG
 ///////////////////////////////////////////////////////////////////////////
 //
 //	USL_HardError() - Handles the Abort/Retry/Fail sort of errors passed
@@ -153,8 +166,10 @@ oh_kill_me:
 	abortprogram = s;
 	ShutdownId();
 	fprintf(stderr,"Terminal Error: %s\n",s);
+#ifdef KEEP_DEBUG
 	if (tedlevel)
 		fprintf(stderr,"You launched from TED. I suggest that you reboot...\n");
+#endif
 
 	return(ABORT);
 #undef	IGNORE
@@ -164,6 +179,7 @@ oh_kill_me:
 #pragma	warn	+par
 #pragma	warn	+rch
 
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -178,10 +194,13 @@ US_Startup(void)
 	if (US_Started)
 		return;
 
+#ifdef KEEP_DEBUG
 	harderr(USL_HardError);	// Install the fatal error handler
+#endif
 
 	US_InitRndT(true);		// Initialize the random number generator
 
+#ifdef KEEP_UNUSED
 	for (i = 1;i < _argc;i++)
 	{
 		switch (US_CheckParm(_argv[i],ParmStrings2))
@@ -194,7 +213,9 @@ US_Startup(void)
 			break;
 		}
 	}
+#endif
 
+#ifdef KEEP_DEBUG
 	// Check for TED launching here
 	for (i = 1;i < _argc;i++)
 	{
@@ -215,6 +236,7 @@ US_Startup(void)
 		   break;
 		}
 	}
+#endif
 
 	US_Started = true;
 }
@@ -279,12 +301,15 @@ US_CheckParm(char *parm,char **strings)
 //		between masked and non-masked fonts
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 void
 US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char far *))
 {
 	USL_MeasureString = measure;
 	USL_DrawString = print;
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -342,6 +367,8 @@ US_PrintUnsigned(longword n)
 //	US_PrintSigned() - Prints a signed long
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 void
 US_PrintSigned(long n)
 {
@@ -349,7 +376,9 @@ US_PrintSigned(long n)
 
 	US_Print(ltoa(n,buffer,10));
 }
+#endif
 
+#ifdef KEEP_DEBUG
 ///////////////////////////////////////////////////////////////////////////
 //
 //	USL_PrintInCenter() - Prints a string in the center of the given rect
@@ -387,6 +416,7 @@ US_PrintCentered(char GAMEVER_RESTORATION_CONDFARPTR *s)
 
 	USL_PrintInCenter(s,r);
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -438,6 +468,7 @@ US_CPrint(char GAMEVER_RESTORATION_CONDFARPTR *s)
 	}
 }
 
+#ifdef KEEP_DEBUG
 ///////////////////////////////////////////////////////////////////////////
 //
 //	US_ClearWindow() - Clears the current window to white and homes the
@@ -534,6 +565,7 @@ US_RestoreWindow(WindowRec *win)
 	PrintX = win->px;
 	PrintY = win->py;
 }
+#endif
 
 //	Input routines
 

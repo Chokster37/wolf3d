@@ -219,11 +219,12 @@ void	VW_MeasurePropString (char far *string, word *width, word *height)
 	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONT+fontnumber]);
 }
 
+#ifdef KEEP_UNUSED
 void	VW_MeasureMPropString  (char far *string, word *width, word *height)
 {
 	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM+fontnumber]);
 }
-
+#endif
 
 
 /*
@@ -325,17 +326,21 @@ int VW_MarkUpdateBlock (int x1, int y1, int x2, int y2)
 	return 1;
 }
 
+#ifdef KEEP_DEBUG
 void VWB_DrawTile8 (int x, int y, int tile)
 {
 	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
 		LatchDrawChar(x,y,tile);
 }
+#endif
 
+#ifdef KEEP_UNUSED
 void VWB_DrawTile8M (int x, int y, int tile)
 {
 	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
 		VL_MemToScreen (((byte far *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
 }
+#endif
 
 
 void VWB_DrawPic (int x, int y, int chunknum)
@@ -449,6 +454,7 @@ void LoadLatchMem (void)
 	byte	far *src;
 	unsigned	destoff;
 
+#ifdef KEEP_DEBUG
 //
 // tile 8s
 //
@@ -464,6 +470,9 @@ void LoadLatchMem (void)
 		destoff +=16;
 	}
 	UNCACHEGRCHUNK (STARTTILE8);
+#else
+	destoff = freelatch;
+#endif
 
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
 	// Do compile in v1.0

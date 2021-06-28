@@ -32,7 +32,9 @@
 //
 // player state info
 //
+#ifdef KEEP_UNUSED
 boolean		running;
+#endif
 long		thrustspeed;
 
 unsigned	plux,pluy;			// player coordinates scaled to unsigned
@@ -58,12 +60,18 @@ statetype s_player = {false,0,0,T_Player,NULL,NULL};
 statetype s_attack = {false,0,0,T_Attack,NULL,NULL};
 
 
+#ifdef KEEP_UNUSED
 long	playerxmove,playerymove;
+#endif
 
 struct atkinf
 {
 	char	tics,attack,frame;		// attack is 1 for gun, 2 for knife
+#ifdef KEEP_UNUSED
 } attackinfo[4][14] =
+#else
+} attackinfo[4][4] =
+#endif
 
 {
 { {6,0,1},{6,2,2},{6,0,3},{6,-1,4} },
@@ -73,7 +81,9 @@ struct atkinf
 };
 
 
+#ifdef KEEP_UNUSED
 int	strafeangle[9] = {0,90,180,270,45,135,225,315,0};
+#endif
 
 void DrawWeapon (void);
 void GiveWeapon (int weapon);
@@ -148,15 +158,19 @@ void CheckWeaponChange (void)
 
 void ControlMovement (objtype *ob)
 {
+#ifdef KEEP_UNUSED
 	long	oldx,oldy;
+#endif
 	int		angle,maxxmove;
 	int		angleunits;
 	long	speed;
 
 	thrustspeed = 0;
 
+#ifdef KEEP_UNUSED
 	oldx = player->x;
 	oldy = player->y;
+#endif
 
 //
 // side to side move
@@ -220,8 +234,10 @@ void ControlMovement (objtype *ob)
 //
 // calculate total move
 //
+#ifdef KEEP_UNUSED
 	playerxmove = player->x - oldx;
 	playerymove = player->y - oldy;
+#endif
 }
 
 /*
@@ -435,7 +451,9 @@ void	TakeDamage (int points,objtype *attacker)
 	if (gamestate.difficulty==gd_baby)
 	  points>>=2;
 
+#ifdef KEEP_DEBUG
 	if (!godmode)
+#endif
 		gamestate.health -= points;
 
 	if (gamestate.health<=0)
@@ -731,6 +749,10 @@ void GiveKey (int key)
 */
 void GetBonus (statobj_t *check)
 {
+#ifdef BUGFIX_62
+	if (playstate == ex_died)
+		return;
+#endif
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
 	unsigned	temp;
@@ -958,10 +980,12 @@ void ClipMove (objtype *ob, long xmove, long ymove)
 	if (TryMove (ob))
 		return;
 
+#ifdef KEEP_DEBUG
 	if (noclip && ob->x > 2*TILEGLOBAL && ob->y > 2*TILEGLOBAL &&
 	ob->x < (((long)(mapwidth-1))<<TILESHIFT)
 	&& ob->y < (((long)(mapheight-1))<<TILESHIFT) )
 		return;		// walk through walls
+#endif
 
 	if (!SD_SoundPlaying())
 		SD_PlaySound (HITWALLSND);

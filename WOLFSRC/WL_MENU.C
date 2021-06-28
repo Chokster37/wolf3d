@@ -527,7 +527,7 @@ void US_ControlPanel(byte scancode)
 	//
 
 	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && !defined(BUGFIX_51)
 	if (startgame)
 #else
 	if (startgame || loadedgame)
@@ -704,7 +704,7 @@ int CP_CheckQuick(unsigned scancode)
 #endif
 			fontnumber=0;
 			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if !defined(GAMEVER_RESTORATION_ANY_APO_PRE14) || defined(BUGFIX_51)
 			MainMenu[savegame].active = 0;
 #endif
 			return 1;
@@ -958,7 +958,7 @@ int CP_EndGame(void)
 
 	#pragma warn -sus
 	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if !defined(GAMEVER_RESTORATION_ANY_APO_PRE14) || defined(BUGFIX_51)
 	MainMenu[savegame].active = 0;
 #endif
 	MainMenu[viewscores].routine=CP_ViewScores;
@@ -4126,6 +4126,7 @@ void CheckForEpisodes(void)
 //
 #ifndef UPLOAD
 #ifndef SPEAR
+  #ifdef KEEP_WOLFWL6
 	if (!findfirst("*.WL6",&f,FA_ARCH))
 	{
 		strcpy(extension,"WL6");
@@ -4141,6 +4142,7 @@ void CheckForEpisodes(void)
 		EpisodeSelect[5] = 1;
 	}
 	else
+  #endif
 	if (!findfirst("*.WL3",&f,FA_ARCH))
 	{
 		strcpy(extension,"WL3");
@@ -4184,11 +4186,17 @@ void CheckForEpisodes(void)
 	strcat(configname,extension);
 	strcat(SaveName,extension);
 	strcat(PageFileName,extension);
+#ifdef KEEP_UNUSED
 	strcat(audioname,extension);
+#endif
 	// *** PRE-V1.4 APOGEE RESTORATION *** - Relocate demoname preparation down for earlier releases
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
+#ifdef KEEP_DEBUG
 	strcat(demoname,extension);
 #endif
+#endif
+
+#ifdef KEEP_UNUSED
 #ifndef SPEAR
 #ifndef GOODTIMES
 	strcat(helpfilename,extension);
@@ -4196,7 +4204,11 @@ void CheckForEpisodes(void)
 	strcat(endfilename,extension);
 #endif
 #endif
+#endif
+
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#ifdef KEEP_DEBUG
 	strcat(demoname,extension);
+#endif
 #endif
 }

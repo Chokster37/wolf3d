@@ -36,8 +36,10 @@
 */
 
 
+#ifdef KEEP_UNUSED
 dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
 	southwest,south,southeast};
+#endif
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
@@ -74,11 +76,14 @@ int	starthitpoints[4][NUMENEMIES] =
 	  25,	// ghosts
 	  25,	// ghosts
 	  25,	// ghosts
-	  25,	// ghosts
+	  25	// ghosts
 
+#ifdef KEEP_WOLFWL6
+	  ,
 	  850,	// Gretel
 	  850,	// Gift
 	  850	// Fat
+#endif
 	  // *** PRE-V1.4 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	  ,
@@ -105,11 +110,14 @@ int	starthitpoints[4][NUMENEMIES] =
 	  25,	// ghosts
 	  25,	// ghosts
 	  25,	// ghosts
-	  25,	// ghosts
+	  25	// ghosts
 
+#ifdef KEEP_WOLFWL6
+	  ,
 	  950,	// Gretel
 	  950,	// Gift
 	  950 	// Fat
+#endif
 	  // *** PRE-V1.4 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	  ,
@@ -138,11 +146,14 @@ int	starthitpoints[4][NUMENEMIES] =
 	  25,	// ghosts
 	  25,	// ghosts
 	  25,	// ghosts
-	  25,	// ghosts
+	  25	// ghosts
 
+#ifdef KEEP_WOLFWL6
+	  ,
 	  1050,	// Gretel
 	  1050,	// Gift
 	  1050 	// Fat
+#endif
 	  // *** PRE-V1.4 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	  ,
@@ -171,11 +182,14 @@ int	starthitpoints[4][NUMENEMIES] =
 	  25,	// ghosts
 	  25,	// ghosts
 	  25,	// ghosts
-	  25,	// ghosts
+	  25	// ghosts
 
+#ifdef KEEP_WOLFWL6
+	  ,
 	  1200,	// Gretel
 	  1200,	// Gift
 	  1200	// Fat
+#endif
 	  // *** PRE-V1.4 APOGEE RESTORATION ***
 #ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
 	  ,
@@ -676,7 +690,7 @@ statetype s_bossshoot8 	= {false,SPR_BOSS_SHOOT1,10,NULL,NULL,&s_bosschase1};
 
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 //
 // gretel
 //
@@ -775,9 +789,15 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 
 
 	map = mapsegs[0]+farmapylookup[tiley]+tilex;
+#ifdef BUGFIX_61
+	tile = *map;
+	if (tile == AMBUSHTILE)
+	{
+#else
 	if (*map == AMBUSHTILE)
 	{
 		tilemap[tilex][tiley] = 0;
+#endif
 
 		if (*(map+1) >= AREATILE)
 			tile = *(map+1);
@@ -818,6 +838,9 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 void SpawnDeadGuard (int tilex, int tiley)
 {
 	SpawnNewObj (tilex,tiley,&s_grddie4);
+#ifdef BUGFIX_63
+	new->flags |= FL_NONMARK;
+#endif
 	new->obclass = inertobj;
 }
 
@@ -833,7 +856,7 @@ void SpawnDeadGuard (int tilex, int tiley)
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnBoss (int tilex, int tiley, int dir)
 #else
 void SpawnBoss (int tilex, int tiley)
@@ -853,7 +876,11 @@ void SpawnBoss (int tilex, int tiley)
 #endif
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = south;
 #endif
@@ -863,7 +890,7 @@ void SpawnBoss (int tilex, int tiley)
 }
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 /*
 ===============
 =
@@ -873,7 +900,7 @@ void SpawnBoss (int tilex, int tiley)
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnGretel (int tilex, int tiley, int dir)
 #else
 void SpawnGretel (int tilex, int tiley)
@@ -888,7 +915,11 @@ void SpawnGretel (int tilex, int tiley)
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_gretel];
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = north;
 #endif
@@ -1095,7 +1126,7 @@ void A_DeathScream (objtype *ob)
 #endif
 		break;
 	// *** SHAREWARE V1.0 APOGEE RESTORATION *** - Looks like these were added after v1.0
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 	case gretelobj:
 		SD_PlaySound(MEINSND);
 		break;
@@ -1466,6 +1497,9 @@ void T_Will (objtype *ob)
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
 			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+	#ifdef BUGFIX_63
+			TryWalk (ob);
+	#endif
 		}
 
 		if (move < ob->distance)
@@ -1990,7 +2024,7 @@ void SpawnGhosts (int which, int tilex, int tiley)
 
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 void	T_Gift (objtype *ob);
 void	T_GiftThrow (objtype *ob);
 
@@ -2074,7 +2108,7 @@ statetype s_needle4 	= {false,SPR_HYPO4,6,T_Projectile,NULL,&s_needle1};
 
 
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 //
 // gift
 //
@@ -2210,7 +2244,7 @@ statetype s_fatshoot6 	= {false,SPR_FAT_SHOOT4,10,NULL,T_Shoot,&s_fatchase1};
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnSchabbs (int tilex, int tiley, int dir)
 #else
 void SpawnSchabbs (int tilex, int tiley)
@@ -2243,7 +2277,11 @@ void SpawnSchabbs (int tilex, int tiley)
 #endif
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = south;
 #endif
@@ -2254,7 +2292,7 @@ void SpawnSchabbs (int tilex, int tiley)
 
 
 // *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 /*
 ===============
 =
@@ -2264,7 +2302,7 @@ void SpawnSchabbs (int tilex, int tiley)
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnGift (int tilex, int tiley, int dir)
 #else
 void SpawnGift (int tilex, int tiley)
@@ -2284,7 +2322,11 @@ void SpawnGift (int tilex, int tiley)
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_gift];
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = north;
 #endif
@@ -2303,7 +2345,7 @@ void SpawnGift (int tilex, int tiley)
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnFat (int tilex, int tiley, int dir)
 #else
 void SpawnFat (int tilex, int tiley)
@@ -2323,7 +2365,11 @@ void SpawnFat (int tilex, int tiley)
 	new->hitpoints = starthitpoints[gamestate.difficulty][en_fat];
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = south;
 #endif
@@ -2388,13 +2434,13 @@ void T_SchabbThrow (objtype *ob)
 }
 
 // *** PRE-V1.4 APOGEE RESTORATION *** - Relocated code to a separate file for v1.2; Not included in v1.0 at all.
-#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined GAMEVER_RESTORATION_WL1_APO10)
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 #include "WL_FSMOK.C"
 #endif
 
 
 // *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 /*
 =================
 =
@@ -2493,6 +2539,9 @@ void T_Schabb (objtype *ob)
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
 			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+	#ifdef BUGFIX_63
+			TryWalk (ob);
+	#endif
 		}
 
 		if (move < ob->distance)
@@ -2530,7 +2579,7 @@ void T_Schabb (objtype *ob)
 
 
 // *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 /*
 =================
 =
@@ -2587,6 +2636,9 @@ void T_Gift (objtype *ob)
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
 			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+	#ifdef BUGFIX_63
+			TryWalk (ob);
+	#endif
 		}
 
 		if (move < ob->distance)
@@ -2679,6 +2731,9 @@ void T_Fat (objtype *ob)
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
 			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+	#ifdef BUGFIX_63
+			TryWalk (ob);
+	#endif
 		}
 
 		if (move < ob->distance)
@@ -2782,8 +2837,13 @@ statetype s_fakeshoot7 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot8}
 statetype s_fakeshoot8 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot9};
 statetype s_fakeshoot9 	= {false,SPR_FAKE_SHOOT,8,NULL,NULL,&s_fakechase1};
 
+#ifdef BUGFIX_59
+statetype s_fire1 	= {false,SPR_FIRE1,6,T_Projectile,NULL,&s_fire2};
+statetype s_fire2 	= {false,SPR_FIRE2,6,T_Projectile,NULL,&s_fire1};
+#else
 statetype s_fire1 	= {false,SPR_FIRE1,6,NULL,T_Projectile,&s_fire2};
 statetype s_fire2 	= {false,SPR_FIRE2,6,NULL,T_Projectile,&s_fire1};
+#endif
 
 //
 // hitler
@@ -2927,7 +2987,7 @@ statetype s_hitlershoot6 	= {false,SPR_HITLER_SHOOT2,10,NULL,T_Shoot,&s_hitlerch
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnFakeHitler (int tilex, int tiley, int dir)
 #else
 void SpawnFakeHitler (int tilex, int tiley)
@@ -2936,6 +2996,7 @@ void SpawnFakeHitler (int tilex, int tiley)
 	unsigned	far *map,tile;
 
 
+#ifdef KEEP_UNUSED
 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_WL1_APO10
 	if (DigiMode != sds_Off)
@@ -2947,6 +3008,7 @@ void SpawnFakeHitler (int tilex, int tiley)
 	  s_hitlerdie2.tictime = 140;
 	else
 	  s_hitlerdie2.tictime = 5;
+#endif
 #endif
 
 	SpawnNewObj (tilex,tiley,&s_fakestand);
@@ -2961,7 +3023,11 @@ void SpawnFakeHitler (int tilex, int tiley)
 #endif
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = north;
 #endif
@@ -2980,7 +3046,7 @@ void SpawnFakeHitler (int tilex, int tiley)
 */
 
 // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if (defined GAMEVER_RESTORATION_ANY_APO_PRE14) && (!defined BUGFIX_08)
 void SpawnHitler (int tilex, int tiley, int dir)
 #else
 void SpawnHitler (int tilex, int tiley)
@@ -3009,7 +3075,11 @@ void SpawnHitler (int tilex, int tiley)
 #endif
 	// *** PRE-V1.4 APOGEE RESTORATION ***
 #ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+    #ifdef BUGFIX_08
+	new->dir = nodir;
+    #else
 	new->dir = dir*2;
+    #endif
 #else
 	new->dir = south;
 #endif
@@ -3051,6 +3121,9 @@ void A_HitlerMorph (objtype *ob)
 	new->distance = ob->distance;
 	new->dir = ob->dir;
 	new->flags = ob->flags | FL_SHOOTABLE;
+#ifdef BUGFIX_05
+	new->flags &= ~FL_NONMARK;
+#endif
 
 	new->obclass = realhitlerobj;
 	 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
@@ -3327,7 +3400,7 @@ void T_Chase (objtype *ob)
 				NewState (ob,&s_bossshoot1);
 				break;
 			// *** SHAREWARE V1.1 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 			case gretelobj:
 				NewState (ob,&s_gretelshoot1);
 				break;
@@ -3384,6 +3457,9 @@ void T_Chase (objtype *ob)
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
 			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+	#ifdef BUGFIX_63
+			TryWalk (ob);
+	#endif
 		}
 
 		if (move < ob->distance)
@@ -3627,6 +3703,9 @@ void T_Path (objtype *ob)
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
 			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+	#ifdef BUGFIX_63
+			TryWalk (ob);
+	#endif
 		}
 
 		if (move < ob->distance)
@@ -3736,7 +3815,7 @@ void T_Shoot (objtype *ob)
 	   break;
 #ifndef SPEAR
 	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
+#if (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
 	 case giftobj:
 	 case fatobj:
 	   PlaySoundLocActor(MISSILEFIRESND,ob);
@@ -3747,12 +3826,14 @@ void T_Shoot (objtype *ob)
 	 case bossobj:
 	   PlaySoundLocActor(BOSSFIRESND,ob);
 	   break;
+#ifdef KEEP_UNUSED
 	 case schabbobj:
 	   PlaySoundLocActor(SCHABBSTHROWSND,ob);
 	   break;
 	 case fakeobj:
 	   PlaySoundLocActor(FLAMETHROWERSND,ob);
 	   break;
+#endif
 #endif
 	 default:
 	   PlaySoundLocActor(NAZIFIRESND,ob);
@@ -3792,7 +3873,7 @@ void T_Bite (objtype *ob)
 		   if (US_RndT()<180)
 		   {
 			  // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
+#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && !defined(BUGFIX_54)
 			   TakeDamage (US_RndT()>>4);
 #else
 			   TakeDamage (US_RndT()>>4,ob);
@@ -4123,12 +4204,14 @@ void	A_StartDeathCam (objtype *ob)
 	case realhitlerobj:
 		NewState (ob,&s_hitlerdeathcam);
 		break;
+#ifdef KEEP_WOLFWL6
 	case giftobj:
 		NewState (ob,&s_giftdeathcam);
 		break;
 	case fatobj:
 		NewState (ob,&s_fatdeathcam);
 		break;
+#endif
 #endif
 	}
 

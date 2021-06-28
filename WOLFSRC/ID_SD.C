@@ -135,13 +135,17 @@ static	byte					sbDMA = 1,
 static	int						sbLocation = -1,sbInterrupt = 7,sbIntVec = 0xf,
 								sbIntVectors[] = {-1,-1,0xa,0xb,-1,0xd,-1,0xf,-1,-1,-1};
 static	volatile longword		sbNextSegLen;
+#ifdef KEEP_UNUSED
 static	volatile SampledSound	huge *sbSamples;
+#endif
 static	void interrupt			(*sbOldIntHand)(void);
 static	byte					sbpOldFMMix,sbpOldVOCMix;
 
 //	SoundSource variables
 		boolean				ssNoCheck;
+	#ifdef KEEP_UNUSED
 		boolean				ssActive;
+	#endif
 		word				ssControl,ssStatus,ssData;
 		byte				ssOn,ssOff;
 		volatile byte		far *ssSample;
@@ -150,7 +154,9 @@ static	byte					sbpOldFMMix,sbpOldVOCMix;
 //	PC Sound variables
 		volatile byte	pcLastSample,far *pcSound;
 		longword		pcLengthLeft;
+	#ifdef KEEP_PTABLE
 		word			pcSoundLookup[255];
+	#endif
 
 //	AdLib variables
 		boolean			alNoCheck;
@@ -162,17 +168,23 @@ static	byte					sbpOldFMMix,sbpOldVOCMix;
 
 // This table maps channel numbers to carrier and modulator op cells
 static	byte			carriers[9] =  { 3, 4, 5,11,12,13,19,20,21},
-						modifiers[9] = { 0, 1, 2, 8, 9,10,16,17,18},
+						modifiers[9] = { 0, 1, 2, 8, 9,10,16,17,18};
 // This table maps percussive voice numbers to op cells
-						pcarriers[5] = {19,0xff,0xff,0xff,0xff},
+#ifdef KEEP_UNUSED
+static	byte					pcarriers[5] = {19,0xff,0xff,0xff,0xff},
 						pmodifiers[5] = {16,17,18,20,21};
+#endif
 
 //	Sequencer variables
 		boolean			sqActive;
 static	word			alFXReg;
+
+#ifdef KEEP_UNUSED
 static	ActiveTrack		*tracks[sqMaxTracks],
 						mytracks[sqMaxTracks];
 static	word			sqMode,sqFadeStep;
+#endif
+
 		word			far *sqHack,far *sqHackPtr,sqHackLen,sqHackSeqLen;
 		long			sqHackTime;
 
@@ -727,6 +739,8 @@ asm	popf
 //	SDL_SSService() - Handles playing the next sample on the Sound Source
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 static void
 SDL_SSService(void)
 {
@@ -766,6 +780,7 @@ SDL_SSService(void)
 	}
 done:;
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -2092,8 +2107,10 @@ SD_Startup(void)
 		}
 	}
 
+#ifdef KEEP_PTABLE
 	for (i = 0;i < 255;i++)
 		pcSoundLookup[i] = i * 60;
+#endif
 
 	if (SoundBlasterPresent)
 		SDL_StartSB();
@@ -2109,6 +2126,9 @@ SD_Startup(void)
 //		the config file was present or not.
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
+
 void
 SD_Default(boolean gotit,SDMode sd,SMMode sm)
 {
@@ -2154,6 +2174,8 @@ SD_Default(boolean gotit,SDMode sd,SMMode sm)
 		SD_SetMusicMode(sm);
 }
 
+#endif
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //	SD_Shutdown() - shuts down the Sound Mgr
@@ -2195,11 +2217,14 @@ SD_Shutdown(void)
 //		of a second from its timer 0 ISR
 //
 ///////////////////////////////////////////////////////////////////////////
+
+#ifdef KEEP_UNUSED
 void
 SD_SetUserHook(void (* hook)(void))
 {
 	SoundUserHook = hook;
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
