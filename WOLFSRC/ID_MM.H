@@ -9,19 +9,7 @@
 
 #define	BUFFERSIZE		0x1000		// miscelanious, allways available buffer
 
-// *** APOGEE+FORMGEN VERSIONS RESTORATION ***
-// Looks like less blocks were used for Shareware 1.2/1.4 Apogee
-// and SOD FormGen versions, and even less in Shareware 1.1 Apogee.
-// On the other hand, more were used in Shareware 1.0 Apogee.
-#ifdef GOODTIMES
-#define MAXBLOCKS		700
-#elif (defined GAMEVER_RESTORATION_WL1_APO11)
-#define MAXBLOCKS		500
-#elif (defined GAMEVER_RESTORATION_WL1_APO10)
-#define MAXBLOCKS		1200
-#else
 #define MAXBLOCKS		600
-#endif
 
 
 //--------

@@ -1,23 +1,11 @@
-//#define BETA
-#define YEAR	1992
-#define MONTH	9
-#define DAY		30
-
 #include "ID_HEADS.H"
 #include <MATH.H>
 #include <VALUES.H>
 
 #include "WL_MENU.H"
 
-#ifdef SPANISH
-#include "SPANISH.H"
-#else
 #include "FOREIGN.H"
-#endif
 
-#ifdef SPEAR
-#include "F_SPEAR.H"
-#endif
 
 /*
 =============================================================================
@@ -51,11 +39,7 @@
 #define MAXSTATS		400				// max number of lamps, bonus, etc
 #endif
 
-#ifndef MORE_DOORS
-#define MAXDOORS		64				// max number of sliding doors
-#else
 #define MOVINGTILE	255
-#endif
 
 #define MAXWALLTILES	64				// max number of wall tiles
 
@@ -75,14 +59,7 @@
 #define NUMBERCHARS	9
 
 
-//----------------
-
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-#define EXTRAPOINTS		20000
-#else
 #define EXTRAPOINTS		40000
-#endif
 
 #define PLAYERSPEED		3000
 #define RUNSPEED   		6000
@@ -102,15 +79,7 @@
 #define MINACTORDIST	0x10000l		// minimum dist from player center
 										// to any actor center
 
-#ifdef KEEP_UNUSED
-#define NUMLATCHPICS	100
-#else
-	#ifdef SPEAR
-	#define NUMLATCHPICS	51
-	#else
-	#define NUMLATCHPICS	46
-	#endif
-#endif
+#define NUMLATCHPICS	46
 
 
 #define PI	3.141592657
@@ -149,15 +118,11 @@
 
 #define STATUSLINES		40
 
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-// Earlier alternatives to these are used for screenloc and freelatch in v1.0
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 #define SCREENSIZE		(SCREENBWIDE*208)
 #define PAGE1START		0
 #define PAGE2START		(SCREENSIZE)
 #define PAGE3START		(SCREENSIZE*2u)
 #define	FREESTART		(SCREENSIZE*3u)
-#endif
 
 
 #define PIXRADIUS		512
@@ -183,10 +148,7 @@
 
 enum	{
 		SPR_DEMO,
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 		SPR_DEATHCAM,
-#endif
 //
 // static sprites
 //
@@ -207,10 +169,6 @@ enum	{
 
 		SPR_STAT_40,SPR_STAT_41,SPR_STAT_42,SPR_STAT_43,
 		SPR_STAT_44,SPR_STAT_45,SPR_STAT_46,SPR_STAT_47,
-
-#ifdef SPEAR
-		SPR_STAT_48,SPR_STAT_49,SPR_STAT_50,SPR_STAT_51,
-#endif
 
 //
 // guard
@@ -324,7 +282,6 @@ enum	{
 
 		SPR_OFC_SHOOT1,SPR_OFC_SHOOT2,SPR_OFC_SHOOT3,
 
-#ifndef SPEAR
 //
 // ghosts
 //
@@ -371,14 +328,6 @@ enum	{
 		SPR_HITLER_DIE1,SPR_HITLER_DIE2,SPR_HITLER_DIE3,SPR_HITLER_DIE4,
 		SPR_HITLER_DIE5,SPR_HITLER_DIE6,SPR_HITLER_DIE7,
 
-		// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-		// Looks required for correct numbers, guessing this as the name
-#if (defined GAMEVER_RESTORATION_WL1_APO10) || (defined GAMEVER_RESTORATION_WL1_APO11)
-		SPR_HITLER_DIE8,
-#endif
-
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 //
 // giftmacher
 //
@@ -386,39 +335,15 @@ enum	{
 		SPR_GIFT_SHOOT1,SPR_GIFT_SHOOT2,
 
 		SPR_GIFT_DIE1,SPR_GIFT_DIE2,SPR_GIFT_DIE3,SPR_GIFT_DEAD,
-#endif
-#endif
 //
 // Rocket, smoke and small explosion
 //
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 		SPR_ROCKET_1,SPR_ROCKET_2,SPR_ROCKET_3,SPR_ROCKET_4,
 		SPR_ROCKET_5,SPR_ROCKET_6,SPR_ROCKET_7,SPR_ROCKET_8,
 
 		SPR_SMOKE_1,SPR_SMOKE_2,SPR_SMOKE_3,SPR_SMOKE_4,
-#endif
-		// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (!defined GAMEVER_RESTORATION_WL1_APO11)
 		SPR_BOOM_1,SPR_BOOM_2,SPR_BOOM_3,
-#endif
 
-//
-// Angel of Death's DeathSparks(tm)
-//
-#ifdef SPEAR
-		SPR_HROCKET_1,SPR_HROCKET_2,SPR_HROCKET_3,SPR_HROCKET_4,
-		SPR_HROCKET_5,SPR_HROCKET_6,SPR_HROCKET_7,SPR_HROCKET_8,
-
-		SPR_HSMOKE_1,SPR_HSMOKE_2,SPR_HSMOKE_3,SPR_HSMOKE_4,
-		SPR_HBOOM_1,SPR_HBOOM_2,SPR_HBOOM_3,
-
-		SPR_SPARK1,SPR_SPARK2,SPR_SPARK3,SPR_SPARK4,
-#endif
-
-#ifndef SPEAR
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 //
 // gretel
 //
@@ -434,68 +359,12 @@ enum	{
 		SPR_FAT_SHOOT1,SPR_FAT_SHOOT2,SPR_FAT_SHOOT3,SPR_FAT_SHOOT4,
 
 		SPR_FAT_DIE1,SPR_FAT_DIE2,SPR_FAT_DIE3,SPR_FAT_DEAD,
-#endif // GAMEVER_RESTORATION_WL1_APO10
 
 //
 // bj
 //
 		SPR_BJ_W1,SPR_BJ_W2,SPR_BJ_W3,SPR_BJ_W4,
 		SPR_BJ_JUMP1,SPR_BJ_JUMP2,SPR_BJ_JUMP3,SPR_BJ_JUMP4,
-#else
-//
-// THESE ARE FOR 'SPEAR OF DESTINY'
-//
-
-//
-// Trans Grosse
-//
-		SPR_TRANS_W1,SPR_TRANS_W2,SPR_TRANS_W3,SPR_TRANS_W4,
-		SPR_TRANS_SHOOT1,SPR_TRANS_SHOOT2,SPR_TRANS_SHOOT3,SPR_TRANS_DEAD,
-
-		SPR_TRANS_DIE1,SPR_TRANS_DIE2,SPR_TRANS_DIE3,
-
-//
-// Wilhelm
-//
-		SPR_WILL_W1,SPR_WILL_W2,SPR_WILL_W3,SPR_WILL_W4,
-		SPR_WILL_SHOOT1,SPR_WILL_SHOOT2,SPR_WILL_SHOOT3,SPR_WILL_SHOOT4,
-
-		SPR_WILL_DIE1,SPR_WILL_DIE2,SPR_WILL_DIE3,SPR_WILL_DEAD,
-
-//
-// UberMutant
-//
-		SPR_UBER_W1,SPR_UBER_W2,SPR_UBER_W3,SPR_UBER_W4,
-		SPR_UBER_SHOOT1,SPR_UBER_SHOOT2,SPR_UBER_SHOOT3,SPR_UBER_SHOOT4,
-
-		SPR_UBER_DIE1,SPR_UBER_DIE2,SPR_UBER_DIE3,SPR_UBER_DIE4,
-		SPR_UBER_DEAD,
-
-//
-// Death Knight
-//
-		SPR_DEATH_W1,SPR_DEATH_W2,SPR_DEATH_W3,SPR_DEATH_W4,
-		SPR_DEATH_SHOOT1,SPR_DEATH_SHOOT2,SPR_DEATH_SHOOT3,SPR_DEATH_SHOOT4,
-
-		SPR_DEATH_DIE1,SPR_DEATH_DIE2,SPR_DEATH_DIE3,SPR_DEATH_DIE4,
-		SPR_DEATH_DIE5,SPR_DEATH_DIE6,SPR_DEATH_DEAD,
-
-//
-// Ghost
-//
-		SPR_SPECTRE_W1,SPR_SPECTRE_W2,SPR_SPECTRE_W3,SPR_SPECTRE_W4,
-		SPR_SPECTRE_F1,SPR_SPECTRE_F2,SPR_SPECTRE_F3,SPR_SPECTRE_F4,
-
-//
-// Angel of Death
-//
-		SPR_ANGEL_W1,SPR_ANGEL_W2,SPR_ANGEL_W3,SPR_ANGEL_W4,
-		SPR_ANGEL_SHOOT1,SPR_ANGEL_SHOOT2,SPR_ANGEL_TIRED1,SPR_ANGEL_TIRED2,
-
-		SPR_ANGEL_DIE1,SPR_ANGEL_DIE2,SPR_ANGEL_DIE3,SPR_ANGEL_DIE4,
-		SPR_ANGEL_DIE5,SPR_ANGEL_DIE6,SPR_ANGEL_DIE7,SPR_ANGEL_DEAD,
-
-#endif
 
 //
 // player attack frames
@@ -570,19 +439,6 @@ typedef enum {
 	giftobj,
 	fatobj,
 	rocketobj
-
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	,
-	spectreobj,
-	angelobj,
-	transobj,
-	uberobj,
-	willobj,
-	deathobj,
-	hrocketobj,
-	sparkobj
-#endif
 } classtype;
 
 typedef enum {
@@ -605,12 +461,6 @@ typedef enum {
 	bo_chaingun,
 	bo_food,
 	bo_fullheal
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	,
-	bo_25clip,
-	bo_spear
-#endif
 } stat_t;
 
 typedef enum {
@@ -626,13 +476,10 @@ typedef enum {
 } dirtype;
 
 
-// *** APOGEE VERSIONS RESTORATION ***
-#if (!defined KEEP_WOLFWL6) || (defined GAMEVER_RESTORATION_WL1_APO10)
+#ifndef KEEP_WOLFWL6
 #define NUMENEMIES		13
-#elif defined GAMEVER_RESTORATION_ANY_APO_PRE14
-#define NUMENEMIES		16
 #else
-#define NUMENEMIES		22
+#define NUMENEMIES		16
 #endif
 typedef enum {
 	en_guard,
@@ -651,16 +498,6 @@ typedef enum {
 	en_gretel,
 	en_gift,
 	en_fat
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	,
-	en_spectre,
-	en_angel,
-	en_trans,
-	en_uber,
-	en_will,
-	en_death
-#endif
 } enemy_t;
 
 
@@ -699,11 +536,7 @@ typedef struct statstruct
 typedef struct doorstruct
 {
 	byte	tilex,tiley;
-#ifdef KEEP_STRUCT
-	boolean	vertical;
-#else
 	byte	vertical;
-#endif
 	byte	lock;
 	enum	{dr_open,dr_closed,dr_opening,dr_closing}	action;
 	int		ticcount;
@@ -718,50 +551,23 @@ typedef struct doorstruct
 
 typedef struct objstruct
 {
-#ifdef KEEP_STRUCT
-	activetype	active;
-	int			ticcount;
-	classtype	obclass;
-	statetype	*state;
-
-	byte		flags;				//	FL_SHOOTABLE, etc
-#else
 	char		active,obclass;
 	byte		dir,tilex,tiley,flags;
 	char		temp1,temp2;
 	int		speed,ticcount;
 	statetype	*state;
-#endif
 
 	long		distance;			// if negative, wait for that door to open
-#ifdef KEEP_STRUCT
-	dirtype		dir;
-#endif
 
 	fixed 		x,y;
-#ifdef KEEP_STRUCT
-	unsigned	tilex,tiley;
-#endif
 	byte		areanumber;
 
 	int	 		viewx;
 	unsigned	viewheight;
 	fixed		transx;
-#ifdef KEEP_UNUSED
-	fixed		transy;		// in global coord
-#endif
 
 	int 		angle;
 	int			hitpoints;
-#ifdef KEEP_STRUCT
-	long		speed;
-
-	int			temp1,temp2;
-#endif
-
-#ifdef KEEP_UNUSED
-	int temp3;
-#endif
 
 	struct		objstruct	*next,*prev;
 } objtype;
@@ -820,10 +626,7 @@ typedef	struct
 	int			episode,secretcount,treasurecount,killcount,
 				secrettotal,treasuretotal,killtotal;
 	long		TimeCount;
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	long		killx,killy;
-#endif
 	boolean		victoryflag;		// set during victory animations
 } gametype;
 
@@ -837,12 +640,8 @@ typedef	enum	{
 	ex_loadedgame,
 	ex_victorious,
 	ex_abort,
-	ex_demodone
-	// *** SHAREWARE V1.0+V1.1 APOGEE RESTORATION ***
-#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (!defined GAMEVER_RESTORATION_WL1_APO11)
-	,
+	ex_demodone,
 	ex_secretlevel
-#endif
 } exit_t;
 
 
@@ -857,12 +656,7 @@ typedef	enum	{
 extern	boolean		MS_CheckParm (char far *string);
 
 extern	char		str[80],str2[20];
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 extern	unsigned			tedlevelnum;
-#else
-extern	int			tedlevelnum;
-#endif
 extern	boolean		tedlevel;
 extern	boolean		nospr;
 extern	boolean		IsA386;
@@ -879,12 +673,7 @@ extern	int			shootdelta;
 
 extern	int			dirangle[9];
 
-// *** PRE-V1.4 APOGEE RESTORATION ***
-extern	boolean         startgame,loadedgame
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	,virtualreality
-#endif
-	;
+extern	boolean         startgame,loadedgame;
 extern	int		mouseadjustment;
 //
 // math tables
@@ -928,23 +717,11 @@ void		ShutdownId (void);
 
 
 extern	boolean		ingame,fizzlein;
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-extern	int	splitscreen;
-#endif
 extern	unsigned	latchpics[NUMLATCHPICS];
 extern	gametype	gamestate;
 extern	int			doornum;
 
 extern	char		demoname[13];
-
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	long		spearx,speary;
-extern	unsigned	spearangle;
-extern	boolean		spearflag;
-#endif
-
 
 void 	DrawPlayBorder (void);
 void 	ScanInfoPlane (void);
@@ -956,15 +733,9 @@ void 	GameLoop (void);
 void ClearMemory (void);
 void PlayDemo (int demonumber);
 void RecordDemo (void);
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 void DrawAllPlayBorder (void);
-#endif
 void	DrawHighScores(void);
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 void DrawAllPlayBorderSides (void);
-#endif
 
 
 // JAB
@@ -982,16 +753,9 @@ void UpdateSoundLoc(void);
 =============================================================================
 */
 
-#ifdef SPEAR
-extern	long		funnyticount;		// FOR FUNNY BJ FACE
-#endif
-
 extern	exit_t		playstate;
 
-// *** PRE-V1.4 APOGEE RESTORATION *** - There was apparently some unused variable here
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 extern	boolean unusedplayvar;
-#endif
 extern	boolean		madenoise;
 
 extern	objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
@@ -1001,20 +765,11 @@ extern	doorobj_t	doorobjlist[MAXDOORS],*lastdoorobj;
 
 extern	unsigned	farmapylookup[MAPSIZE];
 
-#ifdef KEEP_UNUSED
-extern	byte		*nearmapylookup[MAPSIZE];
-#endif
-
 extern	byte		tilemap[MAPSIZE][MAPSIZE];	// wall values only
 extern	byte		spotvis[MAPSIZE][MAPSIZE];
 extern	objtype		*actorat[MAPSIZE][MAPSIZE];
 
-// *** SHAREWARE V1.0 APOGEE RESTORATION *** - Not sure why but looks correct
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-#define UPDATESIZE			((UPDATEWIDE+7)*UPDATEHIGH)
-#else
 #define UPDATESIZE			(UPDATEWIDE*UPDATEHIGH)
-#endif
 extern	byte		update[UPDATESIZE];
 
 extern	boolean		singlestep,godmode,noclip;
@@ -1099,18 +854,9 @@ void PicturePause (void);
 extern	unsigned screenloc[3];
 extern	unsigned freelatch;
 
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-extern	int	screenpage;
-#endif
-
 extern	long 	lasttimecount;
 extern	long 	frameon;
 extern	boolean	fizzlein;
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-extern	int	splitscreen;
-#endif
 
 extern	unsigned	wallheight[MAXVIEWWIDTH];
 
@@ -1207,11 +953,7 @@ boolean	CheckSight (objtype *ob);
 typedef struct
 {
 	unsigned	codeofs[65];
-#ifdef KEEP_STRUCT
-	unsigned	width[65];
-#else
 	byte		width[65];
-#endif
 	byte		code[];
 }	t_compscale;
 
@@ -1235,11 +977,6 @@ extern	byte		mapmasks2[4][8];
 extern	byte		mapmasks3[4][8];
 
 extern	int			maxscale,maxscaleshl2;
-
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	boolean	insetupscaling;
-#endif
 
 void SetupScaling (int maxscaleheight);
 void ScaleShape (int xcenter, int shapenum, unsigned height);
@@ -1266,10 +1003,6 @@ extern	int			facecount;
 void	SpawnPlayer (int tilex, int tiley, int dir);
 void 	DrawFace (void);
 void	DrawHealth (void);
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-void	TakeDamage (int points,objtype *attacker);
-#endif
 void	HealSelf (int points);
 void	DrawLevel (void);
 void	DrawLives (void);
@@ -1306,27 +1039,8 @@ extern	boolean		areabyplayer[NUMAREAS];
 extern unsigned	pwallstate;
 extern unsigned	pwallpos;			// amount a pushable wall has been moved (0-63)
 extern unsigned	pwallx,pwally;
-#ifdef MORE_DOORS
 extern byte	pwalltile, pwalldir;
-#else
-extern int			pwalldir;
-#endif
 
-
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-void InitDoorList (void);
-void InitStaticList (void);
-void SpawnStatic (int tilex, int tiley, int type);
-void SpawnDoor (int tilex, int tiley, boolean vertical, int lock);
-void MoveDoors (void);
-void MovePWalls (void);
-void OpenDoor (int door);
-void PlaceItemType (int itemtype, int tilex, int tiley);
-void PushWall (int checkx, int checky, int dir);
-void OperateDoor (int door);
-void InitAreas (void);
-#endif
 
 /*
 =============================================================================
@@ -1383,23 +1097,10 @@ extern	statetype s_deathchase1;
 extern	statetype s_blinkychase1;
 extern	statetype s_hitlerchase1;
 
-// *** PRE-V1.4 APOGEE RESTORATION *** - Disabling pain1 states
 extern	statetype s_grdpain;
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	statetype s_grdpain1;
-#endif
 extern	statetype s_ofcpain;
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	statetype s_ofcpain1;
-#endif
 extern	statetype s_sspain;
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	statetype s_sspain1;
-#endif
 extern	statetype s_mutpain;
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	statetype s_mutpain1;
-#endif
 
 extern	statetype s_deathcam;
 
@@ -1413,25 +1114,6 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir);
 void KillActor (objtype *ob);
 
 void	US_ControlPanel(byte);
-
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-void SpawnDeadGuard (int tilex, int tiley);
-void SpawnBoss (int tilex, int tiley);
-void SpawnGretel (int tilex, int tiley);
-void SpawnTrans (int tilex, int tiley);
-void SpawnUber (int tilex, int tiley);
-void SpawnWill (int tilex, int tiley);
-void SpawnDeath (int tilex, int tiley);
-void SpawnAngel (int tilex, int tiley);
-void SpawnSpectre (int tilex, int tiley);
-void SpawnGhosts (int which, int tilex, int tiley);
-void SpawnSchabbs (int tilex, int tiley);
-void SpawnGift (int tilex, int tiley);
-void SpawnFat (int tilex, int tiley);
-void SpawnFakeHitler (int tilex, int tiley);
-void SpawnHitler (int tilex, int tiley);
-#endif
 
 /*
 =============================================================================

@@ -59,7 +59,6 @@ boolean		layoutdone;
 
 //===========================================================================
 
-#ifndef JAPAN
 /*
 =====================
 =
@@ -422,14 +421,10 @@ void PageLayout (boolean shownumber)
 // clear the screen
 //
 	VWB_Bar (0,0,320,200,BACKCOLOR);
-	// *** SOD V1.4 ACTIVISION RESTORATION ***
-	// Although none of WL_TEXT.C should even be used...
-#ifndef SPEAR
 	VWB_DrawPic (0,0,H_TOPWINDOWPIC);
 	VWB_DrawPic (0,8,H_LEFTWINDOWPIC);
 	VWB_DrawPic (312,8,H_RIGHTWINDOWPIC);
 	VWB_DrawPic (8,176,H_BOTTOMINFOPIC);
-#endif
 
 	for (i=0;i<TEXTROWS;i++)
 	{
@@ -481,45 +476,15 @@ void PageLayout (boolean shownumber)
 
 	if (shownumber)
 	{
-		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
-		// Micro difference - where/when to set px and py...
-		#ifdef SPANISH
-		strcpy (str,"Hoja ");
-		itoa (pagenum,str2,10);
-		strcat (str,str2);
-		strcat (str," de ");
-		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
-		// Pick location based on version
-		#ifdef GAMEVER_RESTORATION_ANY_POST_GT114
-		py = 183;
-		px = 208;
-		#endif
-		#else
 		strcpy (str,"pg ");
 		itoa (pagenum,str2,10);
 		strcat (str,str2);
 		strcat (str," of ");
-		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
-		// Pick location based on version
-		#ifdef GAMEVER_RESTORATION_ANY_POST_GT114
-		py = 183;
-		px = 213;
-		#endif
-		#endif
 		itoa (numpages,str2,10);
 		strcat (str,str2);
 		fontcolor = 0x4f; 			   //12^BACKCOLOR;
-		// *** APOGEE + EARLY GOODTIMES + ID RELEASES RESTORATION ***
-		// Pick location based on version
-		#ifndef GAMEVER_RESTORATION_ANY_POST_GT114
-		#ifdef SPANISH
-		py = 183;
-		px = 208;
-		#else
 		py = 183;
 		px = 213;
-		#endif
-		#endif
 
 		VWB_DrawPropString (str);
 	}
@@ -582,14 +547,10 @@ void CacheLayoutGraphics (void)
 				numpages++;
 			if (ch == 'E')		// end of file, so load graphics and return
 			{
-				// *** SOD 1.4 ACTIVISION RESTORATION ***
-				// Although none of WL_TEXT.C should even be used...
-#ifndef SPEAR
 				CA_MarkGrChunk(H_TOPWINDOWPIC);
 				CA_MarkGrChunk(H_LEFTWINDOWPIC);
 				CA_MarkGrChunk(H_RIGHTWINDOWPIC);
 				CA_MarkGrChunk(H_BOTTOMINFOPIC);
-#endif
 				CA_CacheMarks ();
 				text = textstart;
 				return;
@@ -612,7 +573,6 @@ void CacheLayoutGraphics (void)
 
 	Quit ("CacheLayoutGraphics: No ^E to terminate file!");
 }
-#endif
 
 
 /*
@@ -623,53 +583,11 @@ void CacheLayoutGraphics (void)
 =====================
 */
 
-#ifdef JAPAN
-void ShowArticle (int which)
-#else
 void ShowArticle (char far *article)
-#endif
 {
-	#ifdef JAPAN
-	int		snames[10] = {	H_HELP1PIC,
-							H_HELP2PIC,
-							H_HELP3PIC,
-							H_HELP4PIC,
-							H_HELP5PIC,
-							H_HELP6PIC,
-							H_HELP7PIC,
-							H_HELP8PIC,
-							H_HELP9PIC,
-							H_HELP10PIC};
-	int		enames[14] = {
-							0,0,
-							#ifndef JAPDEMO
-							C_ENDGAME1APIC,
-							C_ENDGAME1BPIC,
-							C_ENDGAME2APIC,
-							C_ENDGAME2BPIC,
-							C_ENDGAME3APIC,
-							C_ENDGAME3BPIC,
-							C_ENDGAME4APIC,
-							C_ENDGAME4BPIC,
-							C_ENDGAME5APIC,
-							C_ENDGAME5BPIC,
-							C_ENDGAME6APIC,
-							C_ENDGAME6BPIC
-							#endif
-							};
-	#endif
 	unsigned	oldfontnumber;
 	unsigned	temp;
 	boolean 	newpage,firstpage;
-
-	#ifdef JAPAN
-	pagenum = 1;
-	if (!which)
-		numpages = 10;
-	else
-		numpages = 2;
-
-	#else
 
 	text = article;
 	oldfontnumber = fontnumber;
@@ -677,7 +595,6 @@ void ShowArticle (char far *article)
 	CA_MarkGrChunk(STARTFONT);
 	VWB_Bar (0,0,320,200,BACKCOLOR);
 	CacheLayoutGraphics ();
-	#endif
 
 	newpage = true;
 	firstpage = true;
@@ -687,14 +604,7 @@ void ShowArticle (char far *article)
 		if (newpage)
 		{
 			newpage = false;
-			#ifdef JAPAN
-			if (!which)
-				CA_CacheScreen(snames[pagenum - 1]);
-			else
-				CA_CacheScreen(enames[which*2 + pagenum - 1]);
-			#else
 			PageLayout (true);
-			#endif
 			VW_UpdateScreen ();
 			if (firstpage)
 			{
@@ -715,12 +625,8 @@ void ShowArticle (char far *article)
 		case sc_LeftArrow:
 			if (pagenum>1)
 			{
-				#ifndef JAPAN
 				BackPage ();
 				BackPage ();
-				#else
-				pagenum--;
-				#endif
 				newpage = true;
 			}
 			break;
@@ -739,14 +645,6 @@ void ShowArticle (char far *article)
 			break;
 		}
 
-		// *** APOGEE VERSIONS RESTORATION ***
-		// This is also skipped in the Shareware 1.4 Apogee EXE
-		#if (!defined SPEAR) && (defined GOODTIMES)
-		//#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-			PicturePause();
-		#endif
-
 	} while (LastScan != sc_Escape);
 
 	IN_ClearKeysDown ();
@@ -756,24 +654,8 @@ void ShowArticle (char far *article)
 
 //===========================================================================
 
-#ifndef JAPAN
-#ifdef ARTSEXTERN
-// *** PRE-V1.4 APOGEE RESTORATION *** - Change the the order of appearances endextern and helpextern in the v1.2 EXE's layout (and SPEAR wasn't ready for that)
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 int		helpextern = T_HELPART;
 int 	endextern = T_ENDART1;
-#else
-int 	endextern = T_ENDART1;
-#ifndef SPEAR
-int		helpextern = T_HELPART;
-#endif
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
-#endif
-#ifdef KEEP_UNUSED
-char helpfilename[13] = "HELPART.",
-	 endfilename[13] = "ENDART1.";
-#endif
-#endif
 
 /*
 =================
@@ -782,7 +664,6 @@ char helpfilename[13] = "HELPART.",
 =
 =================
 */
-#ifndef SPEAR
 void HelpScreens (void)
 {
 	int			artnum;
@@ -792,51 +673,22 @@ void HelpScreens (void)
 
 	CA_UpLevel ();
 	MM_SortMem ();
-#ifdef JAPAN
-	ShowArticle (0);
-	VW_FadeOut();
-	FreeMusic ();
-	CA_DownLevel ();
-	MM_SortMem ();
-#else
 
-
-
-
-#ifdef ARTSEXTERN
 	artnum = helpextern;
 	CA_CacheGrChunk (artnum);
 	text = (char _seg *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
-#else
-	CA_LoadFile (helpfilename,&layout);
-	text = (char _seg *)layout;
-	MM_SetLock (&layout, true);
-#endif
 
 	ShowArticle (text);
 
-#ifdef ARTSEXTERN
 	MM_FreePtr (&grsegs[artnum]);
-#else
-	MM_FreePtr (&layout);
-#endif
 
-
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	MenuFadeOut();
-#else
-	VW_FadeOut();
-#endif
 
 	FreeMusic ();
 	CA_DownLevel ();
 	MM_SortMem ();
-#endif
 }
-#endif
 
 //
 // END ARTICLES
@@ -847,64 +699,21 @@ void EndText (void)
 	char far 	*text;
 	memptr		layout;
 
-
 	ClearMemory ();
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	ResetSplitScreen ();
-#endif
 	CA_UpLevel ();
 	MM_SortMem ();
-#ifdef JAPAN
-	ShowArticle(gamestate.episode + 1);
 
-	VW_FadeOut();
-
-	SETFONTCOLOR(0,15);
-	IN_ClearKeysDown();
-	if (MousePresent)
-		Mouse(MDelta);	// Clear accumulated mouse movement
-
-	FreeMusic ();
-	CA_DownLevel ();
-	MM_SortMem ();
-#else
-
-
-
-#ifdef ARTSEXTERN
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	artnum = endextern;
-#else
 	artnum = endextern+gamestate.episode;
-#endif
 	CA_CacheGrChunk (artnum);
 	text = (char _seg *)grsegs[artnum];
 	MM_SetLock (&grsegs[artnum], true);
-#else
-	endfilename[6] = '1'+gamestate.episode;
-	CA_LoadFile (endfilename,&layout);
-	text = (char _seg *)layout;
-	MM_SetLock (&layout, true);
-#endif
 
 	ShowArticle (text);
 
-#ifdef ARTSEXTERN
 	MM_FreePtr (&grsegs[artnum]);
-#else
-	MM_FreePtr (&layout);
-#endif
 
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	MenuFadeOut();
-#else
-	VW_FadeOut();
-#endif
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
 	if (MousePresent)
@@ -913,5 +722,4 @@ void EndText (void)
 	FreeMusic ();
 	CA_DownLevel ();
 	MM_SortMem ();
-#endif
 }

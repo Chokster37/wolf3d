@@ -11,26 +11,12 @@
 // PRIVATE PROTOTYPES
 //
 void CP_ReadThis(void);
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 void CP_BackToDemo(void);
-#endif
 
-#ifdef SPEAR
-#define STARTITEM	newgame
-
-#else
-#ifdef GOODTIMES
-#define STARTITEM	newgame
-
-#else
 #define STARTITEM	readthis
-#endif
-#endif
 
-char GAMEVER_RESTORATION_CONDFARPTR endStrings[9][80]=
+char far endStrings[9][80]=
 {
-#ifndef SPEAR
 	{"Dost thou wish to\nleave with such hasty\nabandon?"},
 	{"Chickening out...\nalready?"},
 	{"Press N for more carnage.\nPress Y to be a weenie."},
@@ -40,17 +26,6 @@ char GAMEVER_RESTORATION_CONDFARPTR endStrings[9][80]=
 	{"Heroes, press N.\nWimps, press Y."},
 	{"You are at an intersection.\nA sign says, 'Press Y to quit.'\n>"},
 	{"For guns and glory, press N.\nFor work and worry, press Y."}
-#else
-	ENDSTR1,
-	ENDSTR2,
-	ENDSTR3,
-	ENDSTR4,
-	ENDSTR5,
-	ENDSTR6,
-	ENDSTR7,
-	ENDSTR8,
-	ENDSTR9
-#endif
 };
 
 CP_iteminfo
@@ -63,68 +38,23 @@ CP_iteminfo
 	NewItems={NM_X,NM_Y,4,2,24};
 
 #pragma warn -sus
-CP_itemtype GAMEVER_RESTORATION_CONDFARPTR
+CP_itemtype far
 MainMenu[]=
 {
-#ifdef JAPAN
-	{1,"",CP_NewGame},
-	{1,"",CP_Sound},
-	{1,"",CP_Control},
-	{1,"",CP_LoadGame},
-	{0,"",CP_SaveGame},
-	{1,"",CP_ChangeView},
-	{2,"",CP_ReadThis},
-	{1,"",CP_ViewScores},
-	{1,"",0},
-	{1,"",0}
-#else
-
 	{1,STR_NG,CP_NewGame},
 	{1,STR_SD,CP_Sound},
 	{1,STR_CL,CP_Control},
 	{1,STR_LG,CP_LoadGame},
 	{0,STR_SG,CP_SaveGame},
 	{1,STR_CV,CP_ChangeView},
-
-#ifndef GOODTIMES
-#ifndef SPEAR
-
-	#ifdef SPANISH
-	{2,"Ve esto!",CP_ReadThis},
-	#else
 	{2,"Read This!",CP_ReadThis},
-	#endif
-
-#endif
-#endif
-
 	{1,STR_VS,CP_ViewScores},
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	{1,STR_BD,CP_BackToDemo},
-#else
-	{1,STR_BD,0},
-#endif
 	{1,STR_QT,0}
-#endif
 },
 
-GAMEVER_RESTORATION_CONDFARPTR SndMenu[]=
+far SndMenu[]=
 {
-#ifdef JAPAN
-	{1,"",0},
-	{1,"",0},
-	{1,"",0},
-	{0,"",0},
-	{0,"",0},
-	{1,"",0},
-	{1,"",0},
-	{1,"",0},
-	{0,"",0},
-	{0,"",0},
-	{1,"",0},
-	{1,"",0},
-#else
 	{1,STR_NONE,0},
 	{1,STR_PC,0},
 	{1,STR_ALSB,0},
@@ -137,81 +67,22 @@ GAMEVER_RESTORATION_CONDFARPTR SndMenu[]=
 	{0,"",0},
 	{1,STR_NONE,0},
 	{1,STR_ALSB,0}
-#endif
 },
 
-GAMEVER_RESTORATION_CONDFARPTR CtlMenu[]=
+far CtlMenu[]=
 {
-#ifdef JAPAN
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",MouseSensitivity},
-	{1,"",CustomControls}
-#else
 	{0,STR_MOUSEEN,0},
 	{0,STR_JOYEN,0},
 	{0,STR_PORT2,0},
 	{0,STR_GAMEPAD,0},
 	{0,STR_SENS,MouseSensitivity},
 	{1,STR_CUSTOM,CustomControls}
-#endif
 },
 
 #pragma warn +sus
 
-#ifndef SPEAR
-GAMEVER_RESTORATION_CONDFARPTR NewEmenu[]=
+far NewEmenu[]=
 {
-#ifdef JAPAN
-#ifdef JAPDEMO
-	{1,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-	{0,"",0},
-#else
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0},
-	{1,"",0},
-	{0,"",0}
-#endif
-#else
-	#ifdef SPANISH
-	{1,"Episodio 1\n"
-	   "Fuga desde Wolfenstein",0},
-	{0,"",0},
-	{3,"Episodio 2\n"
-		   "Operacion Eisenfaust",0},
-	{0,"",0},
-	{3,"Episodio 3\n"
-		   "Muere, Fuhrer, Muere!",0},
-	{0,"",0},
-	{3,"Episodio 4\n"
-		  "Un Negro Secreto",0},
-	{0,"",0},
-	{3,"Episodio 5\n"
-		  "Huellas del Loco",0},
-	{0,"",0},
-	{3,"Episodio 6\n"
-		  "Confrontacion",0}
-	#else
 	{1,"Episode 1\n"
 	   "Escape from Wolfenstein",0},
 	{0,"",0},
@@ -229,28 +100,18 @@ GAMEVER_RESTORATION_CONDFARPTR NewEmenu[]=
 	{0,"",0},
 	{3,"Episode 6\n"
 		  "Confrontation",0}
-	#endif
-#endif
 },
-#endif
 
 
-GAMEVER_RESTORATION_CONDFARPTR NewMenu[]=
+far NewMenu[]=
 {
-#ifdef JAPAN
-	{1,"",0},
-	{1,"",0},
-	{1,"",0},
-	{1,"",0}
-#else
 	{1,STR_DADDY,0},
 	{1,STR_HURTME,0},
 	{1,STR_BRINGEM,0},
 	{1,STR_DEATH,0}
-#endif
 },
 
-GAMEVER_RESTORATION_CONDFARPTR LSMenu[]=
+far LSMenu[]=
 {
 	{1,"",0},
 	{1,"",0},
@@ -264,7 +125,7 @@ GAMEVER_RESTORATION_CONDFARPTR LSMenu[]=
 	{1,"",0}
 },
 
-GAMEVER_RESTORATION_CONDFARPTR CusMenu[]=
+far CusMenu[]=
 {
 	{1,"",0},
 	{0,"",0},
@@ -356,15 +217,7 @@ void US_ControlPanel(byte scancode)
 	switch(scancode)
 	{
 		case sc_F1:
-			#ifdef SPEAR
-			BossKey();
-			#else
-			#ifdef GOODTIMES
-			BossKey();
-			#else
 			HelpScreens();
-			#endif
-			#endif
 			goto finishup;
 
 		case sc_F2:
@@ -389,15 +242,8 @@ void US_ControlPanel(byte scancode)
 
 		finishup:
 			CleanupControlPanel();
-			#ifdef SPEAR
-			UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-			#endif
 			return;
 	}
-
-#ifdef SPEAR
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
 
 	DrawMainMenu();
 	MenuFadeIn();
@@ -410,50 +256,6 @@ void US_ControlPanel(byte scancode)
 	{
 		which=HandleMenu(&MainItems,&MainMenu[0],NULL);
 
-		#ifdef SPEAR
-		#ifndef SPEARDEMO
-		//
-		// EASTER EGG FOR SPEAR OF DESTINY!
-		//
-		if (Keyboard[sc_I] && Keyboard[sc_D])
-		{
-			VW_FadeOut();
-			StartCPMusic (XJAZNAZI_MUS);
-			UnCacheLump(OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-			UnCacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-			MM_SortMem ();
-			ClearMemory ();
-
-
-			CA_CacheGrChunk (IDGUYS1PIC);
-			VWB_DrawPic(0,0,IDGUYS1PIC);
-			UNCACHEGRCHUNK(IDGUYS1PIC);
-
-			CA_CacheGrChunk (IDGUYS2PIC);
-			VWB_DrawPic(0,80,IDGUYS2PIC);
-			UNCACHEGRCHUNK(IDGUYS2PIC);
-
-			VW_UpdateScreen();
-
-			CA_CacheGrChunk (IDGUYSPALETTE);
-			VL_FadeIn(0,255,grsegs[IDGUYSPALETTE],30);
-			UNCACHEGRCHUNK(IDGUYSPALETTE);
-
-			while (Keyboard[sc_I] || Keyboard[sc_D]);
-			IN_ClearKeysDown();
-			IN_Ack();
-
-			VW_FadeOut();
-
-			CacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-			CacheLump(OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-			DrawMainMenu();
-			StartCPMusic (MENUSONG);
-			MenuFadeIn();
-		}
-		#endif
-		#endif
-
 		switch(which)
 		{
 			case viewscores:
@@ -464,40 +266,6 @@ void US_ControlPanel(byte scancode)
 				DrawMainMenu();
 				MenuFadeIn();
 				break;
-
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-			case backtodemo:
-				#ifdef SPEAR
-				if (!ingame)
-				{
-					//
-					// DEALLOCATE ALL SOUNDS!
-					//
-					switch (SoundMode)
-					{
-						case sdm_PC:
-							start = STARTPCSOUNDS;
-							break;
-						case sdm_AdLib:
-							start = STARTADLIBSOUNDS;
-							break;
-					}
-
-					if (SoundMode != sdm_Off)
-						for (i=0;i<NUMSOUNDS;i++,start++)
-							if (audiosegs[start])
-								MM_SetPurge (&(memptr)audiosegs[start],3);		// make purgable
-				}
-				#endif
-
-				MM_SortMem();
-				StartGame=1;
-				if (!ingame)
-					StartCPMusic(INTROSONG);
-				VL_FadeOut(0,255,0,0,0,10);
-				break;
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 
 			case -1:
 			case quit:
@@ -526,27 +294,16 @@ void US_ControlPanel(byte scancode)
 	// CHANGE MAINMENU ITEM
 	//
 
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && !defined(BUGFIX_51)
-	if (startgame)
-#else
 	if (startgame || loadedgame)
-#endif
 	{
 		#pragma warn -sus
 		MainMenu[viewscores].routine = NULL;
-		#ifndef JAPAN
-		GAMEVER_RESTORATION_CONDFARSTRCPY(MainMenu[viewscores].string,STR_EG);
-		#endif
+		_fstrcpy(MainMenu[viewscores].string,STR_EG);
 		#pragma warn +sus
 	}
 
 	// RETURN/START GAME EXECUTION
 
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	MM_SortMem ();
-#endif
 }
 
 
@@ -556,61 +313,25 @@ void US_ControlPanel(byte scancode)
 //
 void DrawMainMenu(void)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_OPTIONSPIC);
-#else
 	ClearMScreen();
 
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 	DrawStripes(10);
 	VWB_DrawPic(84,0,C_OPTIONSPIC);
 
-	#ifdef SPANISH
-	DrawWindow(MENU_X-8,MENU_Y-3,MENU_W+8,MENU_H,BKGDCOLOR);
-	#else
 	DrawWindow(MENU_X-8,MENU_Y-3,MENU_W,MENU_H,BKGDCOLOR);
-	#endif
-#endif
 
 	//
 	// CHANGE "GAME" AND "DEMO"
 	//
 	if (ingame)
 	{
-		#ifndef JAPAN
-
-		#ifdef SPANISH
-		GAMEVER_RESTORATION_CONDFARSTRCPY(&MainMenu[backtodemo].string,STR_GAME);
-		#else
-		GAMEVER_RESTORATION_CONDFARSTRCPY(&MainMenu[backtodemo].string[8],STR_GAME);
-		#endif
-
-		#else
-		CA_CacheGrChunk(C_MRETGAMEPIC);
-		VWB_DrawPic(12*8,20*8,C_MRETGAMEPIC);
-		UNCACHEGRCHUNK(C_MRETGAMEPIC);
-		CA_CacheGrChunk(C_MENDGAMEPIC);
-		VWB_DrawPic(12*8,18*8,C_MENDGAMEPIC);
-		UNCACHEGRCHUNK(C_MENDGAMEPIC);
-		#endif
+		_fstrcpy(&MainMenu[backtodemo].string[8],STR_GAME);
 		MainMenu[backtodemo].active=2;
 	}
 	else
 	{
-		#ifndef JAPAN
-		#ifdef SPANISH
-		GAMEVER_RESTORATION_CONDFARSTRCPY(&MainMenu[backtodemo].string,STR_BD);
-		#else
-		GAMEVER_RESTORATION_CONDFARSTRCPY(&MainMenu[backtodemo].string[8],STR_DEMO);
-		#endif
-		#else
-		CA_CacheGrChunk(C_MRETDEMOPIC);
-		VWB_DrawPic(12*8,20*8,C_MRETDEMOPIC);
-		UNCACHEGRCHUNK(C_MRETDEMOPIC);
-		CA_CacheGrChunk(C_MSCORESPIC);
-		VWB_DrawPic(12*8,18*8,C_MSCORESPIC);
-		UNCACHEGRCHUNK(C_MSCORESPIC);
-		#endif
+		_fstrcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
 		MainMenu[backtodemo].active=1;
 	}
 
@@ -618,8 +339,6 @@ void DrawMainMenu(void)
 	VW_UpdateScreen();
 }
 
-#ifndef GOODTIMES
-#ifndef SPEAR
 ////////////////////////////////////////////////////////////////////
 //
 // READ THIS!
@@ -631,36 +350,6 @@ void CP_ReadThis(void)
 	HelpScreens();
 	StartCPMusic(MENUSONG);
 }
-#endif
-#endif
-
-/*** SOD 1.4 ACTIVISION RESTORATION - Should be able to call BossKey... ***/
-#if (defined GOODTIMES) || (defined SPEAR)
-//#ifndef SPEAR
-//#ifndef GOODTIMES
-//#else
-////////////////////////////////////////////////////////////////////
-//
-// BOSS KEY
-//
-////////////////////////////////////////////////////////////////////
-void BossKey(void)
-{
-	SD_MusicOff();
-	_AX = 3;
-	geninterrupt(0x10);
-	printf("C>");
-	while (!Keyboard[sc_Escape])
-	IN_ClearKeysDown();
-
-	SD_MusicOn();
-	VL_SetVGAPlaneMode ();
-	VL_TestPaletteSet ();
-	VL_SetPalette (&gamepal);
-	LoadLatchMem();
-}
-//#endif
-#endif
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -678,35 +367,16 @@ int CP_CheckQuick(unsigned scancode)
 			CA_CacheGrChunk(STARTFONT+1);
 
 			WindowH=160;
-			#ifdef JAPAN
-			if (GetYorN(7,8,C_JAPQUITPIC))
-			#else
 			if (Confirm(ENDGAMESTR))
-			#endif
 			{
 				playstate = ex_died;
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				gamestate.lives = 0;
-#else
 				pickquick = gamestate.lives = 0;
-#endif
 			}
 
-			// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 			DrawAllPlayBorder();
-#endif
 			WindowH=200;
-			// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-			UNCACHEGRCHUNK(STARTFONT+1);
-#endif
 			fontnumber=0;
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#if !defined(GAMEVER_RESTORATION_ANY_APO_PRE14) || defined(BUGFIX_51)
 			MainMenu[savegame].active = 0;
-#endif
 			return 1;
 
 		//
@@ -716,21 +386,12 @@ int CP_CheckQuick(unsigned scancode)
 			if (SaveGamesAvail[LSItems.curpos] && pickquick)
 			{
 				CA_CacheGrChunk(STARTFONT+1);
-				// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-				fontnumber = 1;
-#endif
 				Message(STR_SAVING"...");
 				CP_SaveGame(1);
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				UNCACHEGRCHUNK(STARTFONT+1);
-#endif
 				fontnumber=0;
 			}
 			else
 			{
-				#ifndef SPEAR
 				CA_CacheGrChunk(STARTFONT+1);
 				CA_CacheGrChunk(C_CURSOR1PIC);
 				CA_CacheGrChunk(C_CURSOR2PIC);
@@ -738,16 +399,8 @@ int CP_CheckQuick(unsigned scancode)
 				CA_CacheGrChunk(C_DISKLOADING2PIC);
 				CA_CacheGrChunk(C_SAVEGAMEPIC);
 				CA_CacheGrChunk(C_MOUSELBACKPIC);
-				#else
-				CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-				CA_CacheGrChunk(C_CURSOR1PIC);
-				#endif
 
 				VW_FadeOut ();
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				ResetSplitScreen ();
-#endif
 
 				StartCPMusic(MENUSONG);
 				pickquick=CP_SaveGame(0);
@@ -771,20 +424,12 @@ int CP_CheckQuick(unsigned scancode)
 
 				PM_CheckMainMem ();
 
-				#ifndef SPEAR
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				UNCACHEGRCHUNK(STARTFONT+1);
-#endif
 				UNCACHEGRCHUNK(C_CURSOR1PIC);
 				UNCACHEGRCHUNK(C_CURSOR2PIC);
 				UNCACHEGRCHUNK(C_DISKLOADING1PIC);
 				UNCACHEGRCHUNK(C_DISKLOADING2PIC);
 				UNCACHEGRCHUNK(C_SAVEGAMEPIC);
 				UNCACHEGRCHUNK(C_MOUSELBACKPIC);
-				#else
-				UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-				#endif
 			}
 			return 1;
 
@@ -798,10 +443,6 @@ int CP_CheckQuick(unsigned scancode)
 
 
 				CA_CacheGrChunk(STARTFONT+1);
-				// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-				fontnumber = 1;
-#endif
 
 				strcat(string,SaveGameNames[LSItems.curpos]);
 				strcat(string,"\"?");
@@ -809,19 +450,11 @@ int CP_CheckQuick(unsigned scancode)
 				if (Confirm(string))
 					CP_LoadGame(1);
 
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 				DrawAllPlayBorder();
-#endif
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				UNCACHEGRCHUNK(STARTFONT+1);
-#endif
 				fontnumber=0;
 			}
 			else
 			{
-				#ifndef SPEAR
 				CA_CacheGrChunk(STARTFONT+1);
 				CA_CacheGrChunk(C_CURSOR1PIC);
 				CA_CacheGrChunk(C_CURSOR2PIC);
@@ -829,16 +462,8 @@ int CP_CheckQuick(unsigned scancode)
 				CA_CacheGrChunk(C_DISKLOADING2PIC);
 				CA_CacheGrChunk(C_LOADGAMEPIC);
 				CA_CacheGrChunk(C_MOUSELBACKPIC);
-				#else
-				CA_CacheGrChunk(C_CURSOR1PIC);
-				CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-				#endif
 
 				VW_FadeOut ();
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				ResetSplitScreen ();
-#endif
 
 				StartCPMusic(MENUSONG);
 				pickquick=CP_LoadGame(0);
@@ -862,20 +487,12 @@ int CP_CheckQuick(unsigned scancode)
 					Mouse(MDelta);	// Clear accumulated mouse movement
 				PM_CheckMainMem ();
 
-				#ifndef SPEAR
-				// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-				UNCACHEGRCHUNK(STARTFONT+1);
-#endif
 				UNCACHEGRCHUNK(C_CURSOR1PIC);
 				UNCACHEGRCHUNK(C_CURSOR2PIC);
 				UNCACHEGRCHUNK(C_DISKLOADING1PIC);
 				UNCACHEGRCHUNK(C_DISKLOADING2PIC);
 				UNCACHEGRCHUNK(C_LOADGAMEPIC);
 				UNCACHEGRCHUNK(C_MOUSELBACKPIC);
-				#else
-				UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-				#endif
 			}
 			return 1;
 
@@ -885,21 +502,10 @@ int CP_CheckQuick(unsigned scancode)
 		case sc_F10:
 			CA_CacheGrChunk(STARTFONT+1);
 
-			// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 			WindowX=WindowY=0;
 			WindowW=320;
-#endif
 			WindowH=160;
-			#ifdef JAPAN
-			if (GetYorN(7,8,C_QUITMSGPIC))
-			#else
-				#ifdef SPANISH
-			if (Confirm(ENDGAMESTR))
-				#else
 			if (Confirm(endStrings[US_RndT()&0x7+(US_RndT()&1)]))
-				#endif
-			#endif
 			{
 				int i;
 
@@ -917,15 +523,8 @@ int CP_CheckQuick(unsigned scancode)
 				Quit(NULL);
 			}
 
-			// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 			DrawAllPlayBorder();
-#endif
 			WindowH=200;
-			// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-			UNCACHEGRCHUNK(STARTFONT+1);
-#endif
 			fontnumber=0;
 			return 1;
 		}
@@ -941,30 +540,16 @@ int CP_CheckQuick(unsigned scancode)
 ////////////////////////////////////////////////////////////////////
 int CP_EndGame(void)
 {
-#ifdef JAPAN
-	if (!GetYorN(7,8,C_JAPQUITPIC))
-#else
 	if (!Confirm(ENDGAMESTR))
-#endif
 		return 0;
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	gamestate.lives = 0;
-#else
 	pickquick = gamestate.lives = 0;
-#endif
 	playstate = ex_died;
 
 	#pragma warn -sus
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#if !defined(GAMEVER_RESTORATION_ANY_APO_PRE14) || defined(BUGFIX_51)
 	MainMenu[savegame].active = 0;
-#endif
 	MainMenu[viewscores].routine=CP_ViewScores;
-	#ifndef JAPAN
-	GAMEVER_RESTORATION_CONDFARSTRCPY(MainMenu[viewscores].string,STR_VS);
-	#endif
+	_fstrcpy(MainMenu[viewscores].string,STR_VS);
 	#pragma warn +sus
 
 	return 1;
@@ -980,12 +565,7 @@ void CP_ViewScores(void)
 {
 	fontnumber=0;
 
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	StartCPMusic (XAWARD_MUS);
-#else
 	StartCPMusic (ROSTER_MUS);
-#endif
 
 	DrawHighScores ();
 	VW_UpdateScreen ();
@@ -996,11 +576,6 @@ void CP_ViewScores(void)
 
 	StartCPMusic(MENUSONG);
 	MenuFadeOut();
-
-#ifdef SPEAR
-	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
 }
 
 
@@ -1013,12 +588,6 @@ void CP_NewGame(void)
 {
 	int which,episode;
 
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
-
-
-#ifndef SPEAR
 firstpart:
 
 	DrawNewEpisode();
@@ -1060,11 +629,7 @@ firstpart:
 	// ALREADY IN A GAME?
 	//
 	if (ingame)
-		#ifdef JAPAN
-		if (!GetYorN(7,8,C_JAPNEWGAMEPIC))
-		#else
 		if (!Confirm(CURGAME))
-		#endif
 		{
 			MenuFadeOut();
 			return;
@@ -1072,37 +637,12 @@ firstpart:
 
 	MenuFadeOut();
 
-#else
-	episode = 0;
-
-	//
-	// ALREADY IN A GAME?
-	//
-	CacheLump (NEWGAME_LUMP_START,NEWGAME_LUMP_END);
-	DrawNewGame();
-	if (ingame)
-		if (!Confirm(CURGAME))
-		{
-			MenuFadeOut();
-			UnCacheLump (NEWGAME_LUMP_START,NEWGAME_LUMP_END);
-			CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-			return;
-		}
-
-#endif
-
 	DrawNewGame();
 	which=HandleMenu(&NewItems,&NewMenu[0],DrawNewGameDiff);
 	if (which<0)
 	{
 		MenuFadeOut();
-		#ifndef SPEAR
 		goto firstpart;
-		#else
-		UnCacheLump (NEWGAME_LUMP_START,NEWGAME_LUMP_END);
-		CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-		return;
-		#endif
 	}
 
 	ShootSnd();
@@ -1113,25 +653,10 @@ firstpart:
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
 	//
-	#ifndef SPEAR
-	#ifndef GOODTIMES
 	MainMenu[readthis].active=1;
-	#endif
-	#endif
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	pickquick = 0;
-#endif
-
-#ifdef SPEAR
-	UnCacheLump (NEWGAME_LUMP_START,NEWGAME_LUMP_END);
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
 }
 
 
-#ifndef SPEAR
 /////////////////////
 //
 // DRAW NEW EPISODE MENU
@@ -1140,9 +665,6 @@ void DrawNewEpisode(void)
 {
 	int i;
 
-#ifdef JAPAN
-	CA_CacheScreen(S_EPISODEPIC);
-#else
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 
@@ -1150,12 +672,7 @@ void DrawNewEpisode(void)
 	SETFONTCOLOR(READHCOLOR,BKGDCOLOR);
 	PrintY=2;
 	WindowX=0;
-	#ifdef SPANISH
-	US_CPrint("Cual episodio jugar?");
-	#else
 	US_CPrint("Which episode to play?");
-	#endif
-#endif
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
 	DrawMenu(&NewEitems,&NewEmenu[0]);
@@ -1167,7 +684,6 @@ void DrawNewEpisode(void)
 	MenuFadeIn();
 	WaitKeyUp();
 }
-#endif
 
 /////////////////////
 //
@@ -1175,9 +691,6 @@ void DrawNewEpisode(void)
 //
 void DrawNewGame(void)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_SKILLPIC);
-#else
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 
@@ -1185,18 +698,9 @@ void DrawNewGame(void)
 	PrintX=NM_X+20;
 	PrintY=NM_Y-32;
 
-#ifndef SPEAR
-	#ifdef SPANISH
-	US_Print("Eres macho?");
-	#else
 	US_Print("How tough are you?");
-	#endif
-#else
-	VWB_DrawPic (PrintX,PrintY,C_HOWTOUGHPIC);
-#endif
 
 	DrawWindow(NM_X-5,NM_Y-10,NM_W,NM_H,BKGDCOLOR);
-#endif
 
 	DrawMenu(&NewItems,&NewMenu[0]);
 	DrawNewGameDiff(NewItems.curpos);
@@ -1224,12 +728,6 @@ void DrawNewGameDiff(int w)
 void CP_Sound(void)
 {
 	int which,i;
-
-
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	CacheLump (SOUND_LUMP_START,SOUND_LUMP_END);
-#endif
 
 	DrawSoundMenu();
 	MenuFadeIn();
@@ -1326,11 +824,6 @@ void CP_Sound(void)
 	} while(which>=0);
 
 	MenuFadeOut();
-
-#ifdef SPEAR
-	UnCacheLump (SOUND_LUMP_START,SOUND_LUMP_END);
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
 }
 
 
@@ -1342,10 +835,6 @@ void DrawSoundMenu(void)
 {
 	int i,on;
 
-
-#ifdef JAPAN
-	CA_CacheScreen(S_SOUNDPIC);
-#else
 	//
 	// DRAW SOUND MENU
 	//
@@ -1355,7 +844,6 @@ void DrawSoundMenu(void)
 	DrawWindow(SM_X-8,SM_Y1-3,SM_W,SM_H1,BKGDCOLOR);
 	DrawWindow(SM_X-8,SM_Y2-3,SM_W,SM_H2,BKGDCOLOR);
 	DrawWindow(SM_X-8,SM_Y3-3,SM_W,SM_H3,BKGDCOLOR);
-#endif
 
 	//
 	// IF NO ADLIB, NON-CHOOSENESS!
@@ -1375,18 +863,12 @@ void DrawSoundMenu(void)
 		SndMenu[5].active=0;
 
 	DrawMenu(&SndItems,&SndMenu[0]);
-#ifndef JAPAN
 	VWB_DrawPic(100,SM_Y1-20,C_FXTITLEPIC);
 	VWB_DrawPic(100,SM_Y2-20,C_DIGITITLEPIC);
 	VWB_DrawPic(100,SM_Y3-20,C_MUSICTITLEPIC);
-#endif
 
 	for (i=0;i<SndItems.amount;i++)
-#ifdef JAPAN
-		if (i!=3 && i!=4 && i!=8 && i!=9)
-#else
 		if (SndMenu[i].string[0])
-#endif
 		{
 			//
 			// DRAW SELECTED/NOT SELECTED GRAPHIC BUTTONS
@@ -1496,12 +978,6 @@ int CP_LoadGame(int quick)
 		}
 	}
 
-
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	CacheLump (LOADSAVE_LUMP_START,LOADSAVE_LUMP_END);
-#endif
-
 	DrawLoadSaveScreen(0);
 
 	do
@@ -1526,12 +1002,7 @@ int CP_LoadGame(int quick)
 			//
 			// CHANGE "READ THIS!" TO NORMAL COLOR
 			//
-
-			#ifndef SPEAR
-			#ifndef GOODTIMES
 			MainMenu[readthis].active=1;
-			#endif
-			#endif
 
 			exit=1;
 			break;
@@ -1540,11 +1011,6 @@ int CP_LoadGame(int quick)
 	} while(which>=0);
 
 	MenuFadeOut();
-
-#ifdef SPEAR
-	UnCacheLump (LOADSAVE_LUMP_START,LOADSAVE_LUMP_END);
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
 
 	return exit;
 }
@@ -1657,12 +1123,6 @@ int CP_SaveGame(int quick)
 		}
 	}
 
-
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	CacheLump (LOADSAVE_LUMP_START,LOADSAVE_LUMP_END);
-#endif
-
 	DrawLoadSaveScreen(1);
 
 	do
@@ -1674,11 +1134,7 @@ int CP_SaveGame(int quick)
 			// OVERWRITE EXISTING SAVEGAME?
 			//
 			if (SaveGamesAvail[which])
-				#ifdef JAPAN
-				if (!GetYorN(7,8,C_JAPSAVEOVERPIC))
-				#else
 				if (!Confirm(GAMESVD))
-				#endif
 				{
 					DrawLoadSaveScreen(1);
 					continue;
@@ -1700,12 +1156,7 @@ int CP_SaveGame(int quick)
 				VWB_Bar(LSM_X+LSItems.indent+1,LSM_Y+which*13+1,LSM_W-LSItems.indent-16,10,BKGDCOLOR);
 			VW_UpdateScreen();
 
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,true,31,LSM_W-LSItems.indent-20))
-#else
-			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,true,31,LSM_W-LSItems.indent-30))
-#endif
 			{
 				SaveGamesAvail[which]=1;
 				strcpy(&SaveGameNames[which][0],input);
@@ -1740,130 +1191,15 @@ int CP_SaveGame(int quick)
 
 	MenuFadeOut();
 
-#ifdef SPEAR
-	UnCacheLump (LOADSAVE_LUMP_START,LOADSAVE_LUMP_END);
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	StartGame = 1;	
-#endif
 
 	return exit;
 }
 
-// *** PRE-V1.4 APOGEE RESTORATION *** - CalibrateJoystick was added to v1.4,
-// while v1.2 seems to have an unused handler assigned to "Back to demo"
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 void CP_BackToDemo(void)
 {
 	StartGame = 1;
 }
-#else
-////////////////////////////////////////////////////////////////////
-//
-// CALIBRATE JOYSTICK
-//
-////////////////////////////////////////////////////////////////////
-int CalibrateJoystick(void)
-{
-	#define CALX	85
-	#define CALY	40
-	#define CALW	158
-	#define CALH	140
-
-	unsigned xmin,ymin,xmax,ymax,jb;
-
-
-
-	#ifdef JAPAN
-	VWB_DrawPic(CALX,CALY,C_JOY0PIC);
-	#else
-	DrawWindow(CALX-5,CALY-5,CALW,CALH,TEXTCOLOR);
-	DrawOutline(CALX-5,CALY-5,CALW,CALH,0,HIGHLIGHT);
-	SETFONTCOLOR(0,TEXTCOLOR);
-
-	WindowX = PrintX = CALX;
-	WindowW = CALW;
-	WindowH = CALH;
-	WindowY = PrintY = CALY;
-	US_Print("    "STR_CALIB"\n    "STR_JOYST"\n");
-	VWB_DrawPic(CALX+40,CALY+30,C_JOY1PIC);
-	PrintY = CALY+80;
-	US_Print(STR_MOVEJOY);
-	SETFONTCOLOR(BKGDCOLOR,TEXTCOLOR);
-	US_Print("   "STR_ESCEXIT);
-	#endif
-	VW_UpdateScreen();
-
-	do
-	{
-		jb=IN_JoyButtons();
-		if (Keyboard[sc_Escape])
-			return 0;
-		// *** SHAREWARE/REGISTERED APOGEE RESTORATION ***
-		// This is also skipped in the Apogee EXEs
-		#if (!defined SPEAR) && (defined GOODTIMES)
-		//#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-			PicturePause();
-		#endif
-
-	} while(!(jb&1));
-
-	SD_PlaySound(SHOOTSND);
-	IN_GetJoyAbs(joystickport,&xmin,&ymin);
-
-
-	#ifdef JAPAN
-	VWB_DrawPic(CALX,CALY,C_JOY1PIC);
-	#else
-	DrawWindow(CALX-5,CALY-5,CALW,CALH,TEXTCOLOR);
-	DrawOutline(CALX-5,CALY-5,CALW,CALH,0,HIGHLIGHT);
-	SETFONTCOLOR(0,TEXTCOLOR);
-
-	PrintX = CALX;
-	PrintY = CALY;
-	US_Print("    "STR_CALIB"\n    "STR_JOYST"\n");
-	VWB_DrawPic(CALX+40,CALY+30,C_JOY2PIC);
-	PrintY = CALY+80;
-	US_Print(STR_MOVEJOY2);
-	SETFONTCOLOR(BKGDCOLOR,TEXTCOLOR);
-	US_Print("   "STR_ESCEXIT);
-	#endif
-	VW_UpdateScreen();
-
-	do
-	{
-		jb=IN_JoyButtons();
-		if (Keyboard[sc_Escape])
-			return 0;
-		// *** SHAREWARE/REGISTERED APOGEE RESTORATION ***
-		// And again
-		#if (!defined SPEAR) && (defined GOODTIMES)
-		//#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-			PicturePause();
-		#endif
-	} while(!(jb&2));
-
-	IN_GetJoyAbs(joystickport,&xmax,&ymax);
-	SD_PlaySound(SHOOTSND);
-
-	while (IN_JoyButtons());
-
-	//
-	// ASSIGN ACTUAL VALUES HERE
-	//
-	if ((xmin != xmax) && (ymin != ymax))
-		IN_SetupJoy(joystickport,xmin,xmax,ymin,ymax);
-	else
-		return 0;
-
-	return 1;
-}
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 
 
 ////////////////////////////////////////////////////////////////////
@@ -1876,12 +1212,6 @@ void CP_Control(void)
 	#define CTL_SPC	70
 	enum {MOUSEENABLE,JOYENABLE,USEPORT2,PADENABLE,MOUSESENS,CUSTOMIZE};
 	int i,which;
-
-
-#ifdef SPEAR
-	UnCacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-	CacheLump (CONTROL_LUMP_START,CONTROL_LUMP_END);
-#endif
 
 	DrawCtlScreen();
 	MenuFadeIn();
@@ -1903,12 +1233,6 @@ void CP_Control(void)
 
 			case JOYENABLE:
 				joystickenabled^=1;
-				// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-				if (joystickenabled)
-					if (!CalibrateJoystick())
-						joystickenabled = 0;
-#endif
 				DrawCtlScreen();
 				CusItems.curpos=-1;
 				ShootSnd();
@@ -1936,11 +1260,6 @@ void CP_Control(void)
 	} while(which>=0);
 
 	MenuFadeOut();
-
-#ifdef SPEAR
-	UnCacheLump (CONTROL_LUMP_START,CONTROL_LUMP_END);
-	CacheLump (OPTIONS_LUMP_START,OPTIONS_LUMP_END);
-#endif
 }
 
 
@@ -1950,16 +1269,9 @@ void CP_Control(void)
 //
 void DrawMouseSens(void)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_MOUSESENSPIC);
-#else
 	ClearMScreen();
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
-	#ifdef SPANISH
-	DrawWindow(10,80,300,43,BKGDCOLOR);
-	#else
 	DrawWindow(10,80,300,30,BKGDCOLOR);
-	#endif
 
 	WindowX=0;
 	WindowW=320;
@@ -1968,20 +1280,11 @@ void DrawMouseSens(void)
 	US_CPrint(STR_MOUSEADJ);
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
-	#ifdef SPANISH
-	PrintX=14;
-	PrintY=95+13;
-	US_Print(STR_SLOW);
-	PrintX=252;
-	US_Print(STR_FAST);
-	#else
 	PrintX=14;
 	PrintY=95;
 	US_Print(STR_SLOW);
 	PrintX=269;
 	US_Print(STR_FAST);
-	#endif
-#endif
 
 	VWB_Bar(60,97,200,10,TEXTCOLOR);
 	DrawOutline(60,97,200,10,0,HIGHLIGHT);
@@ -2043,17 +1346,6 @@ void MouseSensitivity(void)
 				break;
 		}
 
-		// *** SHAREWARE/REGISTERED V1.4 APOGEE+SOD (DEMO) V1.0 RESTORATION ***
-		// And again - kind of
-		#ifdef GOODTIMES
-		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-		#else
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
-		#endif
-			PicturePause();
-		#endif
-
 		if (ci.button0 || Keyboard[sc_Space] || Keyboard[sc_Enter])
 			exit=1;
 		else
@@ -2083,16 +1375,11 @@ void DrawCtlScreen(void)
 {
  int i,x,y;
 
-
-#ifdef JAPAN
-	CA_CacheScreen(S_CONTROLPIC);
-#else
  ClearMScreen();
  DrawStripes(10);
  VWB_DrawPic(80,0,C_CONTROLPIC);
  VWB_DrawPic(112,184,C_MOUSELBACKPIC);
  DrawWindow(CTL_X-8,CTL_Y-5,CTL_W,CTL_H,BKGDCOLOR);
-#endif
  WindowX=0;
  WindowW=320;
  SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
@@ -2145,14 +1432,8 @@ void DrawCtlScreen(void)
  // PICK FIRST AVAILABLE SPOT
  //
 
- // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
- if (CtlItems.curpos==-1)
-   for (i=0;i<5;i++)
-#else
  if (CtlItems.curpos<0 || !CtlMenu[CtlItems.curpos].active)
    for (i=0;i<6;i++)
-#endif
 	 if (CtlMenu[i].active)
 	 {
 	  CtlItems.curpos=i;
@@ -2498,24 +1779,10 @@ void FixupCustom(int w)
 	static int lastwhich=-1;
 	int y=CST_Y+26+w*13;
 
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	VWB_Hlin(7,32,y-2,BORDCOLOR);
 	VWB_Hlin(7,32,y-1,DEACTIVE);
 	VWB_Hlin(7,32,y+12,BORD2COLOR);
 	VWB_Hlin(7,32,y+13,BORDCOLOR);
-#else
-	VWB_Hlin(7,32,y-1,DEACTIVE);
-	VWB_Hlin(7,32,y+12,BORD2COLOR);
-#ifndef SPEAR
-	VWB_Hlin(7,32,y-2,BORDCOLOR);
-	VWB_Hlin(7,32,y+13,BORDCOLOR);
-#else
-	VWB_Hlin(7,32,y-2,BORD2COLOR);
-	VWB_Hlin(7,32,y+13,BORD2COLOR);
-#endif
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 
 	switch(w)
 	{
@@ -2529,23 +1796,10 @@ void FixupCustom(int w)
 	if (lastwhich>=0)
 	{
 		y=CST_Y+26+lastwhich*13;
-		// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		VWB_Hlin(7,32,y-2,BORDCOLOR);
 		VWB_Hlin(7,32,y-1,DEACTIVE);
 		VWB_Hlin(7,32,y+12,BORD2COLOR);
 		VWB_Hlin(7,32,y+13,BORDCOLOR);
-#else
-		VWB_Hlin(7,32,y-1,DEACTIVE);
-		VWB_Hlin(7,32,y+12,BORD2COLOR);
-#ifndef SPEAR
-		VWB_Hlin(7,32,y-2,BORDCOLOR);
-		VWB_Hlin(7,32,y+13,BORDCOLOR);
-#else
-		VWB_Hlin(7,32,y-2,BORD2COLOR);
-		VWB_Hlin(7,32,y+13,BORD2COLOR);
-#endif
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 
 		if (lastwhich!=w)
 			switch(lastwhich)
@@ -2569,27 +1823,6 @@ void DrawCustomScreen(void)
 {
 	int i;
 
-
-#ifdef JAPAN
-	CA_CacheScreen(S_CUSTOMPIC);
-	fontnumber=1;
-
-	PrintX=CST_START;
-	PrintY = CST_Y+26;
-	DrawCustMouse(0);
-
-	PrintX=CST_START;
-	US_Print("\n\n\n");
-	DrawCustJoy(0);
-
-	PrintX=CST_START;
-	US_Print("\n\n\n");
-	DrawCustKeybd(0);
-
-	PrintX=CST_START;
-	US_Print("\n\n\n");
-	DrawCustKeys(0);
-#else
 	ClearMScreen();
 	WindowX=0;
 	WindowW=320;
@@ -2604,25 +1837,10 @@ void DrawCustomScreen(void)
 	WindowX=0;
 	WindowW=320;
 
-#ifndef SPEAR
 	PrintY=CST_Y;
 	US_CPrint("Mouse\n");
-#else
-	PrintY = CST_Y+13;
-	VWB_DrawPic (128,48,C_MOUSEPIC);
-#endif
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
-	#ifdef SPANISH
-	PrintX=CST_START-16;
-	US_Print(STR_CRUN);
-	PrintX=CST_START-16+CST_SPC*1;
-	US_Print(STR_COPEN);
-	PrintX=CST_START-16+CST_SPC*2;
-	US_Print(STR_CFIRE);
-	PrintX=CST_START-16+CST_SPC*3;
-	US_Print(STR_CSTRAFE"\n");
-	#else
 	PrintX=CST_START;
 	US_Print(STR_CRUN);
 	PrintX=CST_START+CST_SPC*1;
@@ -2631,7 +1849,6 @@ void DrawCustomScreen(void)
 	US_Print(STR_CFIRE);
 	PrintX=CST_START+CST_SPC*3;
 	US_Print(STR_CSTRAFE"\n");
-	#endif
 
 	DrawWindow(5,PrintY-1,310,13,BKGDCOLOR);
 	DrawCustMouse(0);
@@ -2641,29 +1858,10 @@ void DrawCustomScreen(void)
 	//
 	// JOYSTICK/PAD
 	//
-#ifndef SPEAR
 	SETFONTCOLOR(READCOLOR,BKGDCOLOR);
 	US_CPrint("Joystick/Gravis GamePad\n");
-#else
-	PrintY += 13;
-	VWB_DrawPic (40,88,C_JOYSTICKPIC);
-#endif
-
-#ifdef SPEAR
-	VWB_DrawPic (112,120,C_KEYBOARDPIC);
-#endif
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
-	#ifdef SPANISH
-	PrintX=CST_START-16;
-	US_Print(STR_CRUN);
-	PrintX=CST_START-16+CST_SPC*1;
-	US_Print(STR_COPEN);
-	PrintX=CST_START-16+CST_SPC*2;
-	US_Print(STR_CFIRE);
-	PrintX=CST_START-16+CST_SPC*3;
-	US_Print(STR_CSTRAFE"\n");
-	#else
 	PrintX=CST_START;
 	US_Print(STR_CRUN);
 	PrintX=CST_START+CST_SPC*1;
@@ -2672,7 +1870,6 @@ void DrawCustomScreen(void)
 	US_Print(STR_CFIRE);
 	PrintX=CST_START+CST_SPC*3;
 	US_Print(STR_CSTRAFE"\n");
-	#endif
 	DrawWindow(5,PrintY-1,310,13,BKGDCOLOR);
 	DrawCustJoy(0);
 	US_Print("\n");
@@ -2681,23 +1878,9 @@ void DrawCustomScreen(void)
 	//
 	// KEYBOARD
 	//
-#ifndef SPEAR
 	SETFONTCOLOR(READCOLOR,BKGDCOLOR);
 	US_CPrint("Keyboard\n");
-#else
-	PrintY += 13;
-#endif
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
-	#ifdef SPANISH
-	PrintX=CST_START-16;
-	US_Print(STR_CRUN);
-	PrintX=CST_START-16+CST_SPC*1;
-	US_Print(STR_COPEN);
-	PrintX=CST_START-16+CST_SPC*2;
-	US_Print(STR_CFIRE);
-	PrintX=CST_START-16+CST_SPC*3;
-	US_Print(STR_CSTRAFE"\n");
-	#else
 	PrintX=CST_START;
 	US_Print(STR_CRUN);
 	PrintX=CST_START+CST_SPC*1;
@@ -2706,7 +1889,6 @@ void DrawCustomScreen(void)
 	US_Print(STR_CFIRE);
 	PrintX=CST_START+CST_SPC*3;
 	US_Print(STR_CSTRAFE"\n");
-	#endif
 	DrawWindow(5,PrintY-1,310,13,BKGDCOLOR);
 	DrawCustKeybd(0);
 	US_Print("\n");
@@ -2716,16 +1898,6 @@ void DrawCustomScreen(void)
 	// KEYBOARD MOVE KEYS
 	//
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
-	#ifdef SPANISH
-	PrintX=4;
-	US_Print(STR_LEFT);
-	US_Print("/");
-	US_Print(STR_RIGHT);
-	US_Print("/");
-	US_Print(STR_FRWD);
-	US_Print("/");
-	US_Print(STR_BKWD"\n");
-	#else
 	PrintX=CST_START;
 	US_Print(STR_LEFT);
 	PrintX=CST_START+CST_SPC*1;
@@ -2734,10 +1906,9 @@ void DrawCustomScreen(void)
 	US_Print(STR_FRWD);
 	PrintX=CST_START+CST_SPC*3;
 	US_Print(STR_BKWD"\n");
-	#endif
 	DrawWindow(5,PrintY-1,310,13,BKGDCOLOR);
 	DrawCustKeys(0);
-#endif
+
 	//
 	// PICK STARTING POINT IN MENU
 	//
@@ -2917,17 +2088,6 @@ void CP_ChangeView(void)
 			break;
 		}
 
-		// *** SHAREWARE/REGISTERED V1.4 APOGEE+SOD (DEMO) V1.0 RESTORATION ***
-		// And again
-		#ifdef GOODTIMES
-		#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-		#else
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
-		#endif
-			PicturePause();
-		#endif
-
 		if (ci.button0 || Keyboard[sc_Enter])
 			exit=1;
 		else
@@ -2960,11 +2120,6 @@ void CP_ChangeView(void)
 //
 void DrawChangeView(int view)
 {
-#ifdef JAPAN
-	CA_CacheScreen(S_CHANGEPIC);
-
-	ShowViewSize(view);
-#else
 	VWB_Bar(0,160,320,40,VIEWCOLOR);
 	ShowViewSize(view);
 
@@ -2976,7 +2131,6 @@ void DrawChangeView(int view)
 	US_CPrint(STR_SIZE1"\n");
 	US_CPrint(STR_SIZE2"\n");
 	US_CPrint(STR_SIZE3);
-#endif
 	VW_UpdateScreen();
 
 	MenuFadeIn();
@@ -2992,18 +2146,7 @@ void CP_Quit(void)
 {
 	int i;
 
-
-	#ifdef JAPAN
-	if (GetYorN(7,11,C_QUITMSGPIC))
-	#else
-
-	#ifdef SPANISH
-	if (Confirm(ENDGAMESTR))
-	#else
 	if (Confirm(endStrings[US_RndT()&0x7+(US_RndT()&1)]))
-	#endif
-
-	#endif
 	{
 		VW_UpdateScreen();
 		SD_MusicOff();
@@ -3028,19 +2171,10 @@ void CP_Quit(void)
 ////////////////////////////////////////////////////////////////////
 void IntroScreen(void)
 {
-#ifdef SPEAR
-
-#define MAINCOLOR	0x4f
-#define EMSCOLOR	0x4f
-#define XMSCOLOR	0x4f
-
-#else
-
 #define MAINCOLOR	0x6c
 #define EMSCOLOR	0x6c
 #define XMSCOLOR	0x6c
 
-#endif
 #define FILLCOLOR	14
 
 	long memory,emshere,xmshere;
@@ -3048,11 +2182,7 @@ void IntroScreen(void)
 		xms[10]={100,200,300,400,500,600,700,800,900,1000},
 		main[10]={32,64,96,128,160,192,224,256,288,320};
 
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	StartCPMusic(NAZI_NOR_MUS);
-#endif
-	///
 
 	//
 	// DRAW MAIN MEMORY
@@ -3060,13 +2190,7 @@ void IntroScreen(void)
 	memory=(1023l+mminfo.nearheap+mminfo.farheap)/1024l;
 	for (i=0;i<10;i++)
 		if (memory>=main[i])
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 			VWB_Bar(49,163-8*i,6,5,MAINCOLOR-2*i);
-#else
-			VWB_Bar(49,163-8*i,6,5,MAINCOLOR-i);
-#endif
-
 
 	//
 	// DRAW EMS MEMORY
@@ -3076,12 +2200,7 @@ void IntroScreen(void)
 		emshere=4l*EMSPagesAvail;
 		for (i=0;i<10;i++)
 			if (emshere>=ems[i])
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 				VWB_Bar(89,163-8*i,6,5,EMSCOLOR-2*i);
-#else
-				VWB_Bar(89,163-8*i,6,5,EMSCOLOR-i);
-#endif
 	}
 
 	//
@@ -3092,11 +2211,7 @@ void IntroScreen(void)
 		xmshere=4l*XMSPagesAvail;
 		for (i=0;i<10;i++)
 			if (xmshere>=xms[i])
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 				VWB_Bar(129,163-8*i,6,5,XMSCOLOR-2*i);
-#else
-				VWB_Bar(129,163-8*i,6,5,XMSCOLOR-i);
-#endif
 	}
 
 	//
@@ -3134,11 +2249,7 @@ void IntroScreen(void)
 ////////////////////////////////////////////////////////////////////
 void ClearMScreen(void)
 {
-#ifndef SPEAR
 	VWB_Bar(0,0,320,200,BORDCOLOR);
-#else
-	VWB_DrawPic(0,0,C_BACKDROPPIC);
-#endif
 }
 
 
@@ -3161,10 +2272,6 @@ void UnCacheLump(int lumpstart,int lumpend)
  int i;
 
  for (i=lumpstart;i<=lumpend;i++)
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	if (grsegs[i])
-#endif
 		UNCACHEGRCHUNK(i);
 }
 
@@ -3201,21 +2308,11 @@ void SetupControlPanel(void)
 	char name[13];
 	int which,i;
 
-
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-	// Some v1.0 specific function, guessing it's VW_InitDoubleBuffer
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	VW_InitDoubleBuffer();
-#endif
 	//
 	// CACHE GRAPHICS & SOUNDS
 	//
 	CA_CacheGrChunk(STARTFONT+1);
-#ifndef SPEAR
 	CacheLump(CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#else
-	CacheLump(BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#endif
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
 	fontnumber=1;
@@ -3262,16 +2359,7 @@ void SetupControlPanel(void)
 ////////////////////////////////////////////////////////////////////
 void CleanupControlPanel(void)
 {
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	UNCACHEGRCHUNK(STARTFONT+1);
-#endif
-#ifndef SPEAR
 	UnCacheLump(CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#else
-	UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#endif
-
 	fontnumber = 0;
 }
 
@@ -3281,7 +2369,7 @@ void CleanupControlPanel(void)
 // Handle moving gun around a menu
 //
 ////////////////////////////////////////////////////////////////////
-int HandleMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,void (*routine)(int w))
+int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w))
 {
 	char key;
 	static int redrawitem=1,lastitem=-1;
@@ -3349,20 +2437,6 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *i
 		if (key)
 		{
 			int ok=0;
-
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-			//
-			// CHECK FOR SCREEN CAPTURE
-			//
-			#ifndef SPEAR
-			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-			#else
-			if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm("debugmode"))
-			#endif
-				PicturePause();
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
-
 
 			if (key>='a')
 				key-='a'-'A';
@@ -3488,12 +2562,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *i
 	//
 	if (lastitem!=which)
 	{
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		VWB_Bar(x-1,y,24,16,BKGDCOLOR);
-#else
-		VWB_Bar(x-1,y,25,16,BKGDCOLOR);
-#endif
 		PrintX=item_i->x+item_i->indent;
 		PrintY=item_i->y+which*13;
 		US_Print((items+which)->string);
@@ -3535,14 +2604,9 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *i
 //
 // ERASE GUN & DE-HIGHLIGHT STRING
 //
-void EraseGun(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,int x,int y,int which)
+void EraseGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int y,int which)
 {
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	VWB_Bar(x-1,y,24,16,BKGDCOLOR);
-#else
-	VWB_Bar(x-1,y,25,16,BKGDCOLOR);
-#endif
 	SetTextColor(items+which,0);
 
 	PrintX=item_i->x+item_i->indent;
@@ -3568,14 +2632,9 @@ void DrawHalfStep(int x,int y)
 //
 // DRAW GUN AT NEW POSITION
 //
-void DrawGun(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,int x,int *y,int which,int basey,void (*routine)(int w))
+void DrawGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int *y,int which,int basey,void (*routine)(int w))
 {
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	VWB_Bar(x-1,*y,24,16,BKGDCOLOR);
-#else
-	VWB_Bar(x-1,*y,25,16,BKGDCOLOR);
-#endif
 	*y=basey+which*13;
 	VWB_DrawPic(x,*y,C_CURSOR1PIC);
 	SetTextColor(items+which,1);
@@ -3616,7 +2675,7 @@ void TicDelay(int count)
 // Draw a menu
 //
 ////////////////////////////////////////////////////////////////////
-void DrawMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items)
+void DrawMenu(CP_iteminfo *item_i,CP_itemtype far *items)
 {
 	int i,which=item_i->curpos;
 
@@ -3650,7 +2709,7 @@ void DrawMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *it
 // SET TEXT COLOR (HIGHLIGHT OR NO)
 //
 ////////////////////////////////////////////////////////////////////
-void SetTextColor(CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,int hlight)
+void SetTextColor(CP_itemtype far *items,int hlight)
 {
 	if (hlight)
 		{SETFONTCOLOR(color_hlite[items->active],BKGDCOLOR);}
@@ -3785,7 +2844,7 @@ void ReadAnyControl(ControlInfo *ci)
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
 //
 ////////////////////////////////////////////////////////////////////
-int Confirm(char GAMEVER_RESTORATION_CONDFARPTR *string)
+int Confirm(char far *string)
 {
 	int xit=0,i,x,y,tick=0,time,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
@@ -3819,30 +2878,7 @@ int Confirm(char GAMEVER_RESTORATION_CONDFARPTR *string)
 			TimeCount=0;
 		}
 
-		// *** SHAREWARE/REGISTERED APOGEE RESTORATION ***
-		// And again
-		#if (!defined SPEAR) && (defined GOODTIMES)
-		//#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-			PicturePause();
-		#endif
-
-	#ifdef SPANISH
-	} while(!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-	#else
 	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-	#endif
-
-	#ifdef SPANISH
-	if (Keyboard[sc_S])
-	{
-		xit=1;
-		ShootSnd();
-	}
-
-	while(Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape]);
-
-	#else
 
 	if (Keyboard[sc_Y])
 	{
@@ -3851,71 +2887,11 @@ int Confirm(char GAMEVER_RESTORATION_CONDFARPTR *string)
 	}
 
 	while(Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape]);
-	#endif
 
 	IN_ClearKeysDown();
 	SD_PlaySound(whichsnd[xit]);
 	return xit;
 }
-
-#ifdef JAPAN
-////////////////////////////////////////////////////////////////////
-//
-// DRAW MESSAGE & GET Y OR N
-//
-////////////////////////////////////////////////////////////////////
-int GetYorN(int x,int y,int pic)
-{
-	int xit=0,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
-
-
-	CA_CacheGrChunk(pic);
-	VWB_DrawPic(x * 8,y * 8,pic);
-	UNCACHEGRCHUNK(pic);
-	VW_UpdateScreen();
-	IN_ClearKeysDown();
-
-	do
-	{
-		// *** SHAREWARE/REGISTERED APOGEE RESTORATION ***
-		// And again
-		#if (!defined SPEAR) && (defined GOODTIMES)
-		//#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-			PicturePause();
-		#endif
-
-	#ifdef SPANISH
-	} while(!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-	#else
-	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-	#endif
-
-	#ifdef SPANISH
-	if (Keyboard[sc_S])
-	{
-		xit=1;
-		ShootSnd();
-	}
-
-	while(Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape]);
-
-	#else
-
-	if (Keyboard[sc_Y])
-	{
-		xit=1;
-		ShootSnd();
-	}
-
-	while(Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape]);
-	#endif
-
-	IN_ClearKeysDown();
-	SD_PlaySound(whichsnd[xit]);
-	return xit;
-}
-#endif
 
 
 ////////////////////////////////////////////////////////////////////
@@ -3923,25 +2899,15 @@ int GetYorN(int x,int y,int pic)
 // PRINT A MESSAGE IN A WINDOW
 //
 ////////////////////////////////////////////////////////////////////
-void Message(char GAMEVER_RESTORATION_CONDFARPTR *string)
+void Message(char far *string)
 {
 	int h=0,w=0,mw=0,i,x,y,time;
 	fontstruct _seg *font;
 
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	CA_CacheGrChunk (STARTFONT+1);
-#endif
 	fontnumber=1;
 	font=grsegs[STARTFONT+fontnumber];
 	h=font->height;
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	for (i=0;i<strlen(string);i++)
-#else
 	for (i=0;i<_fstrlen(string);i++)
-#endif
 		if (string[i]=='\n')
 		{
 			if (w>mw)
@@ -4069,13 +3035,8 @@ void DrawMenuGun(CP_iteminfo *iteminfo)
 ///////////////////////////////////////////////////////////////////////////
 void DrawStripes(int y)
 {
-#ifndef SPEAR
 	VWB_Bar(0,y,320,24,0);
 	VWB_Hlin(0,319,y+22,STRIPE);
-#else
-	VWB_Bar(0,y,320,22,0);
-	VWB_Hlin(0,319,y+23,0);
-#endif
 }
 
 void ShootSnd(void)
@@ -4094,38 +3055,8 @@ void CheckForEpisodes(void)
 	struct ffblk f;
 
 //
-// JAPANESE VERSION
-//
-#ifdef JAPAN
-#ifdef JAPDEMO
-	if (!findfirst("*.WJ1",&f,FA_ARCH))
-	{
-		strcpy(extension,"WJ1");
-#else
-	if (!findfirst("*.WJ6",&f,FA_ARCH))
-	{
-		strcpy(extension,"WJ6");
-#endif
-		strcat(configname,extension);
-		strcat(SaveName,extension);
-		strcat(PageFileName,extension);
-		strcat(audioname,extension);
-		strcat(demoname,extension);
-		EpisodeSelect[1] =
-		EpisodeSelect[2] =
-		EpisodeSelect[3] =
-		EpisodeSelect[4] =
-		EpisodeSelect[5] = 1;
-	}
-	else
-		Quit("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
-#else
-
-//
 // ENGLISH
 //
-#ifndef UPLOAD
-#ifndef SPEAR
   #ifdef KEEP_WOLFWL6
 	if (!findfirst("*.WL6",&f,FA_ARCH))
 	{
@@ -4152,63 +3083,19 @@ void CheckForEpisodes(void)
 		EpisodeSelect[2] = 1;
 	}
 	else
-#endif
-#endif
 
-
-
-#ifdef SPEAR
-#ifndef SPEARDEMO
-	if (!findfirst("*.SOD",&f,FA_ARCH))
-	{
-		strcpy(extension,"SOD");
-	}
-	else
-		Quit("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-#else
-	if (!findfirst("*.SDM",&f,FA_ARCH))
-	{
-		strcpy(extension,"SDM");
-	}
-	else
-		Quit("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-#endif
-
-#else
 	if (!findfirst("*.WL1",&f,FA_ARCH))
 	{
 		strcpy(extension,"WL1");
 	}
 	else
 		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
-#endif
 
 	strcat(configname,extension);
 	strcat(SaveName,extension);
 	strcat(PageFileName,extension);
-#ifdef KEEP_UNUSED
-	strcat(audioname,extension);
-#endif
-	// *** PRE-V1.4 APOGEE RESTORATION *** - Relocate demoname preparation down for earlier releases
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
+
 #ifdef KEEP_DEBUG
 	strcat(demoname,extension);
-#endif
-#endif
-
-#ifdef KEEP_UNUSED
-#ifndef SPEAR
-#ifndef GOODTIMES
-	strcat(helpfilename,extension);
-#endif
-	strcat(endfilename,extension);
-#endif
-#endif
-#endif
-
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
-#ifdef KEEP_DEBUG
-	strcat(demoname,extension);
-#endif
 #endif
 }

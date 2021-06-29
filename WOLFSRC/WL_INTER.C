@@ -16,12 +16,6 @@
 
 void ClearSplitVWB (void)
 {
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	if (++screenpage == 3)
-		screenpage = 0;
-	bufferofs = screenloc[screenpage];
-#endif
 	memset (update,0,sizeof(update));
 	WindowX = 0;
 	WindowY = 0;
@@ -29,77 +23,6 @@ void ClearSplitVWB (void)
 	WindowH = 160;
 }
 
-
-//==========================================================================
-
-#ifdef SPEAR
-#ifndef SPEARDEMO
-////////////////////////////////////////////////////////
-//
-// End of Spear of Destiny
-//
-////////////////////////////////////////////////////////
-
-void EndScreen (int palette, int screen)
-{
-	CA_CacheScreen (screen);
-	VW_UpdateScreen ();
-	CA_CacheGrChunk (palette);
-	VL_FadeIn(0,255,grsegs[palette],30);
-	UNCACHEGRCHUNK (palette);
-	IN_ClearKeysDown ();
-	IN_Ack ();
-	VW_FadeOut ();
-}
-
-
-void EndSpear(void)
-{
-	EndScreen (END1PALETTE, ENDSCREEN11PIC);
-
-	CA_CacheScreen (ENDSCREEN3PIC);
-	VW_UpdateScreen ();
-	CA_CacheGrChunk (END3PALETTE);
-	VL_FadeIn(0,255,grsegs[END3PALETTE],30);
-	UNCACHEGRCHUNK (END3PALETTE);
-	fontnumber = 0;
-	fontcolor = 0xd0;
-	WindowX = 0;
-	WindowW = 320;
-	PrintX = 0;
-	PrintY = 180;
-	US_CPrint (STR_ENDGAME1"\n");
-	US_CPrint (STR_ENDGAME2);
-	VW_UpdateScreen ();
-	IN_StartAck ();
-	TimeCount = 0;
-	while (!IN_CheckAck () && TimeCount < 700);
-
-	PrintX = 0;
-	PrintY = 180;
-	VWB_Bar(0,180,320,20,0);
-	US_CPrint (STR_ENDGAME3"\n");
-	US_CPrint (STR_ENDGAME4);
-	VW_UpdateScreen ();
-	IN_StartAck ();
-	TimeCount = 0;
-	while (!IN_CheckAck () && TimeCount < 700);
-
-	VW_FadeOut ();
-
-	EndScreen (END4PALETTE, ENDSCREEN4PIC);
-	EndScreen (END5PALETTE, ENDSCREEN5PIC);
-	EndScreen (END6PALETTE, ENDSCREEN6PIC);
-	EndScreen (END7PALETTE, ENDSCREEN7PIC);
-	EndScreen (END8PALETTE, ENDSCREEN8PIC);
-	EndScreen (END9PALETTE, ENDSCREEN9PIC);
-
-	EndScreen (END2PALETTE, ENDSCREEN12PIC);
-
-	MainMenu[savegame].active = 0;
-}
-#endif
-#endif
 
 //==========================================================================
 
@@ -113,13 +36,7 @@ void EndSpear(void)
 
 void Victory (void)
 {
-#ifndef SPEARDEMO
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	int	sec;
-#else
 	long	sec;
-#endif
 	int i,min,kr,sr,tr,x;
 	char tempstr[8];
 
@@ -128,103 +45,28 @@ void Victory (void)
 #define TIMEX	14
 #define TIMEY	8
 
-
-#ifdef SPEAR
-	StartCPMusic (XTHEEND_MUS);
-
-	CA_CacheGrChunk(BJCOLLAPSE1PIC);
-	CA_CacheGrChunk(BJCOLLAPSE2PIC);
-	CA_CacheGrChunk(BJCOLLAPSE3PIC);
-	CA_CacheGrChunk(BJCOLLAPSE4PIC);
-
-	VWB_Bar(0,0,320,200,VIEWCOLOR);
-	VWB_DrawPic (124,44,BJCOLLAPSE1PIC);
-	VW_UpdateScreen ();
-	VW_FadeIn ();
-	VW_WaitVBL(2*70);
-	VWB_DrawPic (124,44,BJCOLLAPSE2PIC);
-	VW_UpdateScreen ();
-	VW_WaitVBL(105);
-	VWB_DrawPic (124,44,BJCOLLAPSE3PIC);
-	VW_UpdateScreen ();
-	VW_WaitVBL(105);
-	VWB_DrawPic (124,44,BJCOLLAPSE4PIC);
-	VW_UpdateScreen ();
-	VW_WaitVBL(3*70);
-
-	UNCACHEGRCHUNK(BJCOLLAPSE1PIC);
-	UNCACHEGRCHUNK(BJCOLLAPSE2PIC);
-	UNCACHEGRCHUNK(BJCOLLAPSE3PIC);
-	UNCACHEGRCHUNK(BJCOLLAPSE4PIC);
-	VL_FadeOut (0,255,0,17,17,5);
-#endif
-
 	StartCPMusic (URAHERO_MUS);
 	ClearSplitVWB ();
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 	CA_CacheGrChunk(STARTFONT);
 
-#ifndef SPEAR
 	CA_CacheGrChunk(C_TIMECODEPIC);
-#endif
 
 
 	VWB_Bar (0,0,320,200-STATUSLINES,127);
-#ifdef JAPAN
-#ifndef JAPDEMO
-	CA_CacheGrChunk(C_ENDRATIOSPIC);
-	VWB_DrawPic(0,0,C_ENDRATIOSPIC);
-	UNCACHEGRCHUNK(C_ENDRATIOSPIC);
-#endif
-	// ***SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
-	// Possibly relocated this, depending on version
-#ifndef GOODTIMES
 	VWB_DrawPic (8,4,L_BJWINSPIC);
-#endif
-#else
-	// ***SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
-	// Possibly relocated this, depending on version
-#ifndef GOODTIMES
-	VWB_DrawPic (8,4,L_BJWINSPIC);
-#endif
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	Write(18,0,STR_YOUWIN);
-#else
 	Write(18,2,STR_YOUWIN);
-#endif
 
 	Write(TIMEX,TIMEY-2,STR_TOTALTIME);
 
 	Write(12,RATIOY-2,"averages");
 
-	#ifdef SPANISH
-	Write(RATIOX+2,  RATIOY,      STR_RATKILL);
-	Write(RATIOX+2,  RATIOY+2,  STR_RATSECRET);
-	Write(RATIOX+2,  RATIOY+4,STR_RATTREASURE);
-	#else
 	Write(RATIOX+8,RATIOY,      STR_RATKILL);
 	Write(RATIOX+4,RATIOY+2,  STR_RATSECRET);
 	Write(RATIOX,  RATIOY+4,STR_RATTREASURE);
-	#endif
 
-#endif
-
-	// ***SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
-	// Possibly relocate this, depending on version
-#ifdef GOODTIMES
-#ifndef JAPDEMO
-	VWB_DrawPic (8,4,L_BJWINSPIC);
-#endif
-#endif
-
-
-#ifndef SPEAR
 	for (kr = sr = tr = sec = i = 0;i < 8;i++)
-#else
-	for (kr = sr = tr = sec = i = 0;i < 20;i++)
-#endif
 	{
 		sec += LevelRatios[i].time;
 		kr += LevelRatios[i].kill;
@@ -232,29 +74,15 @@ void Victory (void)
 		tr += LevelRatios[i].treasure;
 	}
 
-#ifndef SPEAR
 	kr /= 8;
 	sr /= 8;
 	tr /= 8;
-#else
-	kr /= 14;
-	sr /= 14;
-	tr /= 14;
-#endif
-	// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#if (defined GAMEVER_RESTORATION_WL1_APO10) || (defined GAMEVER_RESTORATION_WL1_APO11)
-	if (sec > 415800)
-		sec = 415800;
-#endif
 
 	min = sec/60;
 	sec %= 60;
 
-	// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (!defined GAMEVER_RESTORATION_WL1_APO11)
 	if (min > 99)
 		min = sec = 99;
-#endif
 
 	i = TIMEX*8+1;
 	VWB_DrawPic(i,TIMEY*8,L_NUM0PIC+(min/10));
@@ -280,51 +108,24 @@ void Victory (void)
 	x=RATIOX+24-strlen(tempstr)*2;
 	Write(x,RATIOY+4,tempstr);
 
-
-#ifndef SPANISH
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#if (!defined UPLOAD) || (defined GAMEVER_RESTORATION_WL1_APO10)
-//#ifndef UPLOAD
-#ifndef SPEAR
 	//
 	// TOTAL TIME VERIFICATION CODE
 	//
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	if (gamestate.difficulty>=gd_medium)
-#endif
 	{
 		VWB_DrawPic (30*8,TIMEY*8,C_TIMECODEPIC);
 		fontnumber = 0;
 		fontcolor = READHCOLOR;
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		PrintX = 30*8;
-#else
 		PrintX = 30*8-3;
-#endif
 		PrintY = TIMEY*8+8;
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		VWB_Bar (PrintX,PrintY,24,10,0x29);
-#endif
 		PrintX+=4;
 		tempstr[0] = (((min/10)^(min%10))^0xa)+'A';
 		tempstr[1] = (((sec/10)^(sec%10))^0xa)+'A';
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		tempstr[2] = 0;
-#else
 		tempstr[2] = (tempstr[0]^tempstr[1])+'A';
 		tempstr[3] = 0;
-#endif
 		US_Print(tempstr);
 	}
-#endif
-#endif
-#endif
-
 
 	fontnumber = 1;
 
@@ -333,34 +134,17 @@ void Victory (void)
 
 	IN_Ack();
 
-	// *** SHAREWARE/REGISTERED APOGEE RESTORATION ***
-	// This is also skipped in the Apogee EXEs
-	#if (!defined SPEAR) && (defined GOODTIMES)
-	//#ifndef SPEAR
-	if (Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-		PicturePause();
-	#endif
-
 	VW_FadeOut ();
 
-#ifndef SPEAR
 	UNCACHEGRCHUNK(C_TIMECODEPIC);
-#endif
 	UnCacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 
-#ifndef SPEAR
 	EndText();
-#else
-	EndSpear();
-#endif
-
-#endif // SPEARDEMO
 }
 
 
 //==========================================================================
 
-#ifndef JAPAN
 /*
 ==================
 =
@@ -372,33 +156,19 @@ void Victory (void)
 void PG13 (void)
 {
 	VW_FadeOut();
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && !defined(BUGFIX_02)
-	VWB_Bar(0,0,319,200,0x82);			// background
-#else
 	VWB_Bar(0,0,320,200,0x82);			// background
-#endif
 
 	CA_CacheGrChunk (PG13PIC);
 	VWB_DrawPic (216,110,PG13PIC);
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	VW_UpdateScreen ();
-#endif
 
 	UNCACHEGRCHUNK (PG13PIC);
 
 	VW_FadeIn();
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	IN_Ack();
-#else
-	IN_UserInput(TickBase*7);
-#endif
 
 	VW_FadeOut ();
 }
-#endif
 
 
 //==========================================================================
@@ -437,13 +207,10 @@ void Write(int x,int y,char *string)
 	   nx+=8;
 	   continue;
 
-	 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	 case '\'':
 	   VWB_DrawPic(nx,ny,L_APOSTROPHEPIC);
 	   nx+=8;
 	   continue;
-#endif
 
 	 case ' ': break;
 	 case 0x3a:	// ':'
@@ -498,11 +265,7 @@ void BJ_Breathe(void)
 ==================
 */
 
-#ifndef SPEAR
 LRstruct LevelRatios[8];
-#else
-LRstruct LevelRatios[20];
-#endif
 
 void LevelCompleted (void)
 {
@@ -510,12 +273,7 @@ void LevelCompleted (void)
 	#define PAR_AMOUNT	500
 	#define PERCENT100AMT	10000
 	typedef struct {
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-			word time;
-#else
 			float time;
-#endif
 			char timestr[6];
 			} times;
 
@@ -523,255 +281,9 @@ void LevelCompleted (void)
 	unsigned	temp;
 	char tempstr[10];
 	long bonus,timeleft=0;
-#ifdef KEEP_STRING
-	times parTimes[]=
-	{
-	 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	 //
-	 // Episode One Par Times
-	 //
-	 {6300,  "01:30"},
-	 {8400,  "02:00"},
-	 {8400,  "02:00"},
-	 {14700, "03:30"},
-	 {12600, "03:00"},
-	 {12600, "03:00"},
-	 {10500, "02:30"},
-	 {10500, "02:30"},
-	 {0,     "??:??"},	// Boss level
-	 {12600, "03:00"},	// Secret level
 
-	 //
-	 // Episode Two Par Times
-	 //
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {0,     "??:??"},
-	 {2100,  "00:30"},
-
-	 //
-	 // Episode Three Par Times
-	 //
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {0,     "??:??"},
-	 {2100,  "00:30"},
-
-	 //
-	 // Episode Four Par Times
-	 //
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {0,     "??:??"},
-	 {2100,  "00:30"},
-
-	 //
-	 // Episode Five Par Times
-	 //
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {0,     "??:??"},
-	 {2100,  "00:30"},
-
-	 //
-	 // Episode Six Par Times
-	 //
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {2100,  "00:30"},
-	 {0,     "??:??"},
-	 {2100,  "00:30"}
-#else
-#ifndef SPEAR
-	 //
-	 // Episode One Par Times
-	 //
-	 {1.5,	"01:30"},
-	 {2,	"02:00"},
-	 {2,	"02:00"},
-	 {3.5,	"03:30"},
-	 {3,	"03:00"},
-	 {3,	"03:00"},
-	 {2.5,	"02:30"},
-	 {2.5,	"02:30"},
-	 {0,	"??:??"},	// Boss level
-	 {0,	"??:??"},	// Secret level
-
-	 //
-	 // Episode Two Par Times
-	 //
-	 {1.5,	"01:30"},
-	 {3.5,	"03:30"},
-	 {3,	"03:00"},
-	 {2,	"02:00"},
-	 {4,	"04:00"},
-	 {6,	"06:00"},
-	 {1,	"01:00"},
-	 {3,	"03:00"},
-	 {0,	"??:??"},
-	 {0,	"??:??"},
-
-	 //
-	 // Episode Three Par Times
-	 //
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {2.5,	"02:30"},
-	 {2.5,	"02:30"},
-	 {3.5,	"03:30"},
-	 {2.5,	"02:30"},
-	 {2,	"02:00"},
-	 {6,	"06:00"},
-	 {0,	"??:??"},
-	 {0,	"??:??"},
-
-	// *** SHAREWARE V1.1 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO11
-	 //
-	 // Episode Four Par Times
-	 //
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {0,	"??:??"},
-	 {0,	"??:??"},
-
-	 //
-	 // Episode Five Par Times
-	 //
-	 {2.5,	"02:30"},
-	 {1.5,	"01:30"},
-	 {2.5,	"02:30"},
-	 {2.5,	"02:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {0,	"??:??"},
-	 {0,	"??:??"},
-
-	 //
-	 // Episode Six Par Times
-	 //
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {1.5,	"01:30"},
-	 {0,	"??:??"},
-	 {0,	"??:??"}
-#else
-	 //
-	 // Episode Four Par Times
-	 //
-	 {2,	"02:00"},
-	 {2,	"02:00"},
-	 {1.5,	"01:30"},
-	 {1,	"01:00"},
-	 {4.5,	"04:30"},
-	 {3.5,	"03:30"},
-	 {2,	"02:00"},
-	 {4.5,	"04:30"},
-	 {0,	"??:??"},
-	 {0,	"??:??"},
-
-	 //
-	 // Episode Five Par Times
-	 //
-	 {2.5,	"02:30"},
-	 {1.5,	"01:30"},
-	 {2.5,	"02:30"},
-	 {2.5,	"02:30"},
-	 {4,	"04:00"},
-	 {3,	"03:00"},
-	 {4.5,	"04:30"},
-	 {3.5,	"03:30"},
-	 {0,	"??:??"},
-	 {0,	"??:??"},
-
-	 //
-	 // Episode Six Par Times
-	 //
-	 {6.5,	"06:30"},
-	 {4,	"04:00"},
-	 {4.5,	"04:30"},
-	 {6,	"06:00"},
-	 {5,	"05:00"},
-	 {5.5,	"05:30"},
-	 {5.5,	"05:30"},
-	 {8.5,	"08:30"},
-	 {0,	"??:??"},
-	 {0,	"??:??"}
-#endif // GAMEVER_RESTORATION_WL1_APO11
-#else
-	 //
-	 // SPEAR OF DESTINY TIMES
-	 //
-	 {1.5,	"01:30"},
-	 {3.5,	"03:30"},
-	 {2.75,	"02:45"},
-	 {3.5,	"03:30"},
-	 {0,	"??:??"},	// Boss 1
-	 {4.5,	"04:30"},
-	 {3.25,	"03:15"},
-	 {2.75,	"02:45"},
-	 {4.75,	"04:45"},
-	 {0,	"??:??"},	// Boss 2
-	 {6.5,	"06:30"},
-	 {4.5,	"04:30"},
-	 {2.75,	"02:45"},
-	 {4.5,	"04:30"},
-	 {6,	"06:00"},
-	 {0,	"??:??"},	// Boss 3
-	 {6,	"06:00"},
-	 {0,	"??:??"},	// Boss 4
-	 {0,	"??:??"},	// Secret level 1
-	 {0,	"??:??"},	// Secret level 2
-#endif
-#endif // GAMEVER_RESTORATION_WL1_APO10
-	};
-#else
 	float parTimes[]=
 	{
-    #ifndef SPEAR
 	 //
 	 // Episode One Par Times
 	 //
@@ -808,7 +320,7 @@ void LevelCompleted (void)
 	 2,	// "02:00"
 	 6	// "06:00"
 
-       #ifdef KEEP_WOLFWL6
+#ifdef KEEP_WOLFWL6
 	 ,
 	 //
 	 // Episode Four Par Times
@@ -845,36 +357,8 @@ void LevelCompleted (void)
 	 5.5,	// "05:30"
 	 5.5,	// "05:30"
 	 8.5	// "08:30"
-       #endif
-    #else
-	 //
-	 // SPEAR OF DESTINY TIMES
-	 //
-	 1.5,	// "01:30"
-	 3.5	// "03:30"
-       #ifdef KEEP_SODFULL
-	 ,
-	 2.75,	// "02:45"
-	 3.5,	// "03:30"
-	 0,	// "??:??"	// Boss 1
-	 4.5,	// "04:30"
-	 3.25,	// "03:15"
-	 2.75,	// "02:45"
-	 4.75,	// "04:45"
-	 0,	// "??:??"	// Boss 2
-	 6.5,	// "06:30"
-	 4.5,	// "04:30"
-	 2.75,	// "02:45"
-	 4.5,	// "04:30"
-	 6,	// "06:00"
-	 0,	// "??:??"	// Boss 3
-	 6,	// "06:00"
-	 0	// "??:??"	// Boss 4
-       #endif
-    #endif
-	};
 #endif
-
+	};
 
 
 	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
@@ -888,44 +372,16 @@ void LevelCompleted (void)
 	IN_ClearKeysDown();
 	IN_StartAck();
 
-#ifdef JAPAN
-	CA_CacheGrChunk(C_INTERMISSIONPIC);
-	VWB_DrawPic(0,0,C_INTERMISSIONPIC);
-	UNCACHEGRCHUNK(C_INTERMISSIONPIC);
-#endif
 	VWB_DrawPic(0,16,L_GUYPIC);
 
-#ifndef SPEAR
 	if (mapon<8)
-#else
-	if (mapon != 4 &&
-		mapon != 9 &&
-		mapon != 15 &&
-		mapon < 17)
-#endif
 	{
-#ifndef JAPAN
-	 #ifdef SPANISH
-	 Write(14,2,"piso\ncompletado");
-	 #else
 	 Write(14,2,"floor\ncompleted");
-	 #endif
 
 	 Write(14,7,STR_BONUS"     0");
 	 Write(16,10,STR_TIME);
 	 Write(16,12,STR_PAR);
 
-#ifdef KEEP_STRING
-	 // *** SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
-	 // Possibly relocated this, depending on version
-	#ifndef GOODTIMES
-	 #ifdef SPANISH
-	 Write(30,12,parTimes[gamestate.episode*10+mapon].timestr);
-	 #else
-	 Write(26,12,parTimes[gamestate.episode*10+mapon].timestr);
-	 #endif
-	#endif
-#else
 	 temp = parTimes[gamestate.episode*8+mapon]*60;
 	 min  = temp/60;
 	 sec  = temp%60;
@@ -941,30 +397,12 @@ void LevelCompleted (void)
 	 VWB_DrawPic(i,12*8,L_NUM0PIC+(sec/10));
 	 i+=2*8;
 	 VWB_DrawPic(i,12*8,L_NUM0PIC+(sec%10));
-#endif
 
-	 #ifdef SPANISH
-	 Write(11,14,    STR_RAT2KILL);
-	 Write(11,16,  STR_RAT2SECRET);
-	 Write(11,18,STR_RAT2TREASURE);
-	 #else
 	 Write(9,14,    STR_RAT2KILL);
 	 Write(5,16,  STR_RAT2SECRET);
 	 Write(1,18,STR_RAT2TREASURE);
-	 #endif
 
 	 Write(26,2,itoa(gamestate.mapon+1,tempstr,10));
-#endif
-
-	 // *** SHAREWARE/REGISTERED V1.4 APOGEE RESTORATION ***
-	 // Possibly relocate this, depending on version
-	#ifdef GOODTIMES
-	 #ifdef SPANISH
-	 Write(30,12,parTimes[gamestate.episode*10+mapon].timestr);
-	 #else
-	 Write(26,12,parTimes[gamestate.episode*10+mapon].timestr);
-	 #endif
-	#endif
 
 	 //
 	 // PRINT TIME
@@ -974,28 +412,13 @@ void LevelCompleted (void)
 	 if (sec > 99*60)		// 99 minutes max
 	   sec = 99*60;
 
-#ifdef KEEP_STRINGS
-	 // *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	 if (gamestate.TimeCount<parTimes[gamestate.episode*10+mapon].time)
-		timeleft=parTimes[gamestate.episode*10+mapon].time/70-sec;
-#else
-	 if (gamestate.TimeCount<parTimes[gamestate.episode*10+mapon].time*4200)
-		timeleft=(parTimes[gamestate.episode*10+mapon].time*4200)/70-sec;
-#endif
-#else
 	 if (gamestate.TimeCount < temp*70)
 		timeleft = temp-sec;
-#endif
 
 	 min=sec/60;
 	 sec%=60;
 
-	 #ifdef SPANISH
-	 i=30*8;
-	 #else
 	 i=26*8;
-	 #endif
 	 VWB_DrawPic(i,10*8,L_NUM0PIC+(min/10));
 	 i+=2*8;
 	 VWB_DrawPic(i,10*8,L_NUM0PIC+(min%10));
@@ -1014,19 +437,12 @@ void LevelCompleted (void)
 	 // FIGURE RATIOS OUT BEFOREHAND
 	 //
 
-	 // *** SHAREWARE V1.0 APOGEE RESTORATION *** (Always calculate in v1.0)
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	 kr = sr = tr = 0;
 	 if (gamestate.killtotal)
-#endif
 		kr=(gamestate.killcount*100)/gamestate.killtotal;
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	 if (gamestate.secrettotal)
-#endif
 		sr=(gamestate.secretcount*100)/gamestate.secrettotal;
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	 if (gamestate.treasuretotal)
-#endif
 		tr=(gamestate.treasurecount*100)/gamestate.treasuretotal;
 
 
@@ -1057,11 +473,7 @@ void LevelCompleted (void)
 	 }
 
 
-	 #ifdef SPANISH
-	 #define RATIOXX		33
-	 #else
 	 #define RATIOXX		37
-	 #endif
 	 //
 	 // KILL RATIO
 	 //
@@ -1229,38 +641,7 @@ void LevelCompleted (void)
 	}
 	else
 	{
-#ifdef SPEAR
-#ifndef SPEARDEMO
-	  switch(mapon)
-	  {
-	   case 4: Write(14,4," trans\n"
-						  " grosse\n"
-						  STR_DEFEATED); break;
-	   case 9: Write(14,4,"barnacle\n"
-						  "wilhelm\n"
-						  STR_DEFEATED); break;
-	   case 15: Write(14,4,"ubermutant\n"
-						   STR_DEFEATED); break;
-	   case 17: Write(14,4," death\n"
-						   " knight\n"
-						   STR_DEFEATED); break;
-	   case 18: Write(13,4,"secret tunnel\n"
-						   "    area\n"
-						   "  completed!"); break;
-	   case 19: Write(13,4,"secret castle\n"
-						   "    area\n"
-						   "  completed!"); break;
-	  }
-#endif
-#else
-	  // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	  Write(14,4,"secret level\n completed!");
-#else
-	  Write(14,4,"secret floor\n completed!");
-#endif
-#endif
-
 	  Write(10,16,"15000 bonus!");
 
 	  VW_UpdateScreen();
@@ -1281,62 +662,15 @@ void LevelCompleted (void)
 //
 // done
 //
-#ifdef SPEARDEMO
-	if (gamestate.mapon == 1)
-	{
-		SD_PlaySound (BONUS1UPSND);
-
-		CA_CacheGrChunk (STARTFONT+1);
-		Message ("This concludes your demo\n"
-				 "of Spear of Destiny! Now,\n"
-				 "go to your local software\n"
-				 "store and buy it!");
-		UNCACHEGRCHUNK (STARTFONT+1);
-
-		IN_ClearKeysDown();
-		IN_Ack();
-	}
-#endif
-
-#ifdef JAPDEMO
-	if (gamestate.mapon == 3)
-	{
-		SD_PlaySound (BONUS1UPSND);
-
-		CA_CacheGrChunk (STARTFONT+1);
-		Message ("This concludes your demo\n"
-				 "of Wolfenstein 3-D! Now,\n"
-				 "go to your local software\n"
-				 "store and buy it!");
-		UNCACHEGRCHUNK (STARTFONT+1);
-
-		IN_ClearKeysDown();
-		IN_Ack();
-	}
-#endif
-
-	// *** SHAREWARE/REGISTERED APOGEE RESTORATION ***
-	// This is also skipped in the Apogee EXEs
-	#if (!defined SPEAR) && (defined GOODTIMES)
-	//#ifndef SPEAR
-	if (Keyboard[sc_P] && MS_CheckParm(GAMEVER_RESTORATION_W3D_DEBUGPARM))
-		PicturePause();
-	#endif
 
 	VW_FadeOut ();
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	temp = bufferofs;
-#endif
 	for (i=0;i<3;i++)
 	{
 		bufferofs = screenloc[i];
 		DrawPlayBorder ();
 	}
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	bufferofs = temp;
-#endif
 
 	UnCacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
 }
@@ -1370,13 +704,8 @@ boolean PreloadUpdate(unsigned current, unsigned total)
 
 	}
 	VW_UpdateScreen();
-//	if (LastScan == sc_Escape)
-//	{
-//		IN_ClearKeysDown();
-//		return(true);
-//	}
-//	else
-		return(false);
+
+	return(false);
 }
 
 void PreloadGraphics(void)
@@ -1423,76 +752,26 @@ void	DrawHighScores(void)
 				x,y;
 	HighScore	*s;
 
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	MM_SortMem ();
-#endif
-
-#ifndef SPEAR
-	// *** SHAREWARE/REGISTERED APOGEE + EARLY GOODTIMES/ID RESTORATION ***
-	// Uncomment line for Shareware/Registered 1.4 Apogee and early GT/ID,
-	// and relocate it for pre-1.4 Apogee
-#if (!defined GAMEVER_RESTORATION_ANY_POST_GT114) && (!defined GAMEVER_RESTORATION_ANY_APO_PRE14)
-	CA_CacheGrChunk (C_CODEPIC);
-#endif
 	CA_CacheGrChunk (HIGHSCORESPIC);
 	CA_CacheGrChunk (STARTFONT);
-	// *** SHAREWARE/REGISTERED APOGEE + EARLY GOODTIMES/ID RESTORATION ***
-	// Relocated line for pre-1.4 Apogee
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	CA_CacheGrChunk (C_CODEPIC);
-#endif
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	CA_CacheGrChunk (C_LEVELPIC);
 	CA_CacheGrChunk (C_SCOREPIC);
 	CA_CacheGrChunk (C_NAMEPIC);
-#endif
 
 	ClearMScreen();
 	DrawStripes(10);
 
 	VWB_DrawPic(48,0,HIGHSCORESPIC);
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-	// Relocate line for pre-1.4 Apogee
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	UNCACHEGRCHUNK (HIGHSCORESPIC);
-#endif
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	VWB_DrawPic(4*8,68,C_NAMEPIC);
 	VWB_DrawPic(20*8,68,C_LEVELPIC);
 	VWB_DrawPic(28*8,68,C_SCOREPIC);
-#endif
-	// *** SHAREWARE V1.0+REGISTERED APOGEE + EARLY GOODTIMES/ID RESTORATION ***
-	// Uncomment line for Shareware 1.0 and any Registered Apogee release, and early Goodtimes/Id
-#if (!defined GAMEVER_RESTORATION_ANY_POST_GT114) && ((!defined UPLOAD) || (defined GAMEVER_RESTORATION_WL1_APO10))
-//#ifndef UPLOAD
 	VWB_DrawPic(35*8,68,C_CODEPIC);
-#endif
 	fontnumber=0;
 
-#else
-	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-	ClearMScreen();
-	DrawStripes(10);
-	UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 
-	CacheLump (HIGHSCORES_LUMP_START,HIGHSCORES_LUMP_END);
-	CA_CacheGrChunk (STARTFONT+1);
-	VWB_DrawPic (0,0,HIGHSCORESPIC);
-
-	fontnumber = 1;
-#endif
-
-
-#ifndef SPEAR
 	SETFONTCOLOR(15,0x29);
-#else
-	SETFONTCOLOR(HIGHLIGHT,0x29);
-#endif
 
 	for (i = 0,s = Scores;i < MaxScores;i++,s++)
 	{
@@ -1502,76 +781,36 @@ void	DrawHighScores(void)
 		// name
 		//
 
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		PrintX = 60;
-#elif (!defined SPEAR)
-//#ifndef SPEAR
 		PrintX = 4*8;
-#else
-		PrintX = 16;
-#endif
 		US_Print(s->name);
 
 		//
 		// level
 		//
 		ultoa(s->completed,buffer,10);
-#ifndef SPEAR
 		for (str = buffer;*str;str++)
 			*str = *str + (129 - '0');	// Used fixed-width numbers (129...)
 		USL_MeasureString(buffer,&w,&h);
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		PrintX = (24 * 8)-w;
-#else
 		PrintX = (22 * 8)-w;
-#endif
-#else
-		USL_MeasureString(buffer,&w,&h);
-		PrintX = 194 - w;
-#endif
 
-#ifndef UPLOAD
-#ifndef SPEAR
 		PrintX -= 6;
 		itoa(s->episode+1,buffer1,10);
 		US_Print("E");
 		US_Print(buffer1);
 		US_Print("/L");
-#endif
-#endif
 
-#ifdef SPEAR
-		if (s->completed == 21)
-			VWB_DrawPic (PrintX+8,PrintY-1,C_WONSPEARPIC);
-		else
-#endif
 		US_Print(buffer);
 
 		//
 		// score
 		//
 		ultoa(s->score,buffer,10);
-#ifndef SPEAR
 		for (str = buffer;*str;str++)
 			*str = *str + (129 - '0');	// Used fixed-width numbers (129...)
 		USL_MeasureString(buffer,&w,&h);
 		PrintX = (34 * 8) - 8 - w;
-#else
-		USL_MeasureString(buffer,&w,&h);
-		PrintX = 292 - w;
-#endif
 		US_Print(buffer);
 
-		// *** SHAREWARE V1.0+REGISTERED APOGEE + EARLY GOODTIMES/ID RESTORATION ***
-		// *** REGISTERED V1.4 APOGEE + EARLY GOODTIMES/ID RESTORATION ***
-		// Do compile verification block for Shareware 1.0 and any Registered Apogee release, and early Goodtimes/Id
-		#ifndef GAMEVER_RESTORATION_ANY_POST_GT114
-		//#if 0
-#if (!defined UPLOAD) || (defined GAMEVER_RESTORATION_WL1_APO10)
-//#ifndef UPLOAD
-#ifndef SPEAR
 		//
 		// verification #
 		//
@@ -1596,24 +835,10 @@ void	DrawHighScores(void)
 		 US_Print(buffer);
 		 SETFONTCOLOR(15,0x29);
 		}
-#endif
-#endif
-		#endif
 	}
 
-	// *** PRE-V1.4 APOGEE RESTORATION (INC. SPECIAL CASE FOR V1.0) ***
-	// Relocated line for pre-1.4 Apogee, but don't compile at all in v1.0
-#ifndef GAMEVER_RESTORATION_WL1_APO10
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	UNCACHEGRCHUNK (HIGHSCORESPIC);
-#endif
 	VW_UpdateScreen ();
-#endif
-
-#ifdef SPEAR
-	UnCacheLump (HIGHSCORES_LUMP_START,HIGHSCORES_LUMP_END);
-	fontnumber = 0;
-#endif
 }
 
 //===========================================================================
@@ -1635,10 +860,7 @@ void	CheckHighScore (long score,word other)
 
 	strcpy(myscore.name,"");
 	myscore.score = score;
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	myscore.episode = gamestate.episode;
-#endif
 	myscore.completed = other;
 
 	for (i = 0,n = -1;i < MaxScores;i++)
@@ -1660,11 +882,7 @@ void	CheckHighScore (long score,word other)
 		}
 	}
 
-#ifdef SPEAR
-	StartCPMusic (XAWARD_MUS);
-#else
 	StartCPMusic (ROSTER_MUS);
-#endif
 	DrawHighScores ();
 
 	VW_FadeIn ();
@@ -1675,35 +893,11 @@ void	CheckHighScore (long score,word other)
 	// got a high score
 	//
 		PrintY = 76 + (16 * n);
-#ifndef SPEAR
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		PrintX = 60;
-#else
 		PrintX = 4*8;
-#endif
-		// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-		backcolor = BORDCOLOR;
-		fontcolor = 15;
-#endif
 		US_LineInput(PrintX,PrintY,Scores[n].name,nil,true,MaxHighName,100);
-#else
-		PrintX = 16;
-		fontnumber = 1;
-		VWB_Bar (PrintX-2,PrintY-2,145,15,0x9c);
-		VW_UpdateScreen ();
-		backcolor = 0x9c;
-		fontcolor = 15;
-		US_LineInput(PrintX,PrintY,Scores[n].name,nil,true,MaxHighName,130);
-#endif
 	}
 	else
 	{
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		VW_UpdateScreen ();
-#endif
 		IN_ClearKeysDown ();
 		IN_UserInput(500);
 	}
@@ -1711,460 +905,4 @@ void	CheckHighScore (long score,word other)
 }
 
 
-#ifndef UPLOAD
-#ifndef SPEAR
-#ifndef JAPAN
-#if !defined(GOODTIMES) && defined(KEEP_NOTICE)
-////////////////////////////////////////////////////////
-//
-// NON-SHAREWARE NOTICE
-//
-////////////////////////////////////////////////////////
-void NonShareware(void)
-{
-	VW_FadeOut();
-
-	ClearMScreen();
-	DrawStripes(10);
-
-	CA_CacheGrChunk(STARTFONT+1);
-	fontnumber = 1;
-
-	SETFONTCOLOR(READHCOLOR,BKGDCOLOR);
-	PrintX=110;
-	PrintY=15;
-
-	#ifdef SPANISH
-	US_Print("Atencion");
-	#else
-	US_Print("Attention");
-	#endif
-
-	SETFONTCOLOR(HIGHLIGHT,BKGDCOLOR);
-	WindowX=PrintX=40;
-	PrintY=60;
-	#ifdef SPANISH
-	US_Print("Este juego NO es gratis y\n");
-	US_Print("NO es Shareware; favor de\n");
-	US_Print("no distribuirlo.\n\n");
-	#else
-	US_Print("This game is NOT shareware.\n");
-	US_Print("Please do not distribute it.\n");
-	US_Print("Thanks.\n\n");
-	#endif
-	US_Print("        Id Software\n");
-
-	VW_UpdateScreen ();
-	VW_FadeIn();
-	IN_Ack();
-}
-#endif
-#endif
-#endif
-#endif
-
-#ifdef SPEAR
-#ifndef SPEARDEMO
-////////////////////////////////////////////////////////
-//
-// COPY PROTECTION FOR FormGen
-//
-////////////////////////////////////////////////////////
-char 	far CopyProFailedStrs[][100] = {
-			STR_COPY1,
-			STR_COPY2,
-
-			STR_COPY3,
-			STR_COPY4,
-
-			STR_COPY5,
-			STR_COPY6,
-
-			STR_COPY7,
-			STR_COPY8,
-
-			STR_COPY9,
-			"",
-
-			STR_COPY10,
-			STR_COPY11,
-
-			STR_COPY12,
-			"",
-
-			STR_COPY13,
-			"",
-
-			STR_COPY14,
-			""
-			},
-
-		far BackDoorStrs[5][16] = {
-			"a spoon?",
-			"bite me!",
-			"joshua",
-			"pelt",
-#ifdef BETA
-			"beta"
-#else
-			"snoops"
-#endif
-			},
-
-		far GoodBoyStrs[10][40] = {
-			"...is the CORRECT ANSWER!",
-			"",
-
-			"Consider yourself bitten, sir.",
-			"",
-
-			"Greetings Professor Falken, would you",
-			"like to play Spear of Destiny?",
-
-			"Do you have any gold spray paint?",
-			"",
-
-#ifdef BETA
-			"Beta testing approved.",
-#else
-			"I wish I had a 21\" monitor...",
-#endif
-			""
-			},
-
-		far bossstrs[4][24] = {
-			"DEATH KNIGHT",
-			"BARNACLE WILHELM",
-			"UBERMUTANTUBER MUTANT",
-			"TRANS GROSSE"
-			},
-
-		far WordStr[5][20] = {
-			"New Game",
-			"Sound...F4",
-			"Control...F6",
-			"Change View...F5",
-			"Quit...F10"},
-
-		far	WordCorrect[5][2] = {"3","4","4","5","5"},
-
-		far MemberStr[10][40] = {
-			STR_COPY15,
-			"",
-
-			STR_COPY16,
-			"",
-
-			STR_COPY17,
-			STR_COPY18,
-
-			STR_COPY19,
-			STR_COPY20,
-
-			STR_COPY21,
-			STR_COPY22},
-
-		far MemberCorrect[5][24] = {
-			"adrian carmack",
-			"john carmackjohn romero",
-			"tom hall",
-			"jay wilbur",
-			"kevin cloud"},
-
-		far DosMessages[9][80] = {
-			STR_NOPE1,
-			STR_NOPE2,
-			STR_NOPE3,
-			STR_NOPE4,
-			STR_NOPE5,
-			STR_NOPE6,
-			STR_NOPE7,
-			STR_NOPE8,
-			STR_NOPE9},
-
-		far MiscTitle[4][20] = {
-			"BLOOD TEST",
-			"STRAIGHT-LACED",
-			"QUITE SHAPELY",
-			"I AM WHAT I AMMO"
-			},
-
-		far MiscStr[12][40] = {
-			STR_MISC1,
-			STR_MISC2,
-			"",
-
-			STR_MISC3,
-			STR_MISC4,
-			"",
-
-			STR_MISC5,
-			STR_MISC6,
-			"",
-
-			STR_MISC7,
-			STR_MISC8,
-			STR_MISC9
-			},
-
-		far MiscCorrect[4][5] = {"ss","8",STR_STAR,"45"};
-
-
-int  BackDoor(char *s)
-{
-	int i;
-
-
-	strlwr(s);
-
-	for (i=0;i<5;i++)
-		if (!_fstrcmp(s,BackDoorStrs[i]))
-		{
-			SETFONTCOLOR(14,15);
-			fontnumber = 0;
-			PrintY = 175;
-			VWB_DrawPic (0,20*8,COPYPROTBOXPIC);
-			US_CPrint(GoodBoyStrs[i*2]);
-			US_CPrint(GoodBoyStrs[i*2+1]);
-			VW_UpdateScreen();
-			return 1;
-		}
-
-	return 0;
-}
-
-
-void CopyProtection(void)
-{
-#define TYPEBOX_Y		177
-#define TYPEBOX_BKGD	0x9c
-#define PRINTCOLOR		HIGHLIGHT
-
-	int	i,match,whichboss,bossnum,try,whichline,enemypicked[4]={0,0,0,0},
-		bosses[4] = { BOSSPIC1PIC,BOSSPIC2PIC,BOSSPIC3PIC,BOSSPIC4PIC },
-		whichone,whichpicked[4]={0,0,0,0},quiztype,whichmem,
-		memberpicked[5]={0,0,0,0,0},wordpicked[5]={0,0,0,0,0},whichword;
-
-	char	inputbuffer[20],
-			message[80];
-
-	enum
-	{
-		debriefing,
-		checkmanual,
-		staffquiz,
-		miscquiz,
-
-		totaltypes
-	};
-
-
-
-	try = 0;
-	VW_FadeOut();
-	CA_CacheGrChunk(C_BACKDROPPIC);
-	CacheLump(COPYPROT_LUMP_START,COPYPROT_LUMP_END);
-	CA_CacheGrChunk(STARTFONT+1);
-	CA_LoadAllSounds();
-	StartCPMusic(COPYPRO_MUS);
-	US_InitRndT(true);
-
-	while (try<3)
-	{
-		fontnumber = 1;
-		SETFONTCOLOR(PRINTCOLOR-2,15);
-		VWB_DrawPic (0,0,C_BACKDROPPIC);
-		VWB_DrawPic (0,0,COPYPROTTOPPIC);
-		VWB_DrawPic (0,20*8,COPYPROTBOXPIC);
-		WindowX = WindowY = 0;
-		WindowW = 320;
-		WindowH = 200;
-		PrintY = 65;
-
-		quiztype = US_RndT()%totaltypes;
-		switch(quiztype)
-		{
-			//
-			// BOSSES QUIZ
-			//
-			case debriefing:
-				PrintX = 0;
-				US_Print(STR_DEBRIEF);
-				SETFONTCOLOR(PRINTCOLOR,15);
-
-				while (enemypicked[whichboss = US_RndT()&3]);
-				enemypicked[whichboss] = 1;
-				bossnum = bosses[whichboss];
-				VWB_DrawPic(128,60,bossnum);
-				fontnumber = 0;
-				PrintY = 130;
-				US_CPrint(STR_ENEMY1"\n");
-				US_CPrint(STR_ENEMY2"\n\n");
-
-				VW_UpdateScreen();
-				VW_FadeIn();
-
-				PrintX = 100;
-				fontcolor = 15;
-				backcolor = TYPEBOX_BKGD;
-				inputbuffer[0] = 0;
-				PrintY = TYPEBOX_Y;
-				fontnumber = 1;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,20,100);
-
-				match = 0;
-				for (i=0;i<_fstrlen(bossstrs[whichboss]);i++)
-					if (!_fstrnicmp(inputbuffer,bossstrs[whichboss]+i,strlen(inputbuffer)) &&
-						strlen(inputbuffer)>3)
-						match = 1;
-
-				match += BackDoor(inputbuffer);
-				break;
-
-			//
-			// MANUAL CHECK
-			//
-			case checkmanual:
-				while (wordpicked[whichword = US_RndT()%5]);
-				wordpicked[whichword] = 1;
-				US_CPrint(STR_CHECKMAN);
-				SETFONTCOLOR(PRINTCOLOR,15);
-				PrintY += 25;
-				US_CPrint(STR_MAN1);
-				US_CPrint(STR_MAN2);
-				_fstrcpy(message,STR_MAN3" \"");
-				_fstrcat(message,WordStr[whichword]);
-				_fstrcat(message,"\" "STR_MAN4);
-				US_CPrint(message);
-				VW_UpdateScreen();
-				VW_FadeIn();
-
-				PrintX = 146;
-				fontcolor = 15;
-				backcolor = TYPEBOX_BKGD;
-				inputbuffer[0] = 0;
-				PrintY = TYPEBOX_Y;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,6,100);
-
-				strlwr(inputbuffer);
-				match = 1-(_fstrcmp(inputbuffer,WordCorrect[whichword])!=0);
-				match += BackDoor(inputbuffer);
-				break;
-
-			//
-			// STAFF QUIZ
-			//
-			case staffquiz:
-				while (memberpicked[whichmem = US_RndT()%5]);
-				memberpicked[whichmem] = 1;
-				US_CPrint(STR_ID1);
-				SETFONTCOLOR(PRINTCOLOR,15);
-				PrintY += 25;
-				US_CPrint(MemberStr[whichmem*2]);
-				US_CPrint(MemberStr[whichmem*2+1]);
-				VW_UpdateScreen();
-				VW_FadeIn();
-
-				PrintX = 100;
-				fontcolor = 15;
-				backcolor = TYPEBOX_BKGD;
-				inputbuffer[0] = 0;
-				PrintY = TYPEBOX_Y;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,20,120);
-
-				strlwr(inputbuffer);
-				match = 0;
-				for (i=0;i<_fstrlen(MemberCorrect[whichmem]);i++)
-					if (!_fstrnicmp(inputbuffer,MemberCorrect[whichmem]+i,strlen(inputbuffer)) &&
-						strlen(inputbuffer)>2)
-							match = 1;
-				match += BackDoor(inputbuffer);
-				break;
-
-			//
-			// MISCELLANEOUS QUESTIONS
-			//
-			case miscquiz:
-				while (whichpicked[whichone = US_RndT()&3]);
-				whichpicked[whichone] = 1;
-				US_CPrint(MiscTitle[whichone]);
-				SETFONTCOLOR(PRINTCOLOR,15);
-				PrintY += 25;
-				US_CPrint(MiscStr[whichone*3]);
-				US_CPrint(MiscStr[whichone*3+1]);
-				US_CPrint(MiscStr[whichone*3+2]);
-				VW_UpdateScreen();
-				VW_FadeIn();
-
-				PrintX = 146;
-				fontcolor = 15;
-				backcolor = TYPEBOX_BKGD;
-				inputbuffer[0] = 0;
-				PrintY = TYPEBOX_Y;
-				US_LineInput(PrintX,PrintY,inputbuffer,nil,true,6,100);
-
-				strlwr(inputbuffer);
-				match = 1-(_fstrcmp(inputbuffer,MiscCorrect[whichone])!=0);
-				match += BackDoor(inputbuffer);
-				break;
-			}
-
-		//
-		// IF NO MATCH, WE'VE GOT A (MINOR) PROBLEM!
-		//
-
-		if (!match)
-		{
-			whichline = 2*(US_RndT()%9);
-			SETFONTCOLOR(14,15);
-			fontnumber = 0;
-			PrintY = 175;
-			VWB_DrawPic (0,20*8,COPYPROTBOXPIC);
-			US_CPrint(CopyProFailedStrs[whichline]);
-			US_CPrint(CopyProFailedStrs[whichline+1]);
-
-			VW_UpdateScreen();
-			SD_PlaySound(NOWAYSND);
-			IN_UserInput(TickBase*3);
-			VW_FadeOut();
-			try++;
-		}
-		else
-		{
-			int start;
-
-
-			SD_PlaySound(BONUS1UPSND);
-			SD_WaitSoundDone();
-			UNCACHEGRCHUNK (STARTFONT+1);
-			UNCACHEGRCHUNK (C_BACKDROPPIC);
-			UnCacheLump (COPYPROT_LUMP_START,COPYPROT_LUMP_END);
-
-			switch(SoundMode)
-			{
-				case sdm_Off: return;
-				case sdm_PC: start = STARTPCSOUNDS; break;
-				case sdm_AdLib: start = STARTADLIBSOUNDS;
-			}
-
-			for (i=0;i<NUMSOUNDS;i++,start++)
-				MM_FreePtr ((memptr *)&audiosegs[start]);
-			return;
-		}
-	}
-
-	ClearMemory();
-	ShutdownId();
-
-	_fstrcpy(message,DosMessages[US_RndT()%9]);
-
-	_AX = 3;
-	geninterrupt(0x10);
-
-	printf("%s\n",message);
-	exit(1);
-}
-
-#endif // SPEARDEMO
-#endif // SPEAR
 //===========================================================================

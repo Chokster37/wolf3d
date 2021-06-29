@@ -4,9 +4,6 @@
 #include <DOS.H>
 #pragma hdrstop
 
-//#define DEBUGWALLS
-//#define DEBUGTICS
-
 /*
 =============================================================================
 
@@ -29,33 +26,10 @@
 */
 
 
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-// Not sure how were these values picked, but here they are
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-#ifdef DEBUGWALLS
-unsigned screenloc[3]= {0,0,0};
-#else
-unsigned screenloc[3]= {3328,16128,28928};
-#endif
-unsigned freelatch = 41728;
-#else
-#ifdef DEBUGWALLS
-unsigned screenloc[3]= {0,0,0};
-#else
 unsigned screenloc[3]= {PAGE1START,PAGE2START,PAGE3START};
-#endif
 unsigned freelatch = FREESTART;
-#endif
-
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-int 	screenpage;
-#endif
 
 long 	lasttimecount;
-#ifdef KEEP_UNUSED
-long 	frameon;
-#endif
 
 unsigned	wallheight[MAXVIEWWIDTH];
 
@@ -104,16 +78,8 @@ int		lasttilehit;
 //
 int			focaltx,focalty;
 
-#ifdef KEEP_UNUSED
-int			viewtx,viewty;
-int			midangle,angle;
-unsigned	xpartial,ypartial;
-unsigned	xpartialup,xpartialdown,ypartialup,ypartialdown;
-unsigned	xinttile,yinttile;
-#else
 int			midangle;
 unsigned	xpartialup,xpartialdown,ypartialup,ypartialdown;
-#endif
 
 unsigned	tilehit;
 unsigned	pixx;
@@ -263,9 +229,6 @@ void TransformActor (objtype *ob)
 // calculate perspective ratio
 //
 	ob->transx = nx;
-#ifdef KEEP_UNUSED
-	ob->transy = ny;
-#endif
 
 	if (nx<mindist)			// too close, don't overflow the divide
 	{
@@ -343,14 +306,9 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 	if (nx<mindist)			// too close, don't overflow the divide
 	{
 		*dispheight = 0;
-#ifdef BUGFIX_55
 	}
 	else
 	{
-#else
-		return false;
-	}
-#endif
 
 	*dispx = centerx + ny*scale/nx;	// DEBUG: use assembly divide
 
@@ -365,9 +323,7 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 
 	*dispheight = temp;
 
-#ifdef BUGFIX_55
 	}
-#endif
 //
 // see if it should be grabbed
 //
@@ -522,12 +478,8 @@ void HitVertWall (void)
 	}
 	wallheight[pixx] = CalcHeight();
 
-#ifdef BUGFIX_53
 	if (lastside==1 && lastintercept == xtile && lasttilehit == tilehit
 	&& !(lasttilehit & 0x40))
-#else
-	if (lastside==1 && lastintercept == xtile && lasttilehit == tilehit)
-#endif
 	{
 		// in the same wall type as last time, so check for optimized draw
 		if (texture == (unsigned)postsource)
@@ -599,12 +551,8 @@ void HitHorizWall (void)
 		texture = 0xfc0-texture;
 	wallheight[pixx] = CalcHeight();
 
-#ifdef BUGFIX_53
 	if (lastside==0 && lastintercept == ytile && lasttilehit == tilehit
 	&& !(lasttilehit & 0x40))
-#else
-	if (lastside==0 && lastintercept == ytile && lasttilehit == tilehit)
-#endif
 	{
 		// in the same wall type as last time, so check for optimized draw
 		if (texture == (unsigned)postsource)
@@ -846,11 +794,7 @@ void HitHorizPWall (void)
 		postx = pixx;
 		postwidth = 1;
 
-	    #ifdef MORE_DOORS
 		wallpic = horizwall[pwalltile];
-	    #else
-		wallpic = horizwall[tilehit&63];
-	    #endif
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
 		(unsigned)postsource = texture;
@@ -914,11 +858,7 @@ void HitVertPWall (void)
 		postx = pixx;
 		postwidth = 1;
 
-	#ifdef MORE_DOORS
 		wallpic = vertwall[pwalltile];
-	#else
-		wallpic = vertwall[tilehit&63];
-	#endif
 
 		*( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
 		(unsigned)postsource = texture;
@@ -928,108 +868,15 @@ void HitVertPWall (void)
 
 //==========================================================================
 
-//==========================================================================
-
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-// Re-enable unused EGA code *and* restore egaFloor+egaCeiling
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-unsigned egaFloor[] = {0,0,0,0,0,0,0,0,0,5};
-unsigned egaCeiling[] = {0x0808,0x0808,0x0808,0x0808,0x0808,0x0808,0x0808,0x0808,0x0808,0x0d0d};
-
-//#if 0
-/*
-=====================
-=
-= ClearScreen
-=
-=====================
-*/
-
-void ClearScreen (void)
-{
- unsigned floor=egaFloor[gamestate.episode*10+mapon],
-	  ceiling=egaCeiling[gamestate.episode*10+mapon];
-
-  //
-  // clear the screen
-  //
-asm	mov	dx,GC_INDEX
-asm	mov	ax,GC_MODE + 256*2		// read mode 0, write mode 2
-asm	out	dx,ax
-asm	mov	ax,GC_BITMASK + 255*256
-asm	out	dx,ax
-
-asm	mov	dx,40
-asm	mov	ax,[viewwidth]
-asm	shr	ax,3
-asm	sub	dx,ax					// dx = 40-viewwidth/8
-
-asm	mov	bx,[viewwidth]
-asm	shr	bx,4					// bl = viewwidth/16
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1					// half height
-
-asm	mov	ax,[ceiling]
-asm	mov	es,[screenseg]
-asm	mov	di,[bufferofs]
-
-toploop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	toploop
-
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1					// half height
-asm	mov	ax,[floor]
-
-bottomloop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	bottomloop
-
-
-asm	mov	dx,GC_INDEX
-asm	mov	ax,GC_MODE + 256*10		// read mode 1, write mode 2
-asm	out	dx,ax
-asm	mov	al,GC_BITMASK
-asm	out	dx,al
-
-}
-#endif
-//==========================================================================
-
 unsigned vgaCeiling[]=
 {
-#ifndef SPEAR
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xbfbf,
  0x4e4e,0x4e4e,0x4e4e,0x1d1d,0x8d8d,0x4e4e,0x1d1d,0x2d2d,0x1d1d,0x8d8d,
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x2d2d,0xdddd,0x1d1d,0x1d1d,//0x9898,
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
- 0x8d8d,
-#else
- 0x9898,
-#endif
-// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO11
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xd7d7,0x1d1d,0x1d1d,0x1d1d,0x1d1d,
- 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,
-#elif (defined KEEP_WOLFWL6) && (!defined GAMEVER_RESTORATION_WL1_APO10)
+ 0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x1d1d,0x2d2d,0xdddd,0x1d1d,0x1d1d,0x9898,
+#ifdef KEEP_WOLFWL6
  0x1d1d,0x9d9d,0x2d2d,0xdddd,0xdddd,0x9d9d,0x2d2d,0x4d4d,0x1d1d,0xdddd,
  0x7d7d,0x1d1d,0x2d2d,0x2d2d,0xdddd,0xd7d7,0x1d1d,0x1d1d,0x1d1d,0x2d2d,
  0x1d1d,0x1d1d,0x1d1d,0x1d1d,0xdddd,0xdddd,0x7d7d,0xdddd,0xdddd,0xdddd
-#endif
-#else
- 0x6f6f,0x4f4f
-#ifdef KEEP_SODFULL
- ,0x1d1d,0xdede,0xdfdf,0x2e2e,0x7f7f,0x9e9e,0xaeae,0x7f7f,
- 0x1d1d,0xdede,0xdfdf,0xdede,0xdfdf,0xdede,0xe1e1,0xdcdc,0x2e2e,0x1d1d,0xdcdc
-#endif
 #endif
 };
 
@@ -1066,9 +913,7 @@ asm	mov	es,[screenseg]
 asm	mov	di,[bufferofs]
 asm	mov	ax,[ceiling]
 
-#ifdef BUGFIX_57
 asm	xor	ch,ch
-#endif
 
 toploop:
 asm	mov	cl,bl
@@ -1108,16 +953,9 @@ int	CalcRotate (objtype *ob)
 
 	viewangle = player->angle + (centerx - ob->viewx)/8;
 
-	// *** PRE-V1.4 APOGEE RESTORATION *** - Including special case for v1.0
-#ifndef GAMEVER_RESTORATION_WL1_APO10
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	if (ob->obclass == rocketobj)
-#else
-	if (ob->obclass == rocketobj || ob->obclass == hrocketobj)
-#endif
 		angle =  (viewangle-180)- ob->angle;
 	else
-#endif
 		angle =  (viewangle-180)- dirangle[ob->dir];
 
 	angle+=ANGLES/16;
@@ -1156,33 +994,18 @@ typedef struct
 		shapenum;
 } visobj_t;
 
-// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION *** - Move back into function body
-#if (!defined GAMEVER_RESTORATION_WL1_APO10) && (!defined GAMEVER_RESTORATION_WL1_APO11)
 visobj_t	vislist[MAXVISABLE],*visptr,*visstep,*farthest;
-#endif
 
 void DrawScaleds (void)
 {
 	int 		i,j,least,numvisable,height;
 	memptr		shape;
-#ifdef BUGFIX_55
 	byte		*visspot;
-#else
-	byte		*tilespot,*visspot;
-#endif
 	int			shapenum;
 	unsigned	spotloc;
 
 	statobj_t	*statptr;
 	objtype		*obj;
-
-// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION *** - Moved back into function body from outside
-#if (defined GAMEVER_RESTORATION_WL1_APO10) || (defined GAMEVER_RESTORATION_WL1_APO11)
-	visobj_t	vislist[MAXVISABLE],*visptr,*visstep,*farthest;
-
-	if (nospr)
-		return;
-#endif
 
 	visptr = &vislist[0];
 
@@ -1207,12 +1030,7 @@ void DrawScaleds (void)
 		if (!visptr->viewheight)
 			continue;						// to close to the object
 
-		// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#if (defined GAMEVER_RESTORATION_WL1_APO10) || (defined GAMEVER_RESTORATION_WL1_APO11)
-		if (visptr < &vislist[MAXVISABLE])
-#else
 		if (visptr < &vislist[MAXVISABLE-1])	// don't let it overflow
-#endif
 			visptr++;
 	}
 
@@ -1226,26 +1044,9 @@ void DrawScaleds (void)
 
 		spotloc = (obj->tilex<<6)+obj->tiley;	// optimize: keep in struct?
 		visspot = &spotvis[0][0]+spotloc;
-#ifdef BUGFIX_55
 		if (*visspot     || *(visspot-1)  || *(visspot+1)
 		|| *(visspot-65) || *(visspot-64) || *(visspot-63)
 		|| *(visspot+65) || *(visspot+64) || *(visspot+63) )
-#else
-		tilespot = &tilemap[0][0]+spotloc;
-
-		//
-		// could be in any of the nine surrounding tiles
-		//
-		if (*visspot
-		|| ( *(visspot-1) && !*(tilespot-1) )
-		|| ( *(visspot+1) && !*(tilespot+1) )
-		|| ( *(visspot-65) && !*(tilespot-65) )
-		|| ( *(visspot-64) && !*(tilespot-64) )
-		|| ( *(visspot-63) && !*(tilespot-63) )
-		|| ( *(visspot+65) && !*(tilespot+65) )
-		|| ( *(visspot+64) && !*(tilespot+64) )
-		|| ( *(visspot+63) && !*(tilespot+63) ) )
-#endif
 		{
 			obj->active = true;
 			TransformActor (obj);
@@ -1260,12 +1061,7 @@ void DrawScaleds (void)
 			if (obj->state->rotate)
 				visptr->shapenum += CalcRotate (obj);
 
-		// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#if (defined GAMEVER_RESTORATION_WL1_APO10) || (defined GAMEVER_RESTORATION_WL1_APO11)
-			if (visptr < &vislist[MAXVISABLE])
-#else
 			if (visptr < &vislist[MAXVISABLE-1])	// don't let it overflow
-#endif
 				visptr++;
 			obj->flags |= FL_VISABLE;
 		}
@@ -1322,17 +1118,12 @@ void DrawPlayerWeapon (void)
 {
 	int	shapenum;
 
-#ifndef SPEAR
 	if (gamestate.victoryflag)
 	{
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 		if (player->state == &s_deathcam && (TimeCount&32) )
 			SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
-#endif
 		return;
 	}
-#endif
 
 	if (gamestate.weapon != -1)
 	{
@@ -1366,8 +1157,6 @@ void CalcTics (void)
 	if (lasttimecount > TimeCount)
 		TimeCount = lasttimecount;		// if the game was paused a LONG time
 
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	if (DemoMode != demo_Off)
 	{
 		oldtimecount = lasttimecount;
@@ -1378,7 +1167,6 @@ void CalcTics (void)
 		tics = DEMOTICS;
 		return;
 	}
-#endif
 
 	do
 	{
@@ -1387,14 +1175,6 @@ void CalcTics (void)
 	} while (!tics);			// make sure at least one tic passes
 
 	lasttimecount = newtime;
-
-#ifdef FILEPROFILE
-		strcpy (scratch,"\tTics:");
-		itoa (tics,str,10);
-		strcat (scratch,str);
-		strcat (scratch,"\n");
-		write (profilehandle,scratch,strlen(scratch));
-#endif
 
 	if (tics>MAXTICS)
 	{
@@ -1417,12 +1197,6 @@ void CalcTics (void)
 
 void	FixOfs (void)
 {
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	if (++screenpage == 3)
-		screenpage = 0;
-	bufferofs = screenloc[screenpage];
-#endif
 	VW_ScreenToScreen (displayofs,bufferofs,viewwidth/8,viewheight);
 }
 
@@ -1453,54 +1227,19 @@ void WallRefresh (void)
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
 
-#ifdef KEEP_UNUSED
-	viewtx = player->x >> TILESHIFT;
-	viewty = player->y >> TILESHIFT;
-#endif
-
 	xpartialdown = viewx&(TILEGLOBAL-1);
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = viewy&(TILEGLOBAL-1);
 	ypartialup = TILEGLOBAL-ypartialdown;
 
-#ifdef BUGFIX_57
 	if(xpartialdown==0) xpartialup=0xffff;
 	if(ypartialdown==0) ypartialup=0xffff;
-#endif
 
 	lastside = -1;			// the first pixel is on a new wall
 	AsmRefresh ();
 	ScalePost ();			// no more optimization on last post
 }
 
-// *** SHAREWARE V1.0 APOGEE RESTORATION *** - An unused function from v1.0
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-//==========================================================================
-
-int someUnusedDrawArray[] = {
-	0x1b, 0x08, 0x1b, 0x1c, 0x00, 0x00, 0x00, 0x00,
-	0x1c, 0x08, 0x1c, 0x1b, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-void	SomeUnusedDrawFunc (void)
-{
-	int *arrPtr;
-	for (arrPtr=someUnusedDrawArray; arrPtr[0]; arrPtr+=8)
-	{
-		arrPtr[7] -= tics;
-		if (arrPtr[7] >= 0)
-			continue;
-		arrPtr[7] += arrPtr[1];
-		++(arrPtr[6]);
-		if (arrPtr[arrPtr[6]+2] == 0)
-			arrPtr[6] = 0;
-		horizwall[arrPtr[0]] = (arrPtr[arrPtr[6]+2]-1)<<1;
-		vertwall[arrPtr[0]] = (arrPtr[arrPtr[6]+2]<<1)-1;
-	}
-}
-
-#endif // GAMEVER_RESTORATION_WL1_APO10
 //==========================================================================
 
 /*
@@ -1528,17 +1267,7 @@ asm	xor	ax,ax
 asm	mov	cx,2048							// 64*64 / 2
 asm	rep stosw
 
-//#ifdef BUGFIX_55
-//	spotvis[player->tilex][player->tiley] = 1;
-//#endif
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	if (++screenpage == 3)
-		screenpage = 0;
-	bufferofs = screenloc[screenpage]+screenofs;
-#else
 	bufferofs += screenofs;
-#endif
 
 //
 // follow the walls from there to the right, drawwing as we go
@@ -1561,22 +1290,11 @@ asm	rep stosw
 		FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,20,false);
 		fizzlein = false;
 
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		lasttimecount = TimeCount;
-#else
-		lasttimecount = TimeCount = 0;		// don't make a big tic count
-#endif
-
 	}
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	displayofs = bufferofs-screenofs;
-#else
 	bufferofs -= screenofs;
 	displayofs = bufferofs;
-#endif
 
 	asm	cli
 	asm	mov	cx,[displayofs]
@@ -1586,26 +1304,12 @@ asm	rep stosw
 	asm	inc	dx
 	asm	mov	al,ch
 	asm	out	dx,al   	// set the high byte
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	asm	dec	dx
-	asm	mov	al,0dh
-	asm	out	dx,al
-	asm	inc	dx
-	asm	mov	al,cl
-	asm	out	dx,al
-	asm	sti
-#else
 	asm	sti
 
 	bufferofs += SCREENSIZE;
 	if (bufferofs > PAGE3START)
 		bufferofs = PAGE1START;
-#endif
 
-#ifdef KEEP_UNUSED
-	frameon++;
-#endif
 	PM_NextFrame();
 }
 

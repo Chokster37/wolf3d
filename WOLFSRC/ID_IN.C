@@ -65,10 +65,6 @@ boolean			JoyPadPresent;
 		JoystickDef	JoyDefs[MaxJoys];
 		ControlType	Controls[MaxPlayers];
 
-	#ifdef KEEP_UNUSED
-		longword	MouseDownCount;
-	#endif
-
 		Demo		DemoMode = demo_Off;
 		byte _seg	*DemoBuffer;
 		word		DemoOffset,DemoSize;
@@ -403,32 +399,6 @@ register	word	result;
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//	IN_GetJoyButtonsDB() - Returns the de-bounced button status of the
-//		specified joystick
-//
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef KEEP_UNUSED
-word
-IN_GetJoyButtonsDB(word joy)
-{
-	longword	lasttime;
-	word		result1,result2;
-
-	do
-	{
-		result1 = INL_GetJoyButtons(joy);
-		lasttime = TimeCount;
-		while (TimeCount == lasttime)
-			;
-		result2 = INL_GetJoyButtons(joy);
-	} while (result1 != result2);
-	return(result1);
-}
-#endif
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	INL_StartKbd() - Sets up my keyboard stuff for use
 //
 ///////////////////////////////////////////////////////////////////////////
@@ -464,15 +434,6 @@ INL_ShutKbd(void)
 static boolean
 INL_StartMouse(void)
 {
-#if 0
-	if (getvect(MouseInt))
-	{
-		Mouse(MReset);
-		if (_AX == 0xffff)
-			return(true);
-	}
-	return(false);
-#endif
  union REGS regs;
  unsigned char far *vector;
 
@@ -529,23 +490,14 @@ IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy)
 	def->joyMinX = minx;
 	def->joyMaxX = maxx;
 	r = maxx - minx;
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	d = r / 5;
-#else
-	d = r / 3;
-#endif
 	def->threshMinX = ((r / 2) - d) + minx;
 	def->threshMaxX = ((r / 2) + d) + minx;
 
 	def->joyMinY = miny;
 	def->joyMaxY = maxy;
 	r = maxy - miny;
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	d = r / 5;
-#else
-	d = r / 3;
-#endif
 	def->threshMinY = ((r / 2) - d) + miny;
 	def->threshMaxY = ((r / 2) + d) + miny;
 
@@ -628,27 +580,6 @@ IN_Startup(void)
 	IN_Started = true;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_Default() - Sets up default conditions for the Input Mgr
-//
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef KEEP_UNUSED
-void
-IN_Default(boolean gotit,ControlType in)
-{
-	if
-	(
-		(!gotit)
-	|| 	((in == ctrl_Joystick1) && !JoysPresent[0])
-	|| 	((in == ctrl_Joystick2) && !JoysPresent[1])
-	|| 	((in == ctrl_Mouse) && !MousePresent)
-	)
-		in = ctrl_Keyboard1;
-	IN_SetControlType(0,in);
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -671,20 +602,6 @@ IN_Shutdown(void)
 	IN_Started = false;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_SetKeyHook() - Sets the routine that gets called by INL_KeyService()
-//			everytime a real make/break code gets hit
-//
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef KEEP_UNUSED
-void
-IN_SetKeyHook(void (*hook)())
-{
-	INL_KeyHook = hook;
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -833,40 +750,6 @@ register	KeyboardDef	*def;
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_SetControlType() - Sets the control type to be used by the specified
-//		player
-//
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef KEEP_UNUSED
-
-void
-IN_SetControlType(int player,ControlType type)
-{
-	// DEBUG - check that requested type is present?
-	Controls[player] = type;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_WaitForKey() - Waits for a scan code, then clears LastScan and
-//		returns the scan code
-//
-///////////////////////////////////////////////////////////////////////////
-ScanCode
-IN_WaitForKey(void)
-{
-	ScanCode	result;
-
-	while (!(result = LastScan))
-		;
-	LastScan = 0;
-	return(result);
-}
-
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //

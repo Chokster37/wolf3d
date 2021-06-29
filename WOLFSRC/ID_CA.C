@@ -20,8 +20,6 @@ loaded into the data segment
 #pragma warn -pro
 #pragma warn -use
 
-#define THREEBYTEGRSTARTS
-
 /*
 =============================================================================
 
@@ -63,12 +61,6 @@ void		_seg	*grsegs[NUMCHUNKS];
 byte		far	grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
-#ifdef KEEP_UNUSED
-int			profilehandle,debughandle;
-
-char		audioname[13]="AUDIO.";
-#endif
-
 /*
 =============================================================================
 
@@ -92,9 +84,6 @@ char extension[5],	// Need a string, not constant to change cache files
      gfilename[10]=GREXT"GRAPH.",
      gdictname[10]=GREXT"DICT.",
      mheadname[10]="MAPHEAD.",
-#ifdef KEEP_UNUSED
-     mfilename[10]="MAPTEMP.",
-#endif
      aheadname[10]="AUDIOHED.",
      afilename[10]="AUDIOT.";
 
@@ -103,21 +92,7 @@ void CA_CannotOpen(char *string);
 long		_seg *grstarts;	// array of offsets in egagraph, -1 for sparse
 long		_seg *audiostarts;	// array of offsets in audio / audiot
 
-#ifdef GRHEADERLINKED
-huffnode	*grhuffman;
-#else
 huffnode	grhuffman[255];
-#endif
-
-#ifdef KEEP_UNUSED
-
-#ifdef AUDIOHEADERLINKED
-huffnode	*audiohuffman;
-#else
-huffnode	audiohuffman[255];
-#endif
-
-#endif
 
 int			grhandle;		// handle to EGAGRAPH
 int			maphandle;		// handle to MAPTEMP / GAMEMAPS
@@ -133,9 +108,7 @@ void	CAL_CarmackExpand (unsigned far *source, unsigned far *dest,
 		unsigned length);
 
 
-#ifdef THREEBYTEGRSTARTS
 #define FILEPOSSIZE	3
-//#define	GRFILEPOS(c) (*(long far *)(((byte far *)grstarts)+(c)*3)&0xffffff)
 long GRFILEPOS(int c)
 {
 	long value;
@@ -152,10 +125,7 @@ long GRFILEPOS(int c)
 
 	return value;
 };
-#else
-#define FILEPOSSIZE	4
-#define	GRFILEPOS(c) (grstarts[c])
-#endif
+
 
 /*
 =============================================================================
@@ -164,31 +134,6 @@ long GRFILEPOS(int c)
 
 =============================================================================
 */
-
-/*
-============================
-=
-= CA_OpenDebug / CA_CloseDebug
-=
-= Opens a binary file with the handle "debughandle"
-=
-============================
-*/
-
-#ifdef KEEP_UNUSED
-
-void CA_OpenDebug (void)
-{
-	unlink ("DEBUG.TXT");
-	debughandle = open("DEBUG.TXT", O_CREAT | O_WRONLY | O_TEXT);
-}
-
-void CA_CloseDebug (void)
-{
-	close (debughandle);
-}
-
-#endif
 
 /*
 ============================
@@ -285,36 +230,6 @@ done:
 /*
 ==========================
 =
-= CA_ReadFile
-=
-= Reads a file into an allready allocated buffer
-=
-==========================
-*/
-
-#ifdef KEEP_UNUSED
-boolean CA_ReadFile (char *filename, memptr *ptr)
-{
-	int handle;
-	long size;
-
-	if ((handle = open(filename,O_RDONLY | O_BINARY, S_IREAD)) == -1)
-		return false;
-
-	size = filelength (handle);
-	if (!CA_FarRead (handle,*ptr,size))
-	{
-		close (handle);
-		return false;
-	}
-	close (handle);
-	return true;
-}
-#endif
-
-/*
-==========================
-=
 = CA_WriteFile
 =
 = Writes a file from a memory buffer
@@ -343,37 +258,6 @@ boolean CA_WriteFile (char *filename, void far *ptr, long length)
 }
 
 
-
-/*
-==========================
-=
-= CA_LoadFile
-=
-= Allocate space for and load a file
-=
-==========================
-*/
-
-#ifdef KEEP_UNUSED
-boolean CA_LoadFile (char *filename, memptr *ptr)
-{
-	int handle;
-	long size;
-
-	if ((handle = open(filename,O_RDONLY | O_BINARY, S_IREAD)) == -1)
-		return false;
-
-	size = filelength (handle);
-	MM_GetPtr (ptr,size);
-	if (!CA_FarRead (handle,*ptr,size))
-	{
-		close (handle);
-		return false;
-	}
-	close (handle);
-	return true;
-}
-#endif
 
 /*
 ============================================================================
@@ -430,11 +314,9 @@ void CAL_OptimizeNodes (huffnode *table)
 void CAL_HuffExpand (byte huge *source, byte huge *dest,
   long length,huffnode *hufftable, boolean screenhack)
 {
-//  unsigned bit,byte,node,code;
   unsigned sourceseg,sourceoff,destseg,destoff,endoff;
   huffnode *headptr;
   byte		mapmask;
-//  huffnode *nodeon;
 
   headptr = hufftable+254;	// head node is allways node 254
 
@@ -681,65 +563,6 @@ void CAL_CarmackExpand (unsigned far *source, unsigned far *dest, unsigned lengt
 /*
 ======================
 =
-= CA_RLEWcompress
-=
-======================
-*/
-
-#ifdef KEEP_UNUSED
-
-long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
-  unsigned rlewtag)
-{
-  long complength;
-  unsigned value,count,i;
-  unsigned huge *start,huge *end;
-
-  start = dest;
-
-  end = source + (length+1)/2;
-
-//
-// compress it
-//
-  do
-  {
-	count = 1;
-	value = *source++;
-	while (*source == value && source<end)
-	{
-	  count++;
-	  source++;
-	}
-	if (count>3 || value == rlewtag)
-	{
-    //
-    // send a tag / count / value string
-    //
-      *dest++ = rlewtag;
-      *dest++ = count;
-      *dest++ = value;
-    }
-    else
-    {
-    //
-    // send word without compressing
-    //
-      for (i=1;i<=count;i++)
-	*dest++ = value;
-	}
-
-  } while (source<end);
-
-  complength = 2*(dest-start);
-  return complength;
-}
-
-#endif
-
-/*
-======================
-=
 = CA_RLEWexpand
 = length is EXPANDED length
 =
@@ -749,7 +572,6 @@ long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
 void CA_RLEWexpand (unsigned huge *source, unsigned huge *dest,long length,
   unsigned rlewtag)
 {
-//  unsigned value,count,i;
   unsigned huge *end;
   unsigned sourceseg,sourceoff,destseg,destoff,endseg,endoff;
 
@@ -757,28 +579,6 @@ void CA_RLEWexpand (unsigned huge *source, unsigned huge *dest,long length,
 //
 // expand it
 //
-#if 0
-  do
-  {
-	value = *source++;
-	if (value != rlewtag)
-	//
-	// uncompressed
-	//
-	  *dest++=value;
-	else
-	{
-	//
-	// compressed string
-	//
-	  count = *source++;
-	  value = *source++;
-	  for (i=1;i<=count;i++)
-	*dest++ = value;
-	}
-  } while (dest<end);
-#endif
-
   end = dest + (length)/2;
   sourceseg = FP_SEG(source);
   sourceoff = FP_OFF(source);
@@ -879,15 +679,6 @@ void CAL_SetupGrFile (void)
 	int handle;
 	memptr compseg;
 
-#ifdef GRHEADERLINKED
-
-	grhuffman = (huffnode *)&EGAdict;
-	grstarts = (long _seg *)FP_SEG(&EGAhead);
-
-	CAL_OptimizeNodes (grhuffman);
-
-#else
-
 //
 // load ???dict.ext (huffman dictionary for graphics files)
 //
@@ -918,8 +709,6 @@ void CAL_SetupGrFile (void)
 
 	close(handle);
 
-
-#endif
 
 //
 // Open the graphics file, leaving it open until the game is finished
@@ -964,7 +753,6 @@ void CAL_SetupMapFile (void)
 //
 // load maphead.ext (offsets and tileinfo for map file)
 //
-#ifndef MAPHEADERLINKED
 	strcpy(fname,mheadname);
 	strcat(fname,extension);
 
@@ -976,30 +764,16 @@ void CAL_SetupMapFile (void)
 	MM_GetPtr (&(memptr)tinf,length);
 	CA_FarRead(handle, tinf, length);
 	close(handle);
-#else
-
-	tinf = (byte _seg *)FP_SEG(&maphead);
-
-#endif
 
 //
 // open the data file
 //
-#ifdef CARMACIZED
 	strcpy(fname,"GAMEMAPS.");
 	strcat(fname,extension);
 
 	if ((maphandle = open(fname,
 		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		CA_CannotOpen(fname);
-#else
-	strcpy(fname,mfilename);
-	strcat(fname,extension);
-
-	if ((maphandle = open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
-		CA_CannotOpen(fname);
-#endif
 
 //
 // load all map header
@@ -1047,7 +821,6 @@ void CAL_SetupAudioFile (void)
 //
 // load maphead.ext (offsets and tileinfo for map file)
 //
-#ifndef AUDIOHEADERLINKED
 	strcpy(fname,aheadname);
 	strcat(fname,extension);
 
@@ -1059,27 +832,16 @@ void CAL_SetupAudioFile (void)
 	MM_GetPtr (&(memptr)audiostarts,length);
 	CA_FarRead(handle, (byte far *)audiostarts, length);
 	close(handle);
-#else
-	audiohuffman = (huffnode *)&audiodict;
-	CAL_OptimizeNodes (audiohuffman);
-	audiostarts = (long _seg *)FP_SEG(&audiohead);
-#endif
 
 //
 // open the data file
 //
-#ifndef AUDIOHEADERLINKED
 	strcpy(fname,afilename);
 	strcat(fname,extension);
 
 	if ((audiohandle = open(fname,
 		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		CA_CannotOpen(fname);
-#else
-	if ((audiohandle = open("AUDIO."EXTENSION,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
-		Quit ("Can't open AUDIO."EXTENSION"!");
-#endif
 }
 
 //==========================================================================
@@ -1097,11 +859,6 @@ void CAL_SetupAudioFile (void)
 
 void CA_Startup (void)
 {
-#ifdef PROFILE
-	unlink ("PROFILE.TXT");
-	profilehandle = open("PROFILE.TXT", O_CREAT | O_WRONLY | O_TEXT);
-#endif
-
 	CAL_SetupMapFile ();
 	CAL_SetupGrFile ();
 	CAL_SetupAudioFile ();
@@ -1127,10 +884,6 @@ void CA_Startup (void)
 
 void CA_Shutdown (void)
 {
-#ifdef PROFILE
-	close (profilehandle);
-#endif
-
 	close (maphandle);
 	close (grhandle);
 	close (audiohandle);
@@ -1149,11 +902,6 @@ void CA_Shutdown (void)
 void CA_CacheAudioChunk (int chunk)
 {
 	long	pos,compressed;
-#ifdef AUDIOHEADERLINKED
-	long	expanded;
-	memptr	bigbufferseg;
-	byte	far *source;
-#endif
 
 	if (audiosegs[chunk])
 	{
@@ -1170,42 +918,11 @@ void CA_CacheAudioChunk (int chunk)
 
 	lseek(audiohandle,pos,SEEK_SET);
 
-#ifndef AUDIOHEADERLINKED
-
 	MM_GetPtr (&(memptr)audiosegs[chunk],compressed);
 	if (mmerror)
 		return;
 
 	CA_FarRead(audiohandle,audiosegs[chunk],compressed);
-
-#else
-
-	if (compressed<=BUFFERSIZE)
-	{
-		CA_FarRead(audiohandle,bufferseg,compressed);
-		source = bufferseg;
-	}
-	else
-	{
-		MM_GetPtr(&bigbufferseg,compressed);
-		if (mmerror)
-			return;
-		MM_SetLock (&bigbufferseg,true);
-		CA_FarRead(audiohandle,bigbufferseg,compressed);
-		source = bigbufferseg;
-	}
-
-	expanded = *(long far *)source;
-	source += 4;			// skip over length
-	MM_GetPtr (&(memptr)audiosegs[chunk],expanded);
-	if (mmerror)
-		goto done;
-	CAL_HuffExpand (source,audiosegs[chunk],expanded,audiohuffman,false);
-
-done:
-	if (compressed>BUFFERSIZE)
-		MM_FreePtr(&bigbufferseg);
-#endif
 }
 
 //===========================================================================
@@ -1450,10 +1167,8 @@ void CA_CacheMap (int mapnum)
 	memptr	*dest,bigbufferseg;
 	unsigned	size;
 	unsigned	far	*source;
-#ifdef CARMACIZED
 	memptr	buffer2seg;
 	long	expanded;
-#endif
 
 	mapon = mapnum;
 
@@ -1466,12 +1181,6 @@ void CA_CacheMap (int mapnum)
 	{
 		pos = mapheaderseg[mapnum]->planestart[plane];
 		compressed = mapheaderseg[mapnum]->planelength[plane];
-		// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-		if (!compressed)
-			continue;
-#endif
-
 		dest = &(memptr)mapsegs[plane];
 
 		lseek(maphandle,pos,SEEK_SET);
@@ -1485,7 +1194,6 @@ void CA_CacheMap (int mapnum)
 		}
 
 		CA_FarRead(maphandle,(byte far *)source,compressed);
-#ifdef CARMACIZED
 		//
 		// unhuffman, then unRLEW
 		// The huffman'd chunk has a two byte expanded length first
@@ -1499,14 +1207,6 @@ void CA_CacheMap (int mapnum)
 		CA_RLEWexpand (((unsigned far *)buffer2seg)+1,*dest,size,
 		((mapfiletype _seg *)tinf)->RLEWtag);
 		MM_FreePtr (&buffer2seg);
-
-#else
-		//
-		// unRLEW, skipping expanded length
-		//
-		CA_RLEWexpand (source+1, *dest,size,
-		((mapfiletype _seg *)tinf)->RLEWtag);
-#endif
 
 		if (compressed>BUFFERSIZE)
 			MM_FreePtr(&bigbufferseg);
@@ -1561,107 +1261,6 @@ void CA_DownLevel (void)
 	ca_levelnum--;
 	CA_CacheMarks();
 }
-
-//===========================================================================
-
-/*
-======================
-=
-= CA_ClearMarks
-=
-= Clears out all the marks at the current level
-=
-======================
-*/
-
-#ifdef KEEP_UNUSED
-
-void CA_ClearMarks (void)
-{
-	int i;
-
-	for (i=0;i<NUMCHUNKS;i++)
-		grneeded[i]&=~ca_levelbit;
-}
-
-
-//===========================================================================
-
-/*
-======================
-=
-= CA_ClearAllMarks
-=
-= Clears out all the marks on all the levels
-=
-======================
-*/
-
-void CA_ClearAllMarks (void)
-{
-	_fmemset (grneeded,0,sizeof(grneeded));
-	ca_levelbit = 1;
-	ca_levelnum = 0;
-}
-
-
-//===========================================================================
-
-
-/*
-======================
-=
-= CA_FreeGraphics
-=
-======================
-*/
-
-
-void CA_SetGrPurge (void)
-{
-	int i;
-
-//
-// free graphics
-//
-	CA_ClearMarks ();
-
-	for (i=0;i<NUMCHUNKS;i++)
-		if (grsegs[i])
-			MM_SetPurge (&(memptr)grsegs[i],3);
-}
-
-
-
-/*
-======================
-=
-= CA_SetAllPurge
-=
-= Make everything possible purgable
-=
-======================
-*/
-
-void CA_SetAllPurge (void)
-{
-	int i;
-
-
-//
-// free sounds
-//
-	for (i=0;i<NUMSNDCHUNKS;i++)
-		if (audiosegs[i])
-			MM_SetPurge (&(memptr)audiosegs[i],3);
-
-//
-// free graphics
-//
-	CA_SetGrPurge ();
-}
-
-#endif
 
 //===========================================================================
 

@@ -1,18 +1,6 @@
 //
 // WL_MENU.H
 //
-#ifdef SPEAR
-
-#define BORDCOLOR	0x99
-#define BORD2COLOR	0x93
-#define DEACTIVE	0x9b
-#define BKGDCOLOR	0x9d
-//#define STRIPE		0x9c
-
-#define MenuFadeOut()	VL_FadeOut(0,255,0,0,51,10)
-
-#else
-
 #define BORDCOLOR	0x29
 #define BORD2COLOR	0x23
 #define DEACTIVE	0x2b
@@ -20,8 +8,6 @@
 #define STRIPE		0x2c
 
 #define MenuFadeOut()	VL_FadeOut(0,255,43,0,0,10)
-
-#endif
 
 #define READCOLOR	0x4a
 #define READHCOLOR	0x47
@@ -33,11 +19,7 @@
 
 #define MENUSONG	WONDERIN_MUS
 
-#ifndef SPEAR
 #define INTROSONG	NAZI_NOR_MUS
-#else
-#define INTROSONG	XTOWER2_MUS
-#endif
 
 #define SENSITIVE	60
 #define CENTER		SENSITIVE*2
@@ -45,11 +27,7 @@
 #define MENU_X	76
 #define MENU_Y	55
 #define MENU_W	178
-#ifndef SPEAR
 #define MENU_H	13*10+6
-#else
-#define MENU_H	13*9+6
-#endif
 
 #define SM_X	48
 #define SM_W	250
@@ -103,7 +81,7 @@ typedef struct {
 		int allowed[4];
 		} CustomCtrls;
 
-extern CP_itemtype GAMEVER_RESTORATION_CONDFARPTR MainMenu[],GAMEVER_RESTORATION_CONDFARPTR NewEMenu[];
+extern CP_itemtype far MainMenu[],far NewEMenu[];
 extern CP_iteminfo MainItems;
 
 //
@@ -112,9 +90,9 @@ extern CP_iteminfo MainItems;
 void SetupControlPanel(void);
 void CleanupControlPanel(void);
 
-void DrawMenu(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items);
+void DrawMenu(CP_iteminfo *item_i,CP_itemtype far *items);
 int  HandleMenu(CP_iteminfo *item_i,
-		CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,
+		CP_itemtype far *items,
 		void (*routine)(int w));
 void ClearMScreen(void);
 void DrawWindow(int x,int y,int w,int h,int wcolor);
@@ -125,17 +103,17 @@ void TicDelay(int count);
 void CacheLump(int lumpstart,int lumpend);
 void UnCacheLump(int lumpstart,int lumpend);
 void StartCPMusic(int song);
-int  Confirm(char GAMEVER_RESTORATION_CONDFARPTR *string);
-void Message(char GAMEVER_RESTORATION_CONDFARPTR *string);
+int  Confirm(char far *string);
+void Message(char far *string);
 void CheckPause(void);
 void ShootSnd(void);
 void CheckSecretMissions(void);
 void BossKey(void);
 
-void DrawGun(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,int x,int *y,int which,int basey,void (*routine)(int w));
+void DrawGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int *y,int which,int basey,void (*routine)(int w));
 void DrawHalfStep(int x,int y);
-void EraseGun(CP_iteminfo *item_i,CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,int x,int y,int which);
-void SetTextColor(CP_itemtype GAMEVER_RESTORATION_CONDFARPTR *items,int hlight);
+void EraseGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int y,int which);
+void SetTextColor(CP_itemtype far *items,int hlight);
 void DrawMenuGun(CP_iteminfo *iteminfo);
 void DrawStripes(int y);
 
@@ -201,21 +179,11 @@ enum
 	loadgame,
 	savegame,
 	changeview,
-
-#ifndef GOODTIMES
-#ifndef SPEAR
 	readthis,
-#endif
-#endif
-
 	viewscores,
 	backtodemo,
 	quit
 }
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-menuitems
-#endif
 ;
 
 //
@@ -223,11 +191,7 @@ menuitems
 //
 typedef struct {
 		int kill,secret,treasure;
-	#ifdef KEEP_STRUCT
-		long time;
-	#else
 		int time;	// only goes up to 99:00 (5940)
-	#endif
 		} LRstruct;
 
 extern LRstruct LevelRatios[];

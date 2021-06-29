@@ -39,11 +39,7 @@ struct
 {SPR_STAT_12,block},			// Urn             "
 {SPR_STAT_13,block},			// Bare table      "
 {SPR_STAT_14},					// Ceiling light   "
-#ifndef SPEAR
 {SPR_STAT_15},					// Kitchen stuff   "
-#else
-{SPR_STAT_15,block},			// Gibs!
-#endif
 //
 // NEW PAGE
 //
@@ -80,39 +76,20 @@ struct
 //
 // NEW PAGE
 //
-#ifndef SPEAR
 {SPR_STAT_40,block},			// Call Apogee		spr7v
-#else
-{SPR_STAT_40},					// Red light
-#endif
 //
 // NEW PAGE
 //
 {SPR_STAT_41},					// junk            "
 {SPR_STAT_42},					// junk 		   "
 {SPR_STAT_43},					// junk            "
-#ifndef SPEAR
 {SPR_STAT_44},					// pots            "
-#else
-{SPR_STAT_44,block},			// Gibs!
-#endif
 {SPR_STAT_45,block},			// stove           " (SOD:gibs)
 {SPR_STAT_46,block},			// spears          " (SOD:gibs)
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-{SPR_STAT_47,block},				// vines			"
-#else
 {SPR_STAT_47},					// vines			"
-#endif
 //
 // NEW PAGE
 //
-#ifdef SPEAR
-{SPR_STAT_48,block},			// marble pillar
-{SPR_STAT_49,bo_25clip},		// bonus 25 clip
-{SPR_STAT_50,block},			// truck
-{SPR_STAT_51,bo_spear},			// SPEAR OF DESTINY!
-#endif
 
 {SPR_STAT_26,bo_clip2},			// Clip            "
 {-1}							// terminator
@@ -170,19 +147,11 @@ void SpawnStatic (int tilex, int tiley, int type)
 	case	bo_key3:
 	case	bo_key4:
 	case	bo_clip:
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	case	bo_25clip:
-#endif
 	case	bo_machinegun:
 	case	bo_chaingun:
 	case	bo_food:
 	case	bo_alpo:
 	case	bo_gibs:
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	case	bo_spear:
-#endif
 		laststatobj->flags = FL_BONUS;
 		laststatobj->itemnumber = statinfo[type].type;
 		break;
@@ -327,10 +296,8 @@ void ConnectAreas (void)
 void InitAreas (void)
 {
 	memset (areabyplayer,0,sizeof(areabyplayer));
-    #ifdef BUGFIX_52
 	if (player->areanumber < NUMAREAS)
-    #endif
-	areabyplayer[player->areanumber] = true;
+		areabyplayer[player->areanumber] = true;
 }
 
 
@@ -366,16 +333,11 @@ void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 	int	areanumber;
 	unsigned	far *map;
 
-    #ifdef MORE_DOORS
 	if (doornum==MAXDOORS)
 	{
 			sprintf (str,"%u+ doors on level!", MAXDOORS);
 			Quit (str);
 	}
-    #else
-	if (doornum==64)
-		Quit ("64+ doors on level!");
-    #endif
 
 	doorposition[doornum] = 0;		// doors start out fully closed
 	lastdoorobj->tilex = tilex;
@@ -575,12 +537,7 @@ void DoorOpen (int door)
 
 void DoorOpening (int door)
 {
-	#ifdef BUGFIX_52
-		unsigned		area1,area2;
-	#else
-		int		area1,area2;
-	#endif
-
+	unsigned		area1,area2;
 	unsigned	far	*map;
 	long	position;
 
@@ -606,7 +563,6 @@ void DoorOpening (int door)
 		area1 -= AREATILE;
 		area2 -= AREATILE;
 
-	#ifdef BUGFIX_52
 		if (area1 < NUMAREAS && area2 < NUMAREAS)
 		{
 			areaconnect[area1][area2]++;
@@ -615,11 +571,6 @@ void DoorOpening (int door)
 			if (player->areanumber < NUMAREAS)
 				ConnectAreas ();
 		}
-	#else
-		areaconnect[area1][area2]++;
-		areaconnect[area2][area1]++;
-		ConnectAreas ();
-	#endif
 
 		if (areabyplayer[area1])
 		{
@@ -656,12 +607,7 @@ void DoorOpening (int door)
 
 void DoorClosing (int door)
 {
-	#ifdef BUGFIX_52
-		unsigned	area1,area2;
-	#else
-		int		area1,area2,move;
-	#endif
-
+	unsigned	area1,area2;
 	unsigned	far	*map;
 	long	position;
 	int		tilex,tiley;
@@ -707,7 +653,6 @@ void DoorClosing (int door)
 		area1 -= AREATILE;
 		area2 -= AREATILE;
 
-	#ifdef BUGFIX_52
 		if (area1 < NUMAREAS && area2 < NUMAREAS)
 		{
 			areaconnect[area1][area2]--;
@@ -716,12 +661,6 @@ void DoorClosing (int door)
 			if (player->areanumber < NUMAREAS)
 				ConnectAreas ();
 		}
-	#else
-		areaconnect[area1][area2]--;
-		areaconnect[area2][area1]--;
-		ConnectAreas ();
-	#endif
-
 	}
 
 	doorposition[door] = position;
@@ -744,11 +683,8 @@ void MoveDoors (void)
 {
 	int		door;
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	if (gamestate.victoryflag)		// don't move door during victory sequence
 		return;
-#endif
 
 	for (door = 0 ; door < doornum ; door++)
 		switch (doorobjlist[door].action)
@@ -780,11 +716,7 @@ unsigned	pwallstate;
 unsigned	pwallpos;			// amount a pushable wall has been moved (0-63)
 unsigned	pwallx,pwally;
 
-#ifdef MORE_DOORS
 byte		pwalltile, pwalldir;
-#else
-int			pwalldir;
-#endif
 
 /*
 ===============
@@ -801,11 +733,7 @@ void PushWall (int checkx, int checky, int dir)
 	if (pwallstate)
 	  return;
 
-    #ifdef MORE_DOORS
 	pwalltile = oldtile = tilemap[checkx][checky];
-    #else
-	oldtile = tilemap[checkx][checky];
-    #endif
 
 	if (!oldtile)
 		return;
@@ -860,11 +788,7 @@ void PushWall (int checkx, int checky, int dir)
 	pwallstate = 1;
 	pwallpos = 0;
 
-    #ifdef MORE_DOORS
 	tilemap[pwallx][pwally] = MOVINGTILE;
-    #else
-	tilemap[pwallx][pwally] |= 0xc0;
-    #endif
 
 	*(mapsegs[1]+farmapylookup[pwally]+pwallx) = 0;	// remove P tile info
 
@@ -896,11 +820,7 @@ void MovePWalls (void)
 	{
 	// block crossed into a new block
 
-	    #ifdef MORE_DOORS
 		oldtile = pwalltile;
-	    #else
-		oldtile = tilemap[pwallx][pwally] & 63;
-	    #endif
 
 		//
 		// the tile can now be walked into
@@ -912,11 +832,7 @@ void MovePWalls (void)
 		//
 		// see if it should be pushed farther
 		//
-#ifdef BUGFIX_01
 		if (pwallstate>255)
-#else
-		if (pwallstate>256)
-#endif
 		{
 		//
 		// the block has been pushed two tiles
@@ -973,12 +889,7 @@ void MovePWalls (void)
 				break;
 			}
 
-		    #ifdef MORE_DOORS
 			tilemap[pwallx][pwally] = MOVINGTILE;
-		    #else
-			tilemap[pwallx][pwally] = oldtile | 0xc0;
-		    #endif
-
 		}
 	}
 

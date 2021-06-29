@@ -18,11 +18,6 @@ long			fullscalefarcall[MAXSCALEHEIGHT+1];
 
 int			maxscale,maxscaleshl2;
 
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-boolean	insetupscaling;
-#endif
-
 /*
 =============================================================================
 
@@ -64,11 +59,6 @@ void SetupScaling (int maxscaleheight)
 {
 	int		i,x,y;
 	byte	far *dest;
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	insetupscaling = true;
-#endif
 
 	maxscaleheight/=2;			// one scaler every two pixels
 
@@ -130,11 +120,6 @@ void SetupScaling (int maxscaleheight)
 //
 	for (i=maxscaleheight;i<MAXSCALEHEIGHT;i++)
 		fullscalefarcall[i] = (long)BadScale;
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-	insetupscaling = false;
-#endif
 }
 
 //===========================================================================
@@ -251,13 +236,6 @@ extern	int			slinex,slinewidth;
 extern	unsigned	far *linecmds;
 extern	long		linescale;
 extern	unsigned	maskword;
-// *** PRE-V1.4 APOGEE RESTORATION *** - There were apparently some unused
-// variables here (or maybe an array). Also brute forcing order of appearances
-// of mask1,mask2,mask3 in the EXE layout.
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
-extern	byte	mask1,mask2,mask3;
-unsigned unusedscalevar1, unusedscalevar2, unusedscalevar3, unusedscalevar4, unusedscalevar5, unusedscalevar6;
-#endif
 byte	mask1,mask2,mask3;
 
 
@@ -430,10 +408,6 @@ asm	jmp	scaletriple					// do the next segment
 =
 =======================
 */
-
-#ifdef KEEP_UNUSED
-static	long		longtemp;
-#endif
 
 void ScaleShape (int xcenter, int shapenum, unsigned height)
 {
@@ -732,22 +706,6 @@ byte	mapmasks3[4][8] = {
 {0 ,0 ,0 ,0 ,0 ,0 ,1 ,3},
 {0 ,0 ,0 ,0 ,0 ,1 ,3 ,7} };
 
-#ifdef KEEP_UNUSED
-unsigned	wordmasks[8][8] = {
-{0x0080,0x00c0,0x00e0,0x00f0,0x00f8,0x00fc,0x00fe,0x00ff},
-{0x0040,0x0060,0x0070,0x0078,0x007c,0x007e,0x007f,0x807f},
-{0x0020,0x0030,0x0038,0x003c,0x003e,0x003f,0x803f,0xc03f},
-{0x0010,0x0018,0x001c,0x001e,0x001f,0x801f,0xc01f,0xe01f},
-{0x0008,0x000c,0x000e,0x000f,0x800f,0xc00f,0xe00f,0xf00f},
-{0x0004,0x0006,0x0007,0x8007,0xc007,0xe007,0xf007,0xf807},
-{0x0002,0x0003,0x8003,0xc003,0xe003,0xf003,0xf803,0xfc03},
-{0x0001,0x8001,0xc001,0xe001,0xf001,0xf801,0xfc01,0xfe01} };
-#endif
-
 int			slinex,slinewidth;
 unsigned	far *linecmds;
 long		linescale;
-#ifdef KEEP_UNUSED
-unsigned	maskword;
-#endif
-

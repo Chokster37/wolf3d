@@ -93,72 +93,6 @@ bufferwidth = ((dest+1)-origdest)*4;
 }
 
 
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-void VW_DrawColorPropString (char far *string)
-{
-	fontstruct	far	*font;
-	int		width,step,height,i;
-	byte	far *source, far *dest, far *origdest;
-	byte	ch,mask;
-
-	font = (fontstruct far *)grsegs[STARTFONT+fontnumber];
-	height = bufferheight = font->height;
-	dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2));
-	mask = 1<<(px&3);
-
-
-	while ((ch = *string++)!=0)
-	{
-		width = step = font->width[ch];
-		source = ((byte far *)font)+font->location[ch];
-		while (width--)
-		{
-			VGAMAPMASK(mask);
-
-asm	mov	ah,[BYTE PTR fontcolor]
-asm	mov	bx,[step]
-asm	mov	cx,[height]
-asm	mov	dx,[linewidth]
-asm	lds	si,[source]
-asm	les	di,[dest]
-
-vertloop:
-asm	mov	al,[si]
-asm	or	al,al
-asm	je	next
-asm	mov	[es:di],ah			// draw color
-
-next:
-asm	add	si,bx
-asm	add	di,dx
-
-asm rcr cx,1				// inc font color
-asm jc  cont
-asm	inc ah
-
-cont:
-asm rcl cx,1
-asm	loop	vertloop
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-			source++;
-			px++;
-			mask <<= 1;
-			if (mask == 16)
-			{
-				mask = 1;
-				dest++;
-			}
-		}
-	}
-bufferheight = height;
-bufferwidth = ((dest+1)-origdest)*4;
-}
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
-
-
 //==========================================================================
 
 
@@ -219,45 +153,6 @@ void	VW_MeasurePropString (char far *string, word *width, word *height)
 	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONT+fontnumber]);
 }
 
-#ifdef KEEP_UNUSED
-void	VW_MeasureMPropString  (char far *string, word *width, word *height)
-{
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM+fontnumber]);
-}
-#endif
-
-
-/*
-=============================================================================
-
-				Double buffer management routines
-
-=============================================================================
-*/
-
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-// An unknown do-nothing stub (possibly having disabled debugging code)
-void VW_NullStub1 (void) {}
-
-// Some v1.0 specific function, guessing it's VW_InitDoubleBuffer
-void VW_InitDoubleBuffer (void)
-{
-	displayofs = 0;
-	bufferofs = linewidth*224;
-	VL_SetScreen (displayofs,0);
-}
-
-// Another v1.0 specific, but unused, function, guessing some random name
-void VW_CopyBuffer (void)
-{
-	VL_ScreenToScreen (displayofs,bufferofs,linewidth,160);
-}
-
-// Another unknown do-nothing stub
-void VW_NullStub2 (void) {}
-#endif
 
 /*
 =======================
@@ -283,12 +178,7 @@ int VW_MarkUpdateBlock (int x1, int y1, int x2, int y2)
 
 	if (xt1<0)
 		xt1=0;
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	else if (xt1>=UPDATEWIDE-1)
-#else
 	else if (xt1>=UPDATEWIDE)
-#endif
 		return 0;
 
 	if (yt1<0)
@@ -298,14 +188,8 @@ int VW_MarkUpdateBlock (int x1, int y1, int x2, int y2)
 
 	if (xt2<0)
 		return 0;
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	else if (xt2>=UPDATEWIDE-1)
-		xt2 = UPDATEWIDE-2;
-#else
 	else if (xt2>=UPDATEWIDE)
 		xt2 = UPDATEWIDE-1;
-#endif
 
 	if (yt2<0)
 		return 0;
@@ -331,14 +215,6 @@ void VWB_DrawTile8 (int x, int y, int tile)
 {
 	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
 		LatchDrawChar(x,y,tile);
-}
-#endif
-
-#ifdef KEEP_UNUSED
-void VWB_DrawTile8M (int x, int y, int tile)
-{
-	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
-		VL_MemToScreen (((byte far *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
 }
 #endif
 
@@ -394,13 +270,6 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 
 void VW_UpdateScreen (void)
 {
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	extern int splitscreen;
-	if (splitscreen)
-		VH_UpdateSplitScreen ();
-	else
-#endif
 		VH_UpdateScreen ();
 }
 
@@ -445,12 +314,7 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 
 void LoadLatchMem (void)
 {
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	int	i,j,p,m,width,height;
-#else
-	int	i,j,p,m,width,height,start,end;
-#endif
 	byte	far *src;
 	unsigned	destoff;
 
@@ -474,46 +338,13 @@ void LoadLatchMem (void)
 	destoff = freelatch;
 #endif
 
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-	// Do compile in v1.0
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-//#if 0	// ran out of latch space!
-//
-// tile 16s
-//
-	src = (byte _seg *)grsegs[STARTTILE16];
-	latchpics[1] = destoff;
-
-	for (i=0;i<NUMTILE16;i++)
-	{
-		CA_CacheGrChunk (STARTTILE16+i);
-		src = (byte _seg *)grsegs[STARTTILE16+i];
-		VL_MemToLatch (src,16,16,destoff);
-		destoff+=64;
-		if (src)
-			UNCACHEGRCHUNK (STARTTILE16+i);
-	}
-#endif
 
 //
 // pics
 //
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	for (i=LATCHPICS_LUMP_START;i<=LATCHPICS_LUMP_END;i++)
-#else
-	start = LATCHPICS_LUMP_START;
-	end = LATCHPICS_LUMP_END;
-
-	for (i=start;i<=end;i++)
-#endif
 	{
-		// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		latchpics[2+i-LATCHPICS_LUMP_START] = destoff;
-#else
-		latchpics[2+i-start] = destoff;
-#endif
 		CA_CacheGrChunk (i);
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;

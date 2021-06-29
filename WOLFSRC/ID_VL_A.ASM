@@ -3,13 +3,9 @@
 	IDEAL
 	MODEL	MEDIUM,C
 
-	; *** PRE-V1.4 APOGEE RESTORATION ***
-	INCLUDE 'VERSION.EQU'
-
 	INCLUDE	'ID_VL.EQU'
 
 SCREENSEG	=	0a000h
-KEEPUNUSED	=	0
 
 	DATASEG
 
@@ -22,10 +18,6 @@ starttime	dw	?
 
 ;===========================================================================
 
-; *** PRE-V1.4 APOGEE RESTORATION ***
-; Older implementation of VL_WaitVBL
-
-IFDEF GAMEVER_RESTORATION_ANY_APO_PRE14
 
 ;==============
 ;
@@ -124,103 +116,6 @@ PUBLIC	VL_WaitVBL
 	ret
 
 ENDP
-
-ELSE ;GAMEVER_RESTORATION_ANY_APO_PRE14
-
-;==============
-;
-; VL_WaitVBL			******** NEW *********
-;
-; Wait for the vertical retrace (returns before the actual vertical sync)
-;
-;==============
-
-PROC	VL_WaitVBL  num:WORD
-PUBLIC	VL_WaitVBL
-@@wait:
-
-	mov	dx,STATUS_REGISTER_1
-
-	mov	cx,[num]
-;
-; wait for a display signal to make sure the raster isn't in the middle
-; of a sync
-;
-@@waitnosync:
-	in	al,dx
-	test	al,8
-	jnz	@@waitnosync
-
-
-@@waitsync:
-	in	al,dx
-	test	al,8
-	jz	@@waitsync
-
-	loop	@@waitnosync
-
-	ret
-
-ENDP
-
-ENDIF ;GAMEVER_RESTORATION_ANY_APO_PRE14
-
-;===========================================================================
-
-;==============
-;
-; VL_SetCRTC
-;
-;==============
-
-IF KEEPUNUSED
-
-PROC	VL_SetCRTC  crtc:WORD
-PUBLIC	VL_SetCRTC
-
-;
-; wait for a display signal to make sure the raster isn't in the middle
-; of a sync
-;
-	cli
-
-	mov	dx,STATUS_REGISTER_1
-
-@@waitdisplay:
-	in	al,dx
-	test	al,1	;1 = display is disabled (HBL / VBL)
-	jnz	@@waitdisplay
-
-
-;
-; set CRTC start
-;
-; for some reason, my XT's EGA card doesn't like word outs to the CRTC
-; index...
-;
-	mov	cx,[crtc]
-	mov	dx,CRTC_INDEX
-	mov	al,0ch		;start address high register
-	out	dx,al
-	inc	dx
-	mov	al,ch
-	out	dx,al
-	dec	dx
-	mov	al,0dh		;start address low register
-	out	dx,al
-	mov	al,cl
-	inc	dx
-	out	dx,al
-
-
-	sti
-
-	ret
-
-ENDP
-
-ENDIF
-
 
 ;===========================================================================
 

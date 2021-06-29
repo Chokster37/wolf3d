@@ -8,12 +8,6 @@
 #ifndef	__ID_SD__
 #define	__ID_SD__
 
-// *** PRE-V1.4 APOGEE RESTORATION ***
-// With no declaration, so the compiler assumes args are passed as 16-bit ints
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-void	alOut(byte n,byte b);
-#endif
-
 #ifdef	__DEBUG__
 #define	__DEBUG_SoundMgr__
 #endif
@@ -156,20 +150,11 @@ typedef	struct
 #define	sf_Melodic		0
 #define	sf_Percussive	1
 
-#if 1
 typedef	struct
 		{
 			word	length,
 					values[1];
 		} MusicGroup;
-#else
-typedef	struct
-		{
-			word	flags,
-					count,
-					offsets[1];
-		} MusicGroup;
-#endif
 
 typedef	struct
 		{
@@ -229,13 +214,6 @@ extern	void	SD_SetDigiDevice(SDSMode),
 				SD_PlayDigitized(word which,int leftpos,int rightpos),
 				SD_StopDigitized(void),
 				SD_Poll(void);
-
-#ifdef	_MUSE_	// MUSE Goes directly to the lower level routines
-extern	void	SDL_PCPlaySound(PCSound far *sound),
-				SDL_PCStopSound(void),
-				SDL_ALPlaySound(AdLibSound far *sound),
-				SDL_ALStopSound(void);
-#endif
 
 #endif
 

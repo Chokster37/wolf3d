@@ -9,17 +9,6 @@
 /*
 =============================================================================
 
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-#define VIEWTILEX	(viewwidth/16)
-#define VIEWTILEY	(viewheight/16)
-
-/*
-=============================================================================
-
 						 GLOBAL VARIABLES
 
 =============================================================================
@@ -28,21 +17,6 @@
 
 int DebugKeys (void);
 
-/*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
-#ifdef KEEP_UNUSED
-int	maporgx;
-int	maporgy;
-enum {mapview,tilemapview,actoratview,visview}	viewtype;
-
-void ViewMap (void);
-#endif
 
 //===========================================================================
 
@@ -164,30 +138,17 @@ void PicturePause (void)
 //
 
 	ClearMemory ();
-	// *** APOGEE+FORMGEN VERSIONS RESTORATION ***
-#ifdef GOODTIMES
-	CA_SetAllPurge();
-#endif
 	MM_GetPtr (&buffer,64000);
 	for (p=0;p<4;p++)
 	{
 	   src = MK_FP(0xa000,displayofs);
 	   dest = (byte far *)buffer+p;
 	   VGAREADMAP(p);
-	   // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 	   for (x=0;x<12800;x++,dest+=4)
-#else
-	   for (x=0;x<16000;x++,dest+=4)
-#endif
 		   *dest = *src++;
 	}
 
 
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-	// Re-enable code for pre-v1.4 Apogee releases
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
-//#if 0
 	for (p=0;p<4;p++)
 	{
 		src = MK_FP(0xa000,0);
@@ -196,7 +157,6 @@ void PicturePause (void)
 		for (x=0;x<3200;x++,dest+=4)
 			*dest = *src++;
 	}
-#endif
 
 	asm	mov	ax,0x13
 	asm	int	0x10
@@ -237,11 +197,6 @@ static	char	buf[10];
 	boolean			done;
 	ScanCode		scan;
 	int				i,j,k,x;
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-	// Define sound variable in pre-v1.4 Apogee releases
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
-	int sound;
-#endif
 	longword		l;
 	memptr			addr;
 	PageListStruct	far *page;
@@ -251,13 +206,6 @@ static	char	buf[10];
 	for (i = 0,done = false;!done;)
 	{
 		US_ClearWindow();
-		// *** PRE-V1.4 APOGEE RESTORATION ***
-		// Do set sound in pre-v1.4 Apogee releases
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
-		sound = -1;
-#else
-//		sound = -1;
-#endif
 
 		page = &PMPages[i];
 		US_Print(" Page #");
@@ -352,13 +300,6 @@ static	char	buf[10];
 				}
 				if (j < NumDigi)
 				{
-					// *** PRE-V1.4 APOGEE RESTORATION ***
-					// Do set sound in pre-v1.4 Apogee releases
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
-					sound = j;
-#else
-//					sound = j;
-#endif
 					US_Print("\n Sound #");
 					US_PrintUnsigned(j);
 					US_Print("\n Segment #");
@@ -415,8 +356,6 @@ static	char	buf[10];
 				PM_GetPage(j);
 			break;
 		case sc_P:
-//			if (sound != -1)
-//				SD_PlayDigitized(sound);
 			break;
 		case sc_Escape:
 			done = true;
@@ -475,13 +414,7 @@ int DebugKeys (void)
 		if (tedlevel)
 			Quit (NULL);
 		playstate = ex_completed;
-		// *** PRE-V1.4 APOGEE RESTORATION ***
-		// Do increment map in pre-v1.4 Apogee releases
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		gamestate.mapon++;
-#else
-//		gamestate.mapon++;
-#endif
 	}
 
 	if (Keyboard[sc_F])		// F = facing spot
@@ -520,12 +453,7 @@ int DebugKeys (void)
 		CenterWindow (12,3);
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
-		// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 		GivePoints (1000);
-#else
-		GivePoints (100000);
-#endif
 		HealSelf (99);
 		if (gamestate.bestweapon<wp_chaingun)
 			GiveWeapon (gamestate.bestweapon+1);
@@ -541,31 +469,6 @@ int DebugKeys (void)
 		DebugMemory();
 		return 1;
 	}
-	// *** SHAREWARE V1.0+1.1 APOGEE RESTORATION ***
-#if (defined SPEAR) || (defined GAMEVER_RESTORATION_WL1_APO10) || (defined GAMEVER_RESTORATION_WL1_APO11)
-//#ifdef SPEAR
-	else if (Keyboard[sc_N])			// N = no clip
-	{
-		noclip^=1;
-		CenterWindow (18,3);
-		if (noclip)
-			US_PrintCentered ("No clipping ON");
-		else
-			US_PrintCentered ("No clipping OFF");
-		VW_UpdateScreen();
-		IN_Ack ();
-		return 1;
-	}
-#endif
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-//#if 0
-	else if (Keyboard[sc_O])			// O = overhead
-	{
-		ViewMap();
-		return 1;
-	}
-#endif
 	else if (Keyboard[sc_P])			// P = pause with no screen disruptioon
 	{
 		PicturePause ();
@@ -609,26 +512,13 @@ int DebugKeys (void)
 	{
 		CenterWindow(26,3);
 		PrintY+=6;
-#ifndef SPEAR
 		US_Print("  Warp to which level(1-10):");
-#else
-		US_Print("  Warp to which level(1-21):");
-#endif
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,2,0);
 		if (!esc)
 		{
 			level = atoi (str);
-			// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 			if (level>0 && level<21)
-#else
-#ifndef SPEAR
-			if (level>0 && level<11)
-#else
-			if (level>0 && level<22)
-#endif
-#endif
 			{
 				gamestate.mapon = level-1;
 				playstate = ex_warped;
@@ -648,144 +538,5 @@ int DebugKeys (void)
 
 	return 0;
 }
-
-
-// *** PRE-V1.4 APOGEE RESTORATION ***
-// Do compile this in pre-v1.4, even if it's never called
-#if defined(GAMEVER_RESTORATION_ANY_APO_PRE14) && defined(KEEP_UNUSED)
-//#if 0
-/*
-===================
-=
-= OverheadRefresh
-=
-===================
-*/
-
-void OverheadRefresh (void)
-{
-	unsigned	x,y,endx,endy,sx,sy;
-	unsigned	tile;
-
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	if (++screenpage == 3)
-		screenpage = 0;
-	bufferofs = screenloc[screenpage]+screenofs;
-#endif
-
-	endx = maporgx+VIEWTILEX;
-	endy = maporgy+VIEWTILEY;
-
-	for (y=maporgy;y<endy;y++)
-		for (x=maporgx;x<endx;x++)
-		{
-			sx = (x-maporgx)*16;
-			sy = (y-maporgy)*16;
-
-			switch (viewtype)
-			{
-#if 0
-			case mapview:
-				tile = *(mapsegs[0]+farmapylookup[y]+x);
-				break;
-
-			case tilemapview:
-				tile = tilemap[x][y];
-				break;
-
-			case visview:
-				tile = spotvis[x][y];
-				break;
-#endif
-			case actoratview:
-				tile = (unsigned)actorat[x][y];
-				break;
-			}
-
-			if (tile<MAXWALLTILES)
-				LatchDrawTile(sx,sy,tile);
-			else
-			{
-				LatchDrawChar(sx,sy,NUMBERCHARS+((tile&0xf000)>>12));
-				LatchDrawChar(sx+8,sy,NUMBERCHARS+((tile&0x0f00)>>8));
-				LatchDrawChar(sx,sy+8,NUMBERCHARS+((tile&0x00f0)>>4));
-				LatchDrawChar(sx+8,sy+8,NUMBERCHARS+(tile&0x000f));
-			}
-		}
-
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	displayofs = bufferofs-screenofs;
-	VW_SetScreen(displayofs,0);
-#endif
-}
-#endif
-
-// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-// Do compile this in v1.0 of Wolfenstein 3D
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-//#if 0
-/*
-===================
-=
-= ViewMap
-=
-===================
-*/
-
-void ViewMap (void)
-{
-	boolean		button0held;
-
-	viewtype = actoratview;
-//	button0held = false;
-
-
-	maporgx = player->tilex - VIEWTILEX/2;
-	if (maporgx<0)
-		maporgx = 0;
-	if (maporgx>MAPSIZE-VIEWTILEX)
-		maporgx=MAPSIZE-VIEWTILEX;
-	maporgy = player->tiley - VIEWTILEY/2;
-	if (maporgy<0)
-		maporgy = 0;
-	if (maporgy>MAPSIZE-VIEWTILEY)
-		maporgy=MAPSIZE-VIEWTILEY;
-
-	do
-	{
-//
-// let user pan around
-//
-		PollControls ();
-		if (controlx < 0 && maporgx>0)
-			maporgx--;
-		if (controlx > 0 && maporgx<mapwidth-VIEWTILEX)
-			maporgx++;
-		if (controly < 0 && maporgy>0)
-			maporgy--;
-		if (controly > 0 && maporgy<mapheight-VIEWTILEY)
-			maporgy++;
-
-#if 0
-		if (c.button0 && !button0held)
-		{
-			button0held = true;
-			viewtype++;
-			if (viewtype>visview)
-				viewtype = mapview;
-		}
-		if (!c.button0)
-			button0held = false;
-#endif
-
-		OverheadRefresh ();
-
-	} while (!Keyboard[sc_Escape]);
-
-	IN_ClearKeysDown ();
-}
-#endif
 
 #endif // KEEP_DEBUG

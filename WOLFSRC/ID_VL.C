@@ -14,11 +14,7 @@
 
 unsigned	bufferofs;
 
-#ifdef KEEP_UNUSED
-unsigned	displayofs,pelpan;
-#else
 unsigned	displayofs;
-#endif
 
 unsigned	screenseg=SCREENSEG;		// set to 0xa000 for asm convenience
 
@@ -43,25 +39,6 @@ void VL_WaitVBL (int vbls);
 
 //===========================================================================
 
-
-/*
-=======================
-=
-= VL_Startup
-=
-=======================
-*/
-
-#if 0
-void	VL_Startup (void)
-{
-	if ( !MS_CheckParm ("HIDDENCARD") && VL_VideoID () != 5)
-		MS_Quit ("You need a VGA graphics card to run this!");
-
-	asm	cld;				// all string instructions assume forward
-}
-
-#endif
 
 /*
 =======================
@@ -122,10 +99,7 @@ void	VL_SetVGAPlaneMode (void)
 asm	mov	ax,0x13
 asm	int	0x10
 	VL_DePlaneVGA ();
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_WL1_APO10
 	VGAMAPMASK(15);
-#endif
 	VL_SetLineWidth (40);
 }
 
@@ -274,28 +248,6 @@ void VL_SetLineWidth (unsigned width)
 	}
 }
 
-/*
-====================
-=
-= VL_SetSplitScreen
-=
-====================
-*/
-
-#ifdef KEEP_UNUSED
-void VL_SetSplitScreen (int linenum)
-{
-	VL_WaitVBL (1);
-	linenum=linenum*2-1;
-	outportb (CRTC_INDEX,CRTC_LINECOMPARE);
-	outportb (CRTC_INDEX+1,linenum % 256);
-	outportb (CRTC_INDEX,CRTC_OVERFLOW);
-	outportb (CRTC_INDEX+1, 1+16*(linenum/256));
-	outportb (CRTC_INDEX,CRTC_MAXSCANLINE);
-	outportb (CRTC_INDEX+1,inportb(CRTC_INDEX+1) & (255-64));
-}
-#endif
-
 
 /*
 =============================================================================
@@ -328,46 +280,6 @@ void VL_FillPalette (int red, int green, int blue)
 		outportb (PEL_DATA,blue);
 	}
 }
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_SetColor
-=
-=================
-*/
-
-#ifdef KEEP_UNUSED
-void VL_SetColor	(int color, int red, int green, int blue)
-{
-	outportb (PEL_WRITE_ADR,color);
-	outportb (PEL_DATA,red);
-	outportb (PEL_DATA,green);
-	outportb (PEL_DATA,blue);
-}
-#endif
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_GetColor
-=
-=================
-*/
-
-#ifdef KEEP_UNUSED
-void VL_GetColor	(int color, int *red, int *green, int *blue)
-{
-	outportb (PEL_READ_ADR,color);
-	*red = inportb (PEL_DATA);
-	*green = inportb (PEL_DATA);
-	*blue = inportb (PEL_DATA);
-}
-#endif
 
 //===========================================================================
 
@@ -826,56 +738,6 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 
 //==========================================================================
 
-
-/*
-=================
-=
-= VL_MaskedToScreen
-=
-= Masks a block of main memory to the screen.
-=
-=================
-*/
-
-#ifdef KEEP_UNUSED
-void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y)
-{
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
-	byte    far *screen,far *maskptr,far *dest,mask;
-#else
-	byte    far *screen,far *dest,mask;
-	byte	far *maskptr;
-#endif
-	int		plane;
-
-	width>>=2;
-	dest = MK_FP(SCREENSEG,bufferofs+ylookup[y]+(x>>2) );
-//	mask = 1 << (x&3);
-
-	// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
-	maskptr = source;
-#else
-//	maskptr = source;
-#endif
-
-	for (plane = 0; plane<4; plane++)
-	{
-		VGAMAPMASK(mask);
-		mask <<= 1;
-		if (mask == 16)
-			mask = 1;
-
-		screen = dest;
-		for (y=0;y<height;y++,screen+=linewidth,source+=width)
-			_fmemcpy (screen,source,width);
-	}
-}
-#endif
-
-//==========================================================================
-
 /*
 =================
 =
@@ -918,196 +780,3 @@ asm	mov	ds,ax
 
 	VGAWRITEMODE(0);
 }
-
-
-//===========================================================================
-
-#if 0
-
-/*
-=================
-=
-= VL_ScreenToScreen
-=
-=================
-*/
-
-void VL_ScreenToScreen (unsigned source, unsigned dest,int width, int height)
-{
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-asm	mov	si,[source]
-asm	mov	di,[dest]
-asm	mov	ax,[width]
-asm	mov	bx,[linewidth]
-asm	sub	bx,ax
-asm	mov	dx,[height]
-asm	mov	cx,SCREENSEG
-asm	mov	ds,cx
-asm	mov	es,cx
-
-drawline:
-asm	mov	cx,ax
-asm	rep movsb
-asm	add	si,bx
-asm	add	di,bx
-asm	dec	dx
-asm	jnz	drawline
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-	VGAWRITEMODE(0);
-}
-
-
-#endif
-
-/*
-=============================================================================
-
-						STRING OUTPUT ROUTINES
-
-=============================================================================
-*/
-
-
-
-
-/*
-===================
-=
-= VL_DrawTile8String
-=
-===================
-*/
-
-#ifdef KEEP_UNUSED
-
-void VL_DrawTile8String (char *str, char far *tile8ptr, int printx, int printy)
-{
-	int		i;
-	unsigned	far *dest,far *screen,far *src;
-
-	dest = MK_FP(SCREENSEG,bufferofs+ylookup[printy]+(printx>>2));
-
-	while (*str)
-	{
-		src = (unsigned far *)(tile8ptr + (*str<<6));
-		// each character is 64 bytes
-
-		VGAMAPMASK(1);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-		VGAMAPMASK(2);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-		VGAMAPMASK(4);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-		VGAMAPMASK(8);
-		screen = dest;
-		for (i=0;i<8;i++,screen+=linewidth)
-			*screen = *src++;
-
-		str++;
-		printx += 8;
-		dest+=2;
-	}
-}
-
-
-
-/*
-===================
-=
-= VL_DrawLatch8String
-=
-===================
-*/
-
-void VL_DrawLatch8String (char *str, unsigned tile8ptr, int printx, int printy)
-{
-	int		i;
-	unsigned	src,dest;
-
-	dest = bufferofs+ylookup[printy]+(printx>>2);
-
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-	while (*str)
-	{
-		src = tile8ptr + (*str<<4);		// each character is 16 latch bytes
-
-asm	mov	si,[src]
-asm	mov	di,[dest]
-asm	mov	dx,[linewidth]
-
-asm	mov	ax,SCREENSEG
-asm	mov	ds,ax
-
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-asm	lodsw
-asm	mov	[di],ax
-asm	add	di,dx
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-		str++;
-		printx += 8;
-		dest+=2;
-	}
-
-	VGAWRITEMODE(0);
-}
-
-
-/*
-===================
-=
-= VL_SizeTile8String
-=
-===================
-*/
-
-void VL_SizeTile8String (char *str, int *width, int *height)
-{
-	*height = 8;
-	*width = 8*strlen(str);
-}
-
-#endif
-
-
-
-
-
-
-
-

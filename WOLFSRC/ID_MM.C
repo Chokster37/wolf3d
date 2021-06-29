@@ -54,9 +54,6 @@ typedef struct mmblockstruct
 } mmblocktype;
 
 
-//#define GETNEWBLOCK {if(!(mmnew=mmfree))Quit("MM_GETNEWBLOCK: No free blocks!")\
-//	;mmfree=mmfree->next;}
-
 #define GETNEWBLOCK {if(!mmfree)MML_ClearBlock();mmnew=mmfree;mmfree=mmfree->next;}
 
 #define FREEBLOCK(x) {*x->useptr=NULL;x->next=mmfree;mmfree=x;}
@@ -94,14 +91,6 @@ mmblocktype	far mmblocks[MAXBLOCKS]
 
 boolean		bombonerror;
 
-//unsigned	totalEMSpages,freeEMSpages,EMSpageframe,EMSpagesmapped,EMShandle;
-
-#ifdef KEEP_UNUSED
-void		(* XMSaddr) (void);		// far pointer to XMS driver
-
-unsigned	numUMBs,UMBbase[MAXUMBS];
-#endif
-
 //==========================================================================
 
 //
@@ -115,116 +104,6 @@ boolean 	MML_CheckForXMS (void);
 void 		MML_ShutdownXMS (void);
 void		MML_UseSpace (unsigned segstart, unsigned seglength);
 void 		MML_ClearBlock (void);
-
-//==========================================================================
-
-/*
-======================
-=
-= MML_CheckForXMS
-=
-= Check for XMM driver
-=
-=======================
-*/
-
-#ifdef KEEP_UNUSED
-
-boolean MML_CheckForXMS (void)
-{
-	numUMBs = 0;
-
-asm {
-	mov	ax,0x4300
-	int	0x2f				// query status of installed diver
-	cmp	al,0x80
-	je	good
-	}
-
-	return false;
-good:
-	return true;
-}
-
-
-/*
-======================
-=
-= MML_SetupXMS
-=
-= Try to allocate all upper memory block
-=
-=======================
-*/
-
-void MML_SetupXMS (void)
-{
-	unsigned	base,size;
-
-asm	{
-	mov	ax,0x4310
-	int	0x2f
-	mov	[WORD PTR XMSaddr],bx
-	mov	[WORD PTR XMSaddr+2],es		// function pointer to XMS driver
-	}
-
-getmemory:
-asm	{
-	mov	ah,XMS_ALLOCUMB
-	mov	dx,0xffff					// try for largest block possible
-	call	[DWORD PTR XMSaddr]
-	or	ax,ax
-	jnz	gotone
-
-	cmp	bl,0xb0						// error: smaller UMB is available
-	jne	done;
-
-	mov	ah,XMS_ALLOCUMB
-	call	[DWORD PTR XMSaddr]		// DX holds largest available UMB
-	or	ax,ax
-	jz	done						// another error...
-	}
-
-gotone:
-asm	{
-	mov	[base],bx
-	mov	[size],dx
-	}
-	MML_UseSpace (base,size);
-	mminfo.XMSmem += size*16;
-	UMBbase[numUMBs] = base;
-	numUMBs++;
-	if (numUMBs < MAXUMBS)
-		goto getmemory;
-
-done:;
-}
-
-
-/*
-======================
-=
-= MML_ShutdownXMS
-=
-======================
-*/
-
-void MML_ShutdownXMS (void)
-{
-	int	i;
-	unsigned	base;
-
-	for (i=0;i<numUMBs;i++)
-	{
-		base = UMBbase[i];
-
-asm	mov	ah,XMS_FREEUMB
-asm	mov	dx,[base]
-asm	call	[DWORD PTR XMSaddr]
-	}
-}
-
-#endif
 
 //==========================================================================
 
@@ -526,29 +405,7 @@ tryagain:
 	{
 
 extern char configname[];
-// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-extern	boolean	insetupscaling;
-extern	int	viewsize;
-boolean SetViewSize (unsigned width, unsigned height);
-#define HEIGHTRATIO		0.50
-//
-// wolf hack -- size the view down
-//
-		if (!insetupscaling && viewsize>10)
-		{
-mmblocktype	far *savedmmnew;
-			savedmmnew = mmnew;
-			viewsize -= 2;
-			SetViewSize (viewsize*16,viewsize*16*HEIGHTRATIO);
-			mmnew = savedmmnew;
-			goto tryagain;
-		}
-
-//		unlink(configname);
-#else
 		unlink(configname);
-#endif // GAMEVER_RESTORATION_ANY_APO_PRE14
 		Quit ("MM_GetPtr: Out of memory!");
 	}
 	else
@@ -769,132 +626,6 @@ void MM_SortMem (void)
 		MM_SetLock(&(memptr)audiosegs[playing],false);
 }
 
-
-//==========================================================================
-
-/*
-=====================
-=
-= MM_ShowMemory
-=
-=====================
-*/
-
-#ifdef KEEP_UNUSED
-
-void MM_ShowMemory (void)
-{
-	mmblocktype far *scan;
-	unsigned color,temp,x,y;
-	long	end,owner;
-	char    scratch[80],str[10];
-
-	temp = bufferofs;
-	bufferofs = displayofs;
-	scan = mmhead;
-
-	end = -1;
-
-	while (scan)
-	{
-		if (scan->attributes & PURGEBITS)
-			color = 5;		// dark purple = purgable
-		else
-			color = 9;		// medium blue = non purgable
-		if (scan->attributes & LOCKBIT)
-			color = 12;		// red = locked
-		if (scan->start<=end)
-			Quit ("MM_ShowMemory: Memory block order currupted!");
-		end = scan->length-1;
-		y = scan->start/320;
-		x = scan->start%320;
-		VW_Hlin(x,x+end,y,color);
-		VW_Plot(x,y,15);
-		if (scan->next && scan->next->start > end+1)
-			VW_Hlin(x+end+1,x+(scan->next->start-scan->start),y,0);	// black = free
-
-		scan = scan->next;
-	}
-
-	VW_FadeIn ();
-	IN_Ack();
-
-	bufferofs = temp;
-}
-
-#endif
-
-// *** SHAREWARE V1.0 APOGEE RESTORATION *** (but looks unused in ALL versions)
-#ifndef GAMEVER_RESTORATION_WL1_APO10
-//==========================================================================
-
-/*
-=====================
-=
-= MM_DumpData
-=
-=====================
-*/
-
-#ifdef KEEP_UNUSED
-
-void MM_DumpData (void)
-{
-	mmblocktype far *scan,far *best;
-	long	lowest,oldlowest;
-	unsigned	owner;
-	char	lock,purge;
-	FILE	*dumpfile;
-
-
-	free (nearheap);
-	dumpfile = fopen ("MMDUMP.TXT","w");
-	if (!dumpfile)
-		Quit ("MM_DumpData: Couldn't open MMDUMP.TXT!");
-
-	lowest = -1;
-	do
-	{
-		oldlowest = lowest;
-		lowest = 0xffff;
-
-		scan = mmhead;
-		while (scan)
-		{
-			owner = (unsigned)scan->useptr;
-
-			if (owner && owner<lowest && owner > oldlowest)
-			{
-				best = scan;
-				lowest = owner;
-			}
-
-			scan = scan->next;
-		}
-
-		if (lowest != 0xffff)
-		{
-			if (best->attributes & PURGEBITS)
-				purge = 'P';
-			else
-				purge = '-';
-			if (best->attributes & LOCKBIT)
-				lock = 'L';
-			else
-				lock = '-';
-			fprintf (dumpfile,"0x%p (%c%c) = %u\n"
-			,(unsigned)lowest,lock,purge,best->length);
-		}
-
-	} while (lowest != 0xffff);
-
-	fclose (dumpfile);
-	Quit ("MMDUMP.TXT created.");
-}
-
-#endif
-
-#endif // GAMEVER_RESTORATION_WL1_APO10
 
 //==========================================================================
 

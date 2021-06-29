@@ -114,8 +114,6 @@ void	VW_MeasurePropString (char far *string, word *width, word *height);
 #define EGAMAPMASK(x)	VGAMAPMASK(x)
 #define EGAWRITEMODE(x)	VGAWRITEMODE(x)
 
-//#define VW_MemToScreen	VL_MemToLatch
-
 #define MS_Quit			Quit
 
 
@@ -128,15 +126,7 @@ boolean 	FizzleFade (unsigned source, unsigned dest,
 	unsigned width,unsigned height, unsigned frames,boolean abortable);
 
 
-#ifdef KEEP_UNUSED
-#define NUMLATCHPICS	100
-#else
-	#ifdef SPEAR
-	#define NUMLATCHPICS	51
-	#else
-	#define NUMLATCHPICS	46
-	#endif
-#endif
+#define NUMLATCHPICS	46
 
 extern	unsigned	latchpics[NUMLATCHPICS];
 extern	unsigned freelatch;

@@ -44,36 +44,17 @@
 //	Internal variables
 #define	ConfigVersion	1
 
-#ifdef KEEP_UNUSED
-static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"},
-					*ParmStrings2[] = {"COMP","NOCOMP"};
-#else
 #ifdef KEEP_DEBUG
 static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"};
 #endif
-#endif
 static	boolean		US_Started;
-
-	#ifdef KEEP_UNUSED
-		boolean		Button0,Button1,
-					CursorBad;
-		int			CursorX,CursorY;
-	#endif
 
 		void		(*USL_MeasureString)(char far *,word *,word *) = VW_MeasurePropString,
 					(*USL_DrawString)(char far *) = VWB_DrawPropString;
 
-	#ifdef KEEP_UNUSED
-		SaveGame	Games[MaxSaveGames];
-	#endif
 		HighScore	Scores[MaxScores] =
 					{
-						// *** PRE-V1.4 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_ANY_APO_PRE14
 						{"Id Software - '92",10000,1},
-#else
-						{"id software-'92",10000,1},
-#endif
 						{"Adrian Carmack",10000,1},
 						{"John Carmack",10000,1},
 						{"Kevin Cloud",10000,1},
@@ -200,21 +181,6 @@ US_Startup(void)
 
 	US_InitRndT(true);		// Initialize the random number generator
 
-#ifdef KEEP_UNUSED
-	for (i = 1;i < _argc;i++)
-	{
-		switch (US_CheckParm(_argv[i],ParmStrings2))
-		{
-		case 0:
-			compatability = true;
-			break;
-		case 1:
-			compatability = false;
-			break;
-		}
-	}
-#endif
-
 #ifdef KEEP_DEBUG
 	// Check for TED launching here
 	for (i = 1;i < _argc;i++)
@@ -224,10 +190,6 @@ US_Startup(void)
 		{
 		 case 0:
 		   tedlevelnum = atoi(_argv[i + 1]);
-		   // *** PRE-V1.4 APOGEE RESTORATION ***
-#ifndef GAMEVER_RESTORATION_ANY_APO_PRE14
-		   if (tedlevelnum >= 0)
-#endif
 		     tedlevel = true;
 		   break;
 
@@ -294,22 +256,6 @@ US_CheckParm(char *parm,char **strings)
 
 //	Window/Printing routines
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_SetPrintRoutines() - Sets the routines used to measure and print
-//		from within the User Mgr. Primarily provided to allow switching
-//		between masked and non-masked fonts
-//
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef KEEP_UNUSED
-void
-US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char far *))
-{
-	USL_MeasureString = measure;
-	USL_DrawString = print;
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -318,9 +264,9 @@ US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_Print(char GAMEVER_RESTORATION_CONDFARPTR *s)
+US_Print(char far *s)
 {
-	char	c,GAMEVER_RESTORATION_CONDFARPTR *se;
+	char	c,far *se;
 	word	w,h;
 
 	while (*s)
@@ -362,21 +308,6 @@ US_PrintUnsigned(longword n)
 	US_Print(ultoa(n,buffer,10));
 }
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_PrintSigned() - Prints a signed long
-//
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef KEEP_UNUSED
-void
-US_PrintSigned(long n)
-{
-	char	buffer[32];
-
-	US_Print(ltoa(n,buffer,10));
-}
-#endif
 
 #ifdef KEEP_DEBUG
 ///////////////////////////////////////////////////////////////////////////
@@ -385,7 +316,7 @@ US_PrintSigned(long n)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-USL_PrintInCenter(char GAMEVER_RESTORATION_CONDFARPTR *s,Rect r)
+USL_PrintInCenter(char far *s,Rect r)
 {
 	word	w,h,
 			rw,rh;
@@ -405,7 +336,7 @@ USL_PrintInCenter(char GAMEVER_RESTORATION_CONDFARPTR *s,Rect r)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_PrintCentered(char GAMEVER_RESTORATION_CONDFARPTR *s)
+US_PrintCentered(char far *s)
 {
 	Rect	r;
 
@@ -425,7 +356,7 @@ US_PrintCentered(char GAMEVER_RESTORATION_CONDFARPTR *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrintLine(char GAMEVER_RESTORATION_CONDFARPTR *s)
+US_CPrintLine(char far *s)
 {
 	word	w,h;
 
@@ -446,9 +377,9 @@ US_CPrintLine(char GAMEVER_RESTORATION_CONDFARPTR *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrint(char GAMEVER_RESTORATION_CONDFARPTR *s)
+US_CPrint(char far *s)
 {
-	char	c,GAMEVER_RESTORATION_CONDFARPTR *se;
+	char	c,far *se;
 
 	while (*s)
 	{

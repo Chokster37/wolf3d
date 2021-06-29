@@ -16,11 +16,7 @@
 //	EMS specific variables
 	boolean			EMSPresent;
 	word			EMSAvail,EMSPagesAvail,EMSHandle,
-#ifdef KEEP_UNUSED
-					EMSPageFrame,EMSPhysicalPage;
-#else
 					EMSPageFrame;
-#endif
 	EMSListStruct	EMSList[EMSFrameCount];
 
 //	XMS specific variables
@@ -216,13 +212,7 @@ asm	mov	[WORD PTR XMSDriver+2],es		// function pointer to XMS driver
 
 	XMS_CALL(XMS_QUERYFREE);			// Find out how much XMS is available
 	XMSAvail = _AX;
-	// *** PRE-V1.4 APOGEE + SOD (DEMO) V1.0 RESTORATION ***
-	// What preceded bugfix?
-#ifdef GAMEVER_RESTORATION_ANY_ALL_PRE14
 	if (_BL)
-#else
-	if (!_AX)				// AJR: bugfix 10/8/92
-#endif
 		goto error;
 
 	XMSAvail &= ~(PMPageSizeKB - 1);	// Round off to nearest page size
@@ -233,13 +223,7 @@ asm	mov	[WORD PTR XMSDriver+2],es		// function pointer to XMS driver
 	XMS_CALL(XMS_ALLOC);				// And do the allocation
 	XMSHandle = _DX;
 
-	// *** PRE-V1.4 APOGEE + SOD (DEMO) V1.0 RESTORATION ***
-	// What preceded bugfix?
-#ifdef GAMEVER_RESTORATION_ANY_ALL_PRE14
 	if (_BL)
-#else
-	if (!_AX)				// AJR: bugfix 10/8/92
-#endif
 	{
 		XMSAvail = 0;
 		goto error;
@@ -288,30 +272,8 @@ asm	pop	si
 		Quit("PML_XMSCopy: Error on copy");
 }
 
-#if 1
 #define	PML_CopyToXMS(s,t,l)	PML_XMSCopy(true,(s),(t),(l))
 #define	PML_CopyFromXMS(t,s,l)	PML_XMSCopy(false,(t),(s),(l))
-#else
-//
-//	PML_CopyToXMS() - Copies the specified number of bytes from the real mode
-//		segment address to the specified XMS page
-//
-void
-PML_CopyToXMS(byte far *source,int targetpage,word length)
-{
-	PML_XMSCopy(true,source,targetpage,length);
-}
-
-//
-//	PML_CopyFromXMS() - Copies the specified number of bytes from an XMS
-//		page to the specified real mode address
-//
-void
-PML_CopyFromXMS(byte far *target,int sourcepage,word length)
-{
-	PML_XMSCopy(false,target,sourcepage,length);
-}
-#endif
 
 //
 //	PML_ShutdownXMS()
@@ -572,7 +534,6 @@ PML_ClosePageFile(void)
 //  		to map our page in. If normal page, use EMS physical page 3, else
 //  		use the physical page specified by the lock type
 //
-#if 1
 #pragma argsused	// DEBUG - remove lock parameter
 memptr
 PML_GetEMSAddress(int page,PMLockType lock)
@@ -619,20 +580,6 @@ PML_GetEMSAddress(int page,PMLockType lock)
 	offset += emsoff * PMPageSizeSeg;
 	return((memptr)(EMSPageFrame + offset));
 }
-#else
-memptr
-PML_GetEMSAddress(int page,PMLockType lock)
-{
-	word	emspage;
-
-	emspage = (lock < pml_EMSLock)? 3 : (lock - pml_EMSLock);
-
-	PML_MapEMS(page / PMEMSSubPage,emspage);
-
-	return((memptr)(EMSPageFrame + (emspage * EMSPageSizeSeg)
-			+ ((page & (PMEMSSubPage - 1)) * PMPageSizeSeg)));
-}
-#endif
 
 //
 //	PM_GetPageAddress() - Returns the address of a given page
@@ -897,26 +844,12 @@ PM_GetPage(int pagenum)
 	if (pagenum >= ChunksInFile)
 		Quit("PM_GetPage: Invalid page request");
 
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,10	// bright green
-asm	out	dx,al
-#endif
-
 	if (!(result = PM_GetPageAddress(pagenum)))
 	{
 		boolean mainonly = (pagenum >= PMSoundStart);
 if (!PMPages[pagenum].offset)	// JDC: sparse page
-	// *** SHAREWARE V1.0 APOGEE RESTORATION ***
-#ifdef GAMEVER_RESTORATION_WL1_APO10
-	return 0;
-#else
 	Quit ("Tried to load a sparse page!");
-#endif
+
 		if (!(result = PML_GetPageFromXMS(pagenum,mainonly)))
 		{
 			if (PMPages[pagenum].lastHit == PMFrameCount)
@@ -927,18 +860,6 @@ if (!PMPages[pagenum].offset)	// JDC: sparse page
 		}
 	}
 	PMPages[pagenum].lastHit = PMFrameCount;
-
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,3	// blue
-asm	out	dx,al
-asm	mov	al,0x20	// normal
-asm	out	dx,al
-#endif
 
 	return(result);
 }
@@ -1103,18 +1024,6 @@ PM_NextFrame(void)
 		PMFrameCount = 0;
 	}
 
-#if 0
-	for (i = 0;i < PMSoundStart;i++)
-	{
-		if (PMPages[i].locked)
-		{
-			char buf[40];
-			sprintf(buf,"PM_NextFrame: Page %d is locked",i);
-			Quit(buf);
-		}
-	}
-#endif
-
 	if (PMPanicMode)
 	{
 		// DEBUG - set border color
@@ -1140,9 +1049,6 @@ PM_Reset(void)
 	XMSPagesAvail = XMSAvail / PMPageSizeKB;
 
 	EMSPagesAvail = EMSAvail * (EMSPageSizeKB / PMPageSizeKB);
-#ifdef KEEP_UNUSED
-	EMSPhysicalPage = 0;
-#endif
 
 	MainPagesUsed = EMSPagesUsed = XMSPagesUsed = 0;
 

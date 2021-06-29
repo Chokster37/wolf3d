@@ -32,9 +32,6 @@ DATASEG
 	EXTRN	pcSound:DWORD
 	EXTRN	pcLengthLeft:WORD
 	EXTRN	pcLastSample:BYTE
-IF PTABLE
-	EXTRN	pcSoundLookup:WORD
-ENDIF
 
 	EXTRN	alSound:DWORD
 	EXTRN	alBlock:WORD
@@ -64,24 +61,6 @@ ENDIF
 count_time	dw	?
 count_fx	dw	?
 
-IF PTABLE
-pcdtab	db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b,00b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-		db	10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b,10b
-ENDIF
 
 
 ;============================================================================
@@ -107,17 +86,6 @@ extreme		dw	?
 ;	Macro used for common prefix code
 ;
 	MACRO	COMMONSTART
-	IF DEBUG
-	push dx
-	push ax
-	mov	dx,STATUS_REGISTER_1
-	in	al,dx
-	mov	dx,ATR_INDEX
-	mov	al,ATR_OVERSCAN
-	out	dx,al
-	mov	al,4	; red
-	out	dx,al
-	ENDIF
 
 	push ds
 	push ax
@@ -145,12 +113,8 @@ extreme		dw	?
 	or	bl,bl
 	jz	@@pcoff						; If 0, turn sounds off
 	xor	bh,bh
-IF PTABLE
-	shl	bx,1
-	mov	bx,[pcSoundLookup+bx]		; Use byte as index into frequency table
-ELSE
 	imul	bx,60		; Ripper
-ENDIF
+
 	mov	al,0b6h						; Write to channel 2 (speaker) timer
 	out	pcTAccess,al
 	mov	al,bl
@@ -253,20 +217,6 @@ ENDIF
 	pop	ax
 	pop	ds
 
-	IF DEBUG
-	mov	dx,STATUS_REGISTER_1
-	in	al,dx
-	mov	dx,ATR_INDEX
-	mov	al,ATR_OVERSCAN
-	out	dx,al
-	mov	al,3	; blue
-	out	dx,al
-	mov	al,20h	; normal
-	out	dx,al
-	pop	ax
-	pop	dx
-	ENDIF
-
 	iret
 	ENDM
 
@@ -308,23 +258,12 @@ ENDIF
 	mov	bl,[es:di]					; Get the byte
 	inc	[WORD PTR pcSound]			; Increment pointer
 
-IF PTABLE
-	and	bl,11100000b				; Nuke some of the precision (DEBUG - do this in the table)
-
-	xor	bh,bh
-	mov	ah,[pcdtab+bx]				; Translate the byte
-
-	in	al,pcSpeaker
-	and	al,11111100b
-	or	al,ah
-ELSE
 	shr	bl,6		; Ripper
 	and	bl,2
 
 	in	al,pcSpeaker
 	and	al,11111100b
 	or	al,bl
-ENDIF
 	out	pcSpeaker,al
 
 	dec	[pcLengthLeft]
@@ -502,18 +441,6 @@ ENDIF
 ;
 	PROC	SDL_t0SlowAsmService
 	PUBLIC	SDL_t0SlowAsmService
-
-	IF DEBUG
-	push dx
-	push ax
-	mov	dx,STATUS_REGISTER_1
-	in	al,dx
-	mov	dx,ATR_INDEX
-	mov	al,ATR_OVERSCAN
-	out	dx,al
-	mov	al,4	; red
-	out	dx,al
-	ENDIF
 
 	push ds
 	push ax
